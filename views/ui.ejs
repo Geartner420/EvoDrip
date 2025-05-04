@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌱 Bewässerungssystem – Einstellungen</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    h2 {
+      color: #4CAF50;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    form {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 1100px;
+      margin: auto;
+      border: 1px solid #ddd;
+    }
+
+    .form-container.longfield {
+      grid-column: span 3;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="password"] {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .timer-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .timer-row input[type="number"] {
+      width: 80px;
+      text-align: right;
+    }
+
+    .button-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      background: #f4f4f9;
+      padding: 10px;
+    }
+
+    button {
+      background: #4CAF50;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    /* --- Media Queries für mobile Geräte --- */
+    @media (max-width: 900px) {
+      .form-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .form-container {
+        grid-template-columns: 1fr;
+      }
+
+      .field-group {
+        margin-bottom: 15px;
+      }
+
+      .timer-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .timer-row input[type="number"] {
+        width: 100%;
+        text-align: left;
+      }
+
+      .button-bar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+      }
+
+      .button-bar button {
+        width: 100%;
+        padding: 8px 16px; /* Buttons kleiner machen */
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>🌱 Bewässerungssystem – Einstellungen</h2>
+
+  <form method="POST" action="/update">
+    <div class="form-container">
+      <% felder.forEach(field => { 
+          const [id, label, type, long, customValue] = field;
+          if (type === 'timer') { %>
+            <div class="field-group longfield">
+              <label><%= label %> (h:min:s)</label>
+              <div class="timer-row">
+                <input type="number" name="SHELLY_TIMER_HOURS" value="<%= h %>" /> h
+                <input type="number" name="SHELLY_TIMER_MINUTES" value="<%= m %>" /> min
+                <input type="number" name="SHELLY_TIMER_SECONDS" value="<%= s %>" /> s
+              </div>
+            </div>
+          <% } else if (type === 'checkbox') { %>
+            <div class="field-group longfield">
+              <label for="<%= id %>"><%= label %></label>
+              <input type="checkbox" id="<%= id %>" name="<%= id %>" value="true" <%= cfg[id] === 'true' ? 'checked' : '' %> />
+            </div>
+          <% } else { 
+            let value = cfg[id] || '';
+            if (id === 'MOISTURE_SAVE_INTERVAL_MS' && value !== '') {
+              value = parseInt(value, 10) / 1000;
+            }
+          %>
+            <div class="field-group <%= long ? 'longfield' : '' %>">
+              <label for="<%= id %>"><%= label %></label>
+              <input type="<%= type %>" id="<%= id %>" name="<%= id %>" value="<%= customValue || value %>" />
+            </div>
+          <% }
+        }); 
+      %>
+    </div>
+
+    <!-- Button-Bar am Ende der Seite -->
+    <div class="button-bar">
+      <button type="submit">💾 Speichern & Neustarten</button>
+      <button type="button" onclick="location.href='/chart'">📈 Feuchte-Zeit-Diagramm</button>
+      <button type="button" onclick="location.href='/moisture-data'">💧 Feuchtigkeits-Datenbank</button>
+      <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
+      <button type="button" onclick="location.href='/status'">🩺 System-Status</button>
+      <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
+      <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits Diagramme</button>
+    </div>
+  </form>
+</body>
+</html>

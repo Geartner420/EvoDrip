@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TP357S Sensor Dashboard</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #4CAF50;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      background: #eee;
+      font-size: 16px;
+      border-radius: 6px;
+    }
+    .tab.active {
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+    }
+    .tab-wrapper {
+      display: flex;
+      align-items: center;
+    }
+    .name-input {
+      padding: 5px;
+      font-size: 14px;
+      width: 160px;
+    }
+    .edit-btn, .save-btn {
+      margin-left: 10px;
+      padding: 5px 10px;
+      background-color: #FF9800;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .save-btn {
+      background-color: #4CAF50;
+    }
+    .save-btn:hover, .edit-btn:hover {
+      opacity: 0.9;
+    }
+    #chartsContainer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .chart-container {
+      width: 46%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fff;
+    }
+    @media (max-width: 768px) {
+      .chart-container {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🌡️ TP357S Sensor Dashboard</h1>
+  <div class="tabs" id="tabsContainer"></div>
+  <div class="update-time" id="updateTime"></div>
+  <div id="chartsContainer"></div>
+</div>
+
+<script>
+  let sensorData = {};
+  let selectedSensorId = "";
+  const sensorNames = {};  // Wird durch API geladen
+
+  const tabsContainer = document.getElementById('tabsContainer');
+  const chartsContainer = document.getElementById('chartsContainer');
+  const updateTime = document.getElementById('updateTime');
+
+  function fetchSensorNames() {
+    fetch('/api/sensor-names')
+      .then(res => res.json())
+      .then(names => {
+        Object.assign(sensorNames, names);
+        createEditableTabs(Object.keys(sensorData));
+      })
+      .catch(err => console.error('Fehler beim Abrufen der Namen:', err));
+  }
+
+  function fetchSensorData() {
+    fetch('/api/sensordata')
+      .then(res => res.json())
+      .then(data => {
+        sensorData = data;
+        const ids = Object.keys(data);
+        if (!selectedSensorId || !sensorData[selectedSensorId]) {
+          selectedSensorId = ids[0];
+        }
+        createEditableTabs(ids);
+        highlightActiveTab();
+        drawCharts(sensorData[selectedSensorId], selectedSensorId);
+        updateTime.textContent = `Letzte Aktualisierung: ${new Date().toLocaleTimeString()}`;
+      })
+      .catch(err => console.error('Fehler beim Laden:', err));
+  }
+
+  function createEditableTabs(sensorIds) {
+    tabsContainer.innerHTML = '';
+    sensorIds.forEach(id => {
+      if (sensorData[id] && sensorData[id].length > 0) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'tab-wrapper';
+
+        const nameSpan = document.createElement('button');
+        nameSpan.className = 'tab';
+        nameSpan.textContent = sensorNames[id] || `Sensor ${id}`;
+        nameSpan.dataset.sensorId = id;
+        if (id === selectedSensorId) nameSpan.classList.add('active');
+        nameSpan.addEventListener('click', () => {
+          selectedSensorId = id;
+          highlightActiveTab();
+          drawCharts(sensorData[id], id);
+        });
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'edit-btn';
+        editBtn.textContent = 'Bearbeiten';
+        editBtn.addEventListener('click', () => {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = sensorNames[id] || `Sensor ${id}`;
+          input.className = 'name-input';
+
+          const saveBtn = document.createElement('button');
+          saveBtn.className = 'save-btn';
+          saveBtn.textContent = 'Speichern';
+
+          saveBtn.addEventListener('click', () => {
+            saveSensorName(id, input.value);
+          });
+
+          wrapper.innerHTML = ''; // Clear and replace
+          wrapper.appendChild(input);
+          wrapper.appendChild(saveBtn);
+        });
+
+        wrapper.appendChild(nameSpan);
+        wrapper.appendChild(editBtn);
+        tabsContainer.appendChild(wrapper);
+      }
+    });
+  }
+
+  function highlightActiveTab() {
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.sensorId === selectedSensorId);
+    });
+  }
+
+  function saveSensorName(id, newName) {
+    fetch('/api/sensor-names', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, name: newName })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          sensorNames[id] = newName;
+          createEditableTabs(Object.keys(sensorData));
+          drawCharts(sensorData[selectedSensorId], selectedSensorId);
+        } else {
+          alert('Fehler beim Speichern.');
+        }
+      })
+      .catch(err => {
+        console.error('Speicherfehler:', err);
+        alert('Speichern fehlgeschlagen.');
+      });
+  }
+
+  function drawCharts(entries, sensorId) {
+    if (!entries || entries.length === 0) {
+      chartsContainer.innerHTML = `<p>Keine Daten für ${sensorNames[sensorId] || `Sensor ${sensorId}`} verfügbar.</p>`;
+      return;
+    }
+
+    const timestamps = entries.map(d => new Date(d.timestamp));
+    const temps = entries.map(d => d.temperature);
+    const hums = entries.map(d => d.humidity);
+
+    chartsContainer.innerHTML = `
+      <div class="chart-container">
+        <h3>🌡️ Temperatur – ${sensorNames[sensorId] || `Sensor ${sensorId}`}</h3>
+        <div id="tempChart"></div>
+      </div>
+      <div class="chart-container">
+        <h3>💧 Feuchtigkeit – ${sensorNames[sensorId] || `Sensor ${sensorId}`}</h3>
+        <div id="humChart"></div>
+      </div>
+    `;
+
+    Plotly.react("tempChart", [{
+      x: timestamps,
+      y: temps,
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Temperatur (°C)',
+      line: { color: 'green', width: 3 },
+      marker: { color: temps.map(t => t > 30 ? 'red' : 'green'), size: 6 }
+    }], {
+      title: 'Temperaturverlauf',
+      xaxis: { title: 'Zeit', type: 'date', tickformat: '%d.%m.%Y %H:%M', tickangle: -45 },
+      yaxis: { title: 'Temperatur (°C)', range: [0, 40] },
+      shapes: [{
+        type: 'rect', xref: 'paper', x0: 0, x1: 1,
+        yref: 'y', y0: 30, y1: 40,
+        fillcolor: 'rgba(255,0,0,0.1)', line: { width: 0 }
+      }],
+      margin: { t: 20, r: 20, b: 60, l: 60 }
+    });
+
+    Plotly.react("humChart", [{
+      x: timestamps,
+      y: hums,
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Feuchtigkeit (%)',
+      line: { color: 'blue', width: 3 },
+      marker: { color: hums.map(h => h > 60 ? 'red' : 'blue'), size: 6 }
+    }], {
+      title: 'Feuchtigkeitsverlauf',
+      xaxis: { title: 'Zeit', type: 'date', tickformat: '%d.%m.%Y %H:%M', tickangle: -45 },
+      yaxis: { title: 'Feuchtigkeit (%)', range: [0, 100] },
+      shapes: [{
+        type: 'rect', xref: 'paper', x0: 0, x1: 1,
+        yref: 'y', y0: 60, y1: 100,
+        fillcolor: 'rgba(255,0,0,0.08)', line: { width: 0 }
+      }],
+      margin: { t: 20, r: 20, b: 60, l: 60 }
+    });
+  }
+
+  fetchSensorNames();
+  fetchSensorData();
+  setInterval(fetchSensorData, 10000);
+</script>
+
+</body>
+</html>
