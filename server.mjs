@@ -19,6 +19,11 @@ import logger from './helper/logger.mjs';
 import { cta } from './services/connectAll.mjs';
 import {getLatestSensorValues} from './services/connectAll.mjs'
 import sensorDataRoutes from './routes/sensorDataRoutes.mjs';
+import { startSensorProcessing } from './services/VpdService.mjs';
+import historyRoute from './routes/historyRoute.mjs';
+import historyViewRoute from './routes/historyView.mjs';
+
+
 
 const {
   UI_USERNAME,
@@ -37,6 +42,10 @@ async function startServer() {
   app.use(bodyParser.json());
   app.use(basicAuth({ users: { [UI_USERNAME]: UI_PASSWORD }, challenge: true }));
   app.use('/', sensorDataRoutes);
+  app.use(historyRoute);
+  app.use(historyViewRoute);
+
+  
 
   // Feuchtigkeitsdaten initial laden
   let lastTriggerTime = loadState();
@@ -66,6 +75,7 @@ async function startServer() {
 
 // Server starten
 startServer();
-getLatestSensorValues();
 cta();
+getLatestSensorValues();
+startSensorProcessing();
 watchEnvAndRestart();
