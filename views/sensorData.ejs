@@ -33,19 +33,8 @@
       gap: 10px;
       margin-bottom: 20px;
     }
-    .tab {
-      padding: 10px 20px;
-      cursor: pointer;
-      border: none;
-      background: #eee;
-      font-size: 16px;
-      border-radius: 6px;
-    }
-    .tab.active {
-      background-color: #4CAF50;
-      color: white;
-      font-weight: bold;
-    }
+    .tab { cursor: pointer; background: #eee; margin: 5px; padding: 10px; border-radius: 6px; display: inline-block; }
+    .tab.active { background: #4CAF50; color: white; font-weight: bold; }
     .tab-wrapper {
       display: flex;
       align-items: center;
@@ -107,6 +96,15 @@
       font-style: italic;
       color: #666;
     }
+    .tab-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: move; /* Drag-Hinweis */
+}
+.tab-wrapper.dragging {
+  opacity: 0.5;
+}
+
   </style>
 </head>
 <body>
@@ -119,6 +117,7 @@
   </div>
 
   <script>
+
     let sensorData = {};
     let selectedSensorId = "";
     const sensorNames = {};
@@ -155,51 +154,174 @@
     }
 
     function createEditableTabs(sensorIds) {
-      tabsContainer.innerHTML = '';
-      sensorIds.forEach(id => {
-        if (sensorData[id] && sensorData[id].length > 0) {
-          const wrapper = document.createElement('div');
-          wrapper.className = 'tab-wrapper';
+  tabsContainer.innerHTML = '';
 
-          const nameSpan = document.createElement('button');
-          nameSpan.className = 'tab';
-          nameSpan.textContent = sensorNames[id] || `Sensor ${id}`;
-          nameSpan.dataset.sensorId = id;
-          if (id === selectedSensorId) nameSpan.classList.add('active');
-          nameSpan.addEventListener('click', () => {
-            selectedSensorId = id;
-            highlightActiveTab();
-            drawCharts(sensorData[id], id);
-          });
+  const savedOrder = JSON.parse(localStorage.getItem('sensorTabOrder') || '[]');
+  if (savedOrder.length) {
+    sensorIds.sort((a, b) => savedOrder.indexOf(a) - savedOrder.indexOf(b));
+  }
 
-          const editBtn = document.createElement('button');
-          editBtn.className = 'edit-btn';
-          editBtn.textContent = 'Bearbeiten';
-          editBtn.addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = sensorNames[id] || `Sensor ${id}`;
-            input.className = 'name-input';
+  sensorIds.forEach(id => {
+    if (sensorData[id] && sensorData[id].length > 0) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'tab-wrapper';
+      wrapper.setAttribute('draggable', 'true');
+      wrapper.dataset.sensorId = id;
 
-            const saveBtn = document.createElement('button');
-            saveBtn.className = 'save-btn';
-            saveBtn.textContent = 'Speichern';
+      const tab = document.createElement('div');
+      tab.className = 'tab';
+      tab.textContent = sensorNames[id] || `Sensor ${id}`;
+      tab.dataset.sensorId = id;
+      if (id === selectedSensorId) tab.classList.add('active');
 
-            saveBtn.addEventListener('click', () => {
-              saveSensorName(id, input.value);
-            });
+      tab.onclick = () => {
+          selectedSensor = id;
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          wrapper.classList.add('active');
+          rendercharts();
+      };
 
-            wrapper.innerHTML = '';
-            wrapper.appendChild(input);
-            wrapper.appendChild(saveBtn);
-          });
+      // Rechtsklick zum Umbenennen
+      tab.addEventListener('contextmenu', e => {
+        e.preventDefault();
 
-          wrapper.appendChild(nameSpan);
-          wrapper.appendChild(editBtn);
-          tabsContainer.appendChild(wrapper);
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = sensorNames[id] || `Sensor ${id}`;
+        input.className = 'name-input';
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'save-btn';
+        saveBtn.textContent = 'Speichern';
+
+        saveBtn.onclick = () => {
+          const newName = input.value.trim();
+          if (newName) {
+            saveSensorName(id, newName);
+          }
+        };
+
+        wrapper.innerHTML = '';
+        wrapper.appendChild(input);
+        wrapper.appendChild(saveBtn);
+      });
+
+      wrapper.appendChild(tab);
+      tabsContainer.appendChild(wrapper);
+
+      // Drag & Drop Events
+      wrapper.addEventListener('dragstart', e => {
+        wrapper.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', id);
+      });
+
+      wrapper.addEventListener('dragend', () => {
+        wrapper.classList.remove('dragging');
+        const newOrder = Array.from(tabsContainer.children).map(el => el.dataset.sensorId);
+        localStorage.setItem('sensorTabOrder', JSON.stringify(newOrder));
+      });
+
+      wrapper.addEventListener('dragover', e => {
+        e.preventDefault();
+        const dragging = document.querySelector('.dragging');
+        if (dragging && dragging !== wrapper) {
+          const bounding = wrapper.getBoundingClientRect();
+          const offset = e.clientY - bounding.top;
+          if (offset < bounding.height / 2) {
+            tabsContainer.insertBefore(dragging, wrapper);
+          } else {
+            tabsContainer.insertBefore(dragging, wrapper.nextSibling);
+          }
         }
       });
     }
+  });
+}
+function createEditableTabs(sensorIds) {
+  tabsContainer.innerHTML = '';
+
+  const savedOrder = JSON.parse(localStorage.getItem('sensorTabOrder') || '[]');
+  if (savedOrder.length) {
+    sensorIds.sort((a, b) => savedOrder.indexOf(a) - savedOrder.indexOf(b));
+  }
+
+  sensorIds.forEach(id => {
+    if (sensorData[id] && sensorData[id].length > 0) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'tab-wrapper';
+      wrapper.setAttribute('draggable', 'true');
+      wrapper.dataset.sensorId = id;
+
+      const tab = document.createElement('div');
+      tab.className = 'tab';
+      tab.textContent = sensorNames[id] || `Sensor ${id}`;
+      tab.dataset.sensorId = id;
+      if (id === selectedSensorId) tab.classList.add('active');
+
+      tab.onclick = () => {
+        selectedSensorId = id;
+        highlightActiveTab();
+        drawCharts(sensorData[id], id);
+      };
+
+      // Rechtsklick zum Umbenennen
+      tab.addEventListener('contextmenu', e => {
+        e.preventDefault();
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = sensorNames[id] || `Sensor ${id}`;
+        input.className = 'name-input';
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'save-btn';
+        saveBtn.textContent = 'Speichern';
+
+        saveBtn.onclick = () => {
+          const newName = input.value.trim();
+          if (newName) {
+            saveSensorName(id, newName);
+          }
+        };
+
+        wrapper.innerHTML = '';
+        wrapper.appendChild(input);
+        wrapper.appendChild(saveBtn);
+      });
+
+      wrapper.appendChild(tab);
+      tabsContainer.appendChild(wrapper);
+
+      // Drag & Drop Events
+      wrapper.addEventListener('dragstart', e => {
+        wrapper.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', id);
+      });
+
+      wrapper.addEventListener('dragend', () => {
+        wrapper.classList.remove('dragging');
+        const newOrder = Array.from(tabsContainer.children).map(el => el.dataset.sensorId);
+        localStorage.setItem('sensorTabOrder', JSON.stringify(newOrder));
+      });
+
+      wrapper.addEventListener('dragover', e => {
+        e.preventDefault();
+        const dragging = document.querySelector('.dragging');
+        if (dragging && dragging !== wrapper) {
+          const bounding = wrapper.getBoundingClientRect();
+          const offset = e.clientY - bounding.top;
+          if (offset < bounding.height / 2) {
+            tabsContainer.insertBefore(dragging, wrapper);
+          } else {
+            tabsContainer.insertBefore(dragging, wrapper.nextSibling);
+          }
+        }
+      });
+    }
+  });
+}
+
+
 
     function highlightActiveTab() {
       document.querySelectorAll('.tab').forEach(tab => {
@@ -241,11 +363,11 @@
 
       chartsContainer.innerHTML = `
         <div class="chart-container">
-          <h3>🌡️ Temperatur – ${sensorNames[sensorId] || `Sensor ${sensorId}`}</h3>
+          <h3>🌡️ Temperatur-Verlauf – ${sensorNames[sensorId] || `Sensor ${sensorId}`}</h3>
           <div id="tempChart"></div>
         </div>
         <div class="chart-container">
-          <h3>💧 Feuchtigkeit – ${sensorNames[sensorId] || `Sensor ${sensorId}`}</h3>
+          <h3>💧 Feuchtigkeits-Verlauf – ${sensorNames[sensorId] || `Sensor ${sensorId}`}</h3>
           <div id="humChart"></div>
         </div>
       `;
@@ -259,7 +381,7 @@
         line: { color: 'green', width: 3 },
         marker: { color: temps.map(t => t > 30 ? 'red' : 'green'), size: 6 }
       }], {
-        title: 'Temperaturverlauf',
+      
         xaxis: { title: 'Zeit', type: 'date', tickformat: '%d.%m.%Y %H:%M', tickangle: -45 },
         yaxis: { title: 'Temperatur (°C)', range: [0, 40] },
         shapes: [{
@@ -279,7 +401,7 @@
         line: { color: 'blue', width: 3 },
         marker: { color: hums.map(h => h > 60 ? 'red' : 'blue'), size: 6 }
       }], {
-        title: 'Feuchtigkeitsverlauf',
+   
         xaxis: { title: 'Zeit', type: 'date', tickformat: '%d.%m.%Y %H:%M', tickangle: -45 },
         yaxis: { title: 'Feuchtigkeit (%)', range: [0, 100] },
         shapes: [{

@@ -14,33 +14,63 @@
     .chart-box { background: white; border: 1px solid #ccc; border-radius: 10px; padding: 10px; flex: 1 1 45%; }
     @media(max-width: 768px){ .chart-box { flex: 1 1 100%; } }
     .back-btn {
-  display: block;
-  margin: 20px auto;
-  text-align: center;
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  text-decoration: none;
-  width: max-content;
-}
-.back-btn:hover {
-  background-color: #45a049;
-}
- </style>
+      display: block;
+      margin: 20px auto;
+      text-align: center;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      width: max-content;
+    }
+    .back-btn:hover {
+      background-color: #45a049;
+    }
+    .tab.dragging {
+      opacity: 0.5;
+    }
+    .name-input {
+      margin-left: 10px;
+      padding: 5px;
+      font-size: 14px;
+    }
+    .save-btn {
+      margin-left: 5px;
+      padding: 5px 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .save-btn:hover {
+      background-color: #45a049;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-      <h1>📈 TP357S Klima-Diagramme</h1>
-      <a class="back-btn" href="/">Zurück zur Übersicht</a>
-      <div id="tabs"></div>
-      <div id="charts" class="charts"></div>
-    </div>
-  
+  <div class="container">
+    <h1>📈 TP357S Klima-Diagramme</h1>
+    <a class="back-btn" href="/">Zurück zur Übersicht</a>
+    <div id="tabs"></div>
+    <div id="charts" class="charts"></div>
+  </div>
 
   <script>
+    const sensorNames = {};
     let historyData = {};
     let selectedSensor = "";
+
+    function fetchSensorNames() {
+      fetch('/api/sensor-names')
+        .then(res => res.json())
+        .then(data => {
+          Object.assign(sensorNames, data);
+          fetchHistory(); // danach History laden
+        })
+        .catch(err => console.error('Fehler beim Laden der Namen:', err));
+    }
 
     function fetchHistory() {
       fetch('/api/history')
@@ -57,20 +87,113 @@
         .catch(err => console.error('Fehler beim Laden der Historie:', err));
     }
 
+    function saveSensorName(id, newName) {
+      fetch('/api/sensor-names', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name: newName })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            sensorNames[id] = newName;
+            renderTabs(Object.keys(historyData));
+            renderCharts();
+          } else {
+            alert("Fehler beim Speichern des Namens.");
+          }
+        })
+        .catch(err => {
+          console.error('Fehler beim Speichern:', err);
+          alert("Fehler beim Speichern.");
+        });
+    }
+
+    /**
+     * Rendered die Tabs f r die verschiedenen Sensoren.
+     * Gibt die Sensoren in der Reihenfolge aus, die im LocalStorage
+     * unter "historyTabOrder" gespeichert ist.
+     * @param {string[]} ids Die IDs der Sensoren
+     */
     function renderTabs(ids) {
       const tabsDiv = document.getElementById('tabs');
       tabsDiv.innerHTML = '';
+
+      const savedOrder = JSON.parse(localStorage.getItem('historyTabOrder') || '[]');
+      if (savedOrder.length) {
+        ids.sort((a, b) => savedOrder.indexOf(a) - savedOrder.indexOf(b));
+      }
+
       ids.forEach(id => {
-        const tab = document.createElement('div');
-        tab.className = 'tab' + (id === selectedSensor ? ' active' : '');
-        tab.textContent = `Sensor ${id}`;
-        tab.onclick = () => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'tab';
+        wrapper.setAttribute('draggable', 'true');
+        wrapper.dataset.sensorId = id;
+        if (id === selectedSensor) wrapper.classList.add('active');
+
+        const name = sensorNames[id] || `Sensor ${id}`;
+        wrapper.textContent = name;
+
+
+        // Setzt den aktuell ausgew hlte Sensor und
+        // aktualisiert die Darstellung der Tabs und Charts
+
+        wrapper.onclick = () => {
           selectedSensor = id;
           document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
+          wrapper.classList.add('active');
           renderCharts();
         };
-        tabsDiv.appendChild(tab);
+
+        // Rechtsklick zum Umbenennen
+        wrapper.addEventListener('contextmenu', e => {
+          e.preventDefault();
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = sensorNames[id] || `Sensor ${id}`;
+          input.className = 'name-input';
+
+          const saveBtn = document.createElement('button');
+          saveBtn.textContent = 'Speichern';
+          saveBtn.className = 'save-btn';
+
+          wrapper.innerHTML = '';
+          wrapper.appendChild(input);
+          wrapper.appendChild(saveBtn);
+
+          saveBtn.onclick = () => {
+            saveSensorName(id, input.value.trim());
+          };
+        });
+
+        // Drag-Events
+        wrapper.addEventListener('dragstart', e => {
+          wrapper.classList.add('dragging');
+          e.dataTransfer.setData('text/plain', id);
+        });
+
+        wrapper.addEventListener('dragend', () => {
+          wrapper.classList.remove('dragging');
+          const newOrder = Array.from(document.querySelectorAll('#tabs .tab'))
+                                .map(t => t.dataset.sensorId);
+          localStorage.setItem('historyTabOrder', JSON.stringify(newOrder));
+        });
+
+        wrapper.addEventListener('dragover', e => {
+          e.preventDefault();
+          const dragging = document.querySelector('.tab.dragging');
+          if (dragging && dragging !== wrapper) {
+            const rect = wrapper.getBoundingClientRect();
+            const offset = e.clientX - rect.left;
+            if (offset < rect.width / 2) {
+              tabsDiv.insertBefore(dragging, wrapper);
+            } else {
+              tabsDiv.insertBefore(dragging, wrapper.nextSibling);
+            }
+          }
+        });
+
+        tabsDiv.appendChild(wrapper);
       });
     }
 
@@ -103,12 +226,14 @@
         Plotly.newPlot(id, [{
           x: timestamps, y, type: 'scatter', mode: 'lines', line: { width: 2 }
         }], {
-          margin: { t: 30 }, xaxis: { title: 'Zeit', type: 'date' }, yaxis: { title }
+          margin: { t: 30 },
+          xaxis: { title: 'Zeit', type: 'date' },
+          yaxis: { title }
         });
       });
     }
 
-    fetchHistory();
+    fetchSensorNames(); // Startpunkt
     setInterval(fetchHistory, 60000); // alle 60 Sekunden
   </script>
 </body>
