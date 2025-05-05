@@ -2,12 +2,12 @@
 # setup_mac.sh – Install newdrip.js as a launchd service on macOS
 
 # Variables
-WORKDIR="/Users/Peter_Pan/newdrip"
-PLIST_PATH="/Library/LaunchDaemons/com.newdrip.service.plist"
+WORKDIR="/Users/Peter_Pan/evo"
+PLIST_PATH="/Library/LaunchDaemons/com.newdripEvo.service.plist"
 
 # Create working directory
 sudo mkdir -p "$WORKDIR"
-sudo cp newdrip.mjs "$WORKDIR"
+sudo cp server.mjs "$WORKDIR"
 cd "$WORKDIR"
 
 # Install dependencies
@@ -26,11 +26,11 @@ sudo tee "$PLIST_PATH" > /dev/null <<EOF
 <plist version="1.0">
   <dict>
     <key>Label</key>
-    <string>com.newdrip.service</string>
+    <string>com.evodrip.service</string>
     <key>ProgramArguments</key>
     <array>
       <string>/usr/local/bin/node</string>
-      <string>$WORKDIR/newdrip.mjs</string>
+      <string>$WORKDIR/server.mjs</string>
     </array>
     <key>WorkingDirectory</key>
     <string>$WORKDIR</string>
@@ -49,4 +49,4 @@ EOF
 
 # Load service
 sudo launchctl load -w "$PLIST_PATH"
-echo "Service installed and loaded. Use 'sudo launchctl list | grep com.newdrip.service' to verify."
+echo "Service installed and loaded. Use 'sudo launchctl list | grep com.evodrip.service' to verify."

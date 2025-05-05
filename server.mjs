@@ -1,4 +1,4 @@
-// newdrip.js – Verbesserte Bewässerungssteuerung
+// server.mjs – Verbesserte Bewässerungssteuerung
 
 import express from 'express';
 import path from 'path';
@@ -19,9 +19,15 @@ import logger from './helper/logger.mjs';
 import { cta } from './services/connectAll.mjs';
 import {getLatestSensorValues} from './services/connectAll.mjs'
 import sensorDataRoutes from './routes/sensorDataRoutes.mjs';
-import { startSensorProcessing } from './services/VpdService.mjs';
+import { startSensorProcessing } from './services/vpdService.mjs';
 import historyRoute from './routes/historyRoute.mjs';
 import historyViewRoute from './routes/historyView.mjs';
+import rulesRoutes from './routes/api/rules.mjs';
+import relaysRoutes from './routes/api/relays.mjs';
+import sensorsRoutes from './routes/api/sensors.mjs';
+import { startRuleEngine } from './services/rule_engine.mjs';
+
+
 
 
 
@@ -41,13 +47,45 @@ async function startServer() {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
   app.use(basicAuth({ users: { [UI_USERNAME]: UI_PASSWORD }, challenge: true }));
-  app.use('/', sensorDataRoutes);
+  app.use('/sensor-data', sensorDataRoutes);
   app.use(historyRoute);
   app.use(historyViewRoute);
+  app.use('/api/rules', rulesRoutes);
+  app.use('/api/relays', relaysRoutes);
+  app.use('/api/sensors', sensorsRoutes);
+ 
+  const filePath = './sensor_data/sensorNames.json';
+  // GET: Alle Namen zurückgeben
+app.get('/api/sensor-names', (req, res) => {
+  fs.readFile(filePath, (err, data) => {
+    if (err) return res.status(500).json({});
+    res.json(JSON.parse(data));
+  });
+});
 
-  
+app.get('/shelly-control', (req, res) => {
+  res.render('index');
+});
 
-  // Feuchtigkeitsdaten initial laden
+// POST: Einen Namen speichern
+app.post('/api/sensor-names', (req, res) => {
+  const { id, name } = req.body;
+  if (!id || typeof name !== 'string') {
+    return res.status(400).json({ success: false, message: 'Ungültige Daten' });
+  }
+
+  fs.readFile(filePath, (err, data) => {
+    const current = err ? {} : JSON.parse(data);
+    current[id] = name;
+
+    fs.writeFile(filePath, JSON.stringify(current, null, 2), err => {
+      if (err) return res.status(500).json({ success: false });
+      res.json({ success: true });
+    });
+  });
+});
+
+   // Feuchtigkeitsdaten initial laden
   let lastTriggerTime = loadState();
   loadMoistureData();
 
@@ -67,7 +105,7 @@ async function startServer() {
   setInterval(saveMoistureData, MOISTURE_SAVE_INTERVAL_MS);
 
   // Server starten
-  const PORT = process.env.PORT || 3600;
+  const PORT = process.env.PORT || 3500;
   app.listen(PORT, () => logger.info(`🛜 Interface läuft auf http://localhost:${PORT}`));
 
   logger.info(`💾 Feuchtigkeitsdaten werden alle ${MOISTURE_SAVE_INTERVAL_MS / 1000} Sekunden gespeichert`);
@@ -78,4 +116,11 @@ startServer();
 cta();
 getLatestSensorValues();
 startSensorProcessing();
+startRuleEngine();
 watchEnvAndRestart();
+
+//sudo launchctl start com.evodrip.service
+//sudo launchctl stop com.evodrip.service
+//sudo launchctl list | grep com.evodrip.service
+//tail -f /Users/Peter_Pan/evo/newdrip.log 
+

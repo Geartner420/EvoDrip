@@ -25,6 +25,8 @@ const envFields = [
   { key: 'DEBUG', type: 'boolean', required: false },
   { key: 'TELEGRAM_BOT_TOKEN', type: 'string', required: false },
   { key: 'TELEGRAM_CHAT_ID', type: 'string', required: false },
+  { key: 'LEAF_TEMP_DIFF', type: 'number', min: -20, max: 20, required: false },
+
 ];
 
 function buildValidationSchema(fields) {

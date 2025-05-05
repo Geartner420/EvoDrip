@@ -1,0 +1,192 @@
+[
+  {
+    "timestamp": "2025-05-05T23:52:55.707Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ],
+    "activeFrom": "00:00",
+    "activeTo": "23:59"
+  },
+  {
+    "timestamp": "2025-05-05T23:50:26.361Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ],
+    "activeFrom": "00:00",
+    "activeTo": "23:59"
+  },
+  {
+    "timestamp": "2025-05-05T23:49:57.834Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ],
+    "activeFrom": "00:00",
+    "activeTo": "23:59"
+  },
+  {
+    "timestamp": "2025-05-05T23:42:46.365Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ],
+    "activeFrom": "00:00",
+    "activeTo": "23:59"
+  },
+  {
+    "timestamp": "2025-05-05T23:31:47.115Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ],
+    "activeFrom": "00:00",
+    "activeTo": "23:59"
+  },
+  {
+    "timestamp": "2025-05-05T23:00:37.875Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ],
+    "activeFrom": "00:00",
+    "activeTo": "23:59"
+  },
+  {
+    "timestamp": "2025-05-05T22:53:37.418Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ],
+    "activeFrom": "00:00",
+    "activeTo": "23:59"
+  },
+  {
+    "timestamp": "2025-05-05T22:22:11.485Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ],
+    "activeFrom": "00:00",
+    "activeTo": "23:59"
+  },
+  {
+    "timestamp": "2025-05-05T22:20:47.930Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ],
+    "activeFrom": "00:00",
+    "activeTo": "23:59"
+  },
+  {
+    "timestamp": "2025-05-05T22:15:57.982Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ],
+    "activeFrom": "00:00",
+    "activeTo": "23:59"
+  },
+  {
+    "timestamp": "2025-05-05T22:05:26.160Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ],
+    "activeFrom": "00:00",
+    "activeTo": "23:59"
+  },
+  {
+    "timestamp": "2025-05-05T20:44:48.553Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "vpd",
+        "op": ">",
+        "value": "1.15"
+      }
+    ]
+  }
+]

@@ -7,8 +7,8 @@ import config from '../helper/config.mjs'; // oder './config/index.js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dir = path.join(__dirname, '../sensor_data');
 
-const LEAF_TEMP_DIFF = config.leafTempDiff ?? 2; // Fallback falls nicht gesetzt
-const MAX_HISTORY = 5000;
+const LEAF_TEMP_DIFF = config.LEAF_TEMP_DIFF; // Fallback falls nicht gesetzt
+const MAX_HISTORY = 200000;
 
 const files = fs.readdirSync(dir).filter(f =>
   f.startsWith('sensor_') && f.endsWith('.json') && f !== 'sensor_ids.json'

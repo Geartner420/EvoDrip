@@ -1,0 +1,58 @@
+[
+  {
+    "sensor": "sensor_1.json",
+    "relay": "Abluft",
+    "action": "on",
+    "activeFrom": "06:00",
+    "activeTo": "18:00",
+    "conditions": [
+      {
+        "param": "vpd",
+        "op": ">",
+        "value": "1.15"
+      }
+    ]
+  },
+  {
+    "sensor": "sensor_1.json",
+    "relay": "Abluft",
+    "action": "off",
+    "activeFrom": "06:01",
+    "activeTo": "18:00",
+    "conditions": [
+      {
+        "param": "vpd",
+        "op": "<",
+        "value": "0.95"
+      }
+    ]
+  },
+  {
+    "sensor": "sensor_1.json",
+    "relay": "Dunstabzug",
+    "action": "on",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">",
+        "value": "60"
+      }
+    ]
+  },
+  {
+    "sensor": "sensor_1.json",
+    "relay": "Dunstabzug",
+    "action": "off",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<",
+        "value": "50"
+      }
+    ]
+  }
+]

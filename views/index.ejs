@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>🌱 Shelly-Regelsteuerung</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    h1, h2, h3 {
+      color: #4CAF50;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 1100px;
+      margin: auto;
+      border: 1px solid #ddd;
+    }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+    }
+    input, select {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .rule-list {
+      margin: 0 auto 20px auto;
+      max-width: 1100px;
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .rule-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .button-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      padding: 10px;
+    }
+    button {
+      background: #4CAF50;
+      color: #fff;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .delete-btn {
+      background: #d9534f;
+      font-size: 12px;
+      padding: 4px 10px;
+    }
+    .delete-btn:hover {
+      background: #c9302c;
+    }
+    .success-msg {
+      color: green;
+      margin-top: 6px;
+      font-size: 14px;
+    }
+    @media (max-width: 900px) {
+      .form-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 600px) {
+      .form-container {
+        grid-template-columns: 1fr;
+      }
+      .field-group {
+        margin-bottom: 15px;
+      }
+      .button-bar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+      }
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+  <div style="text-align: center; margin-bottom: 20px;">
+    <button onclick="location.href='/'" style="background: #777; color: white; padding: 8px 16px; border: none; border-radius: 5px; font-size: 14px; cursor: pointer;">
+      ⬅️ Zurück zur Übersicht
+    </button>
+  </div>
+</head>
+<body>
+  <h1>🌡️💧 Shelly-Regelsteuerung</h1>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+const { useState, useEffect } = React;
+
+const operatorLabels = {
+  '>': 'größer als',
+  '<': 'kleiner als',
+  '>=': 'größer oder gleich',
+  '<=': 'kleiner oder gleich',
+  '==': 'gleich'
+};
+
+function SensorRuleGroup({ sensor, rules, operatorLabels, onDelete, onUpdate }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div style={{ marginBottom: '12px' }}>
+      <div
+        onClick={() => setExpanded(!expanded)}
+        style={{
+          cursor: 'pointer',
+          background: '#e9f5e9',
+          padding: '8px',
+          borderRadius: '5px',
+          fontWeight: 'bold',
+          border: '1px solid #ccc'
+        }}
+      >
+        {expanded ? '▼' : '▶'} {sensor} ({rules.length} Regel{rules.length !== 1 ? 'n' : ''})
+      </div>
+      {expanded && (
+        <div style={{ paddingLeft: '10px', marginTop: '6px' }}>
+          {rules.map((r, i) => (
+            <EditableRuleItem
+              key={i}
+              r={r}
+              operatorLabels={operatorLabels}
+              onDelete={onDelete}
+              onUpdate={onUpdate}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EditableRuleItem({ r, operatorLabels, onDelete, onUpdate }) {
+  const [editMode, setEditMode] = useState(false);
+  const [editRule, setEditRule] = useState(r);
+  const [success, setSuccess] = useState(false);
+
+  function saveEdit() {
+    fetch('/api/rules/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ oldRule: r, newRule: editRule })
+    }).then(() => {
+      onUpdate(r, editRule);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
+      setEditMode(false);
+    });
+  }
+
+  function addCondition() {
+    setEditRule({ ...editRule, conditions: [...editRule.conditions, { param: 'vpd', op: '>', value: '' }] });
+  }
+
+  function removeCondition(i) {
+    const updated = [...editRule.conditions];
+    updated.splice(i, 1);
+    setEditRule({ ...editRule, conditions: updated });
+  }
+
+  return (
+    <div className="rule-item">
+      <div style={{ flex: 1 }}>
+        {!editMode ? (
+          <>
+            <strong>{r.relay}</strong> {r.action === 'on' ? 'einschalten' : 'ausschalten'}<br />
+            Wenn {r.conditions.map(c =>
+              `${c.param} ${operatorLabels[c.op] || c.op} ${c.value}`
+            ).join(' UND ')}
+            {r.activeFrom && r.activeTo && (
+              <div style={{ fontSize: '12px', color: '#555' }}>
+                (aktiv von {r.activeFrom} bis {r.activeTo})
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <select value={editRule.action} onChange={e => setEditRule({ ...editRule, action: e.target.value })}>
+              <option value="on">einschalten</option>
+              <option value="off">ausschalten</option>
+            </select>
+            <input type="time" value={editRule.activeFrom} onChange={e => setEditRule({ ...editRule, activeFrom: e.target.value })} />
+            <input type="time" value={editRule.activeTo} onChange={e => setEditRule({ ...editRule, activeTo: e.target.value })} />
+            {editRule.conditions.map((c, i) => (
+              <div key={i} style={{ display: 'flex', gap: '6px', marginBottom: '4px' }}>
+                <select value={c.param} onChange={e => {
+                  const cond = [...editRule.conditions];
+                  cond[i].param = e.target.value;
+                  setEditRule({ ...editRule, conditions: cond });
+                }}>
+                  <option value="vpd">VPD</option>
+                  <option value="temperature">Temperatur</option>
+                  <option value="humidity">Luftfeuchtigkeit</option>
+                </select>
+                <select value={c.op} onChange={e => {
+                  const cond = [...editRule.conditions];
+                  cond[i].op = e.target.value;
+                  setEditRule({ ...editRule, conditions: cond });
+                }}>
+                  <option value=">">größer als</option>
+                  <option value="<">kleiner als</option>
+                  <option value=">=">größer oder gleich</option>
+                  <option value="<=">kleiner oder gleich</option>
+                  <option value="==">gleich</option>
+                </select>
+                <input type="text" value={c.value} onChange={e => {
+                  const cond = [...editRule.conditions];
+                  cond[i].value = e.target.value;
+                  setEditRule({ ...editRule, conditions: cond });
+                }} />
+                <button className="delete-btn" onClick={() => removeCondition(i)}>🗑️</button>
+              </div>
+            ))}
+            <button onClick={addCondition}>➕ Bedingung</button>
+          </>
+        )}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '10px', gap: '4px' }}>
+        {!editMode ? (
+          <>
+            <button onClick={() => setEditMode(true)}>✏️ bearbeiten</button>
+            <button className="delete-btn" onClick={() => onDelete(r)}>🗑️ löschen</button>
+          </>
+        ) : (
+          <>
+            <button onClick={saveEdit}>💾 speichern</button>
+            <button onClick={() => {
+              setEditRule(r);
+              setEditMode(false);
+            }}>✖️ abbrechen</button>
+          </>
+        )}
+        {success && <div className="success-msg">✅ Gespeichert</div>}
+      </div>
+    </div>
+  );
+}
+function App() {
+  const [rules, setRules] = useState([]);
+  const [relays, setRelays] = useState([]);
+  const [sensors, setSensors] = useState([]);
+  const [sensorNameMap, setSensorNameMap] = useState({});
+  const [newRelay, setNewRelay] = useState({ name: '', ip: '' });
+  const [newRule, setNewRule] = useState({
+    sensor: '',
+    relay: '',
+    action: '',
+    activeFrom: '',
+    activeTo: '',
+    conditions: [{ param: 'vpd', op: '>', value: '' }]
+  });
+
+  useEffect(() => {
+    fetch('/api/relays').then(res => res.json()).then(setRelays);
+    fetch('/api/rules').then(res => res.json()).then(setRules);
+    fetch('/api/sensors').then(res => res.json()).then(setSensors);
+    fetch('/api/sensor-names').then(res => res.json()).then(setSensorNameMap);
+  }, []);
+
+  function saveRules(updated) {
+    fetch('/api/rules', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated)
+    }).then(() => setRules(updated));
+  }
+
+  function addRule() {
+    fetch('/api/rules/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newRule)
+    }).then(() => {
+      setRules([...rules, newRule]);
+      setNewRule({
+        sensor: '',
+        relay: '',
+        action: '',
+        activeFrom: '',
+        activeTo: '',
+        conditions: [{ param: 'vpd', op: '>', value: '' }]
+      });
+    });
+  }
+
+  function deleteRule(ruleToDelete) {
+    fetch('/api/rules/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ruleToDelete)
+    }).then(() => {
+      setRules(rules.filter(rule => rule !== ruleToDelete));
+    });
+  }
+
+  function updateRuleInUI(oldRule, newRule) {
+    const updated = [...rules];
+    const index = updated.findIndex(r => r === oldRule);
+    if (index !== -1) {
+      updated[index] = newRule;
+      setRules(updated);
+    }
+  }
+
+  const grouped = rules.reduce((acc, rule) => {
+    if (!acc[rule.sensor]) acc[rule.sensor] = [];
+    acc[rule.sensor].push(rule);
+    return acc;
+  }, {});
+  return (
+    <div>
+      <div className="rule-list">
+        <h2>Regeln pro Sensor</h2>
+        {Object.entries(grouped).map(([sensorId, sensorRules]) => (
+          <SensorRuleGroup
+            key={sensorId}
+            sensor={sensorNameMap[sensorId.replace('sensor_', '').replace('.json', '')] || sensorId}
+            rules={sensorRules}
+            operatorLabels={operatorLabels}
+            onDelete={deleteRule}
+            onUpdate={updateRuleInUI}
+          />
+        ))}
+      </div>
+
+      <div className="form-container">
+        <div className="field-group">
+          <label>Sensor</label>
+          <select value={newRule.sensor} onChange={e => setNewRule({ ...newRule, sensor: e.target.value })}>
+            <option value="">Sensor wählen</option>
+            {sensors.map(s => (
+              <option key={s} value={s}>
+                {sensorNameMap[s.replace('sensor_', '').replace('.json', '')] || s}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="field-group">
+          <label>Relais</label>
+          <select value={newRule.relay} onChange={e => setNewRule({ ...newRule, relay: e.target.value })}>
+            <option value="">Relais wählen</option>
+            {relays.map(r => <option key={r.name} value={r.name}>{r.name}</option>)}
+          </select>
+        </div>
+
+        <div className="field-group">
+          <label>Aktion</label>
+          <select value={newRule.action} onChange={e => setNewRule({ ...newRule, action: e.target.value })}>
+            <option value="">Aktion wählen</option>
+            <option value="on">einschalten</option>
+            <option value="off">ausschalten</option>
+          </select>
+        </div>
+
+        <div className="field-group">
+          <label>Aktiv von</label>
+          <input type="time" value={newRule.activeFrom} onChange={e => setNewRule({ ...newRule, activeFrom: e.target.value })} />
+        </div>
+
+        <div className="field-group">
+          <label>Aktiv bis</label>
+          <input type="time" value={newRule.activeTo} onChange={e => setNewRule({ ...newRule, activeTo: e.target.value })} />
+        </div>
+
+        {newRule.conditions.map((cond, i) => (
+          <div key={i} className="field-group">
+            <label>Bedingung {i + 1}</label>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <select value={cond.param} onChange={e => {
+                const updated = [...newRule.conditions];
+                updated[i].param = e.target.value;
+                setNewRule({ ...newRule, conditions: updated });
+              }}>
+                <option value="vpd">VPD</option>
+                <option value="temperature">Temperatur</option>
+                <option value="humidity">Luftfeuchtigkeit</option>
+              </select>
+              <select value={cond.op} onChange={e => {
+                const updated = [...newRule.conditions];
+                updated[i].op = e.target.value;
+                setNewRule({ ...newRule, conditions: updated });
+              }}>
+                <option value=">">größer als</option>
+                <option value="<">kleiner als</option>
+                <option value=">=">größer oder gleich</option>
+                <option value="<=">kleiner oder gleich</option>
+                <option value="==">gleich</option>
+              </select>
+              <input type="text" placeholder="Wert" value={cond.value} onChange={e => {
+                const updated = [...newRule.conditions];
+                updated[i].value = e.target.value;
+                setNewRule({ ...newRule, conditions: updated });
+              }} />
+              <button className="delete-btn" onClick={() => {
+                const updated = [...newRule.conditions];
+                updated.splice(i, 1);
+                setNewRule({ ...newRule, conditions: updated });
+              }}>🗑️</button>
+            </div>
+          </div>
+        ))}
+
+        <div className="field-group">
+          <button onClick={() => setNewRule({ ...newRule, conditions: [...newRule.conditions, { param: 'vpd', op: '>', value: '' }] })}>
+            ➕ Bedingung
+          </button>
+        </div>
+
+        <div className="field-group">
+          <label>Neue Regel speichern</label>
+          <button onClick={addRule}>➕ Regel hinzufügen</button>
+        </div>
+      </div>
+
+      <div className="rule-list">
+        <h2>Bekannte Relais</h2>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {relays.map(r => (
+            <li key={r.name}><strong>{r.name}</strong> → {r.ip}</li>
+          ))}
+        </ul>
+
+        <h3>Neues Relais hinzufügen</h3>
+        <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
+          <input type="text" placeholder="Relaisname" value={newRelay.name}
+            onChange={e => setNewRelay({ ...newRelay, name: e.target.value })} />
+          <input type="text" placeholder="IP-Adresse" value={newRelay.ip}
+            onChange={e => setNewRelay({ ...newRelay, ip: e.target.value })} />
+          <button onClick={() => {
+            const updated = [...relays, newRelay];
+            fetch('/api/relays', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(updated)
+            }).then(() => {
+              setRelays(updated);
+              setNewRelay({ name: '', ip: '' });
+            });
+          }}>➕ Hinzufügen</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
