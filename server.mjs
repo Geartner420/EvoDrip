@@ -27,6 +27,8 @@ import relaysRoutes from './routes/api/relays.mjs';
 import sensorsRoutes from './routes/api/sensors.mjs';
 import { startRuleEngine } from './services/rule_engine.mjs';
 
+console.log('[DEBUG] CWD:', process.cwd());
+console.log('[DEBUG] __dirname:', import.meta.url);
 
 
 
@@ -120,7 +122,8 @@ startRuleEngine();
 watchEnvAndRestart();
 
 //sudo launchctl start com.evodrip.service
-//sudo launchctl stop com.evodrip.service
+//sudo launchctl bootout system /Library/LaunchDaemons/com.evodrip.service.plist
+
 //sudo launchctl list | grep com.evodrip.service
 //tail -f /Users/Peter_Pan/evo/newdrip.log 
 

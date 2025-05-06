@@ -320,8 +320,13 @@
     // VPD-Anzeige aktualisieren (Wert UND Tooltip)
   const vpdBox = document.getElementById('vpdDisplay');
     if (vpdBox) {
-    vpdBox.innerHTML = `VPD: <strong>${vpd} kPa</strong>`;
-    vpdBox.title = "VPD < 0.6 = zu feucht · 0.6–1.2 = ideal · > 1.2 = zu trocken";
+      vpdBox.innerHTML = `
+  🌡️ <strong>${T.toFixed(1)} °C</strong> |
+  💧 <strong>${RH.toFixed(1)} %</strong> |
+  VPD: <strong>${vpd} kPa</strong>
+`;
+vpdBox.title = "VPD < 0.6 = zu feucht · 0.6–1.2 = ideal · > 1.2 = zu trocken";
+
     }   
 
 
