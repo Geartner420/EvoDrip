@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🌱 Bewässerungssystem – Einstellungen</title>
+  <title>Klima-Automatik & Bewässerungssystem – Einstellungen</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -134,7 +134,7 @@
   </style>
 </head>
 <body>
-  <h2>🌱 Bewässerungssystem – Einstellungen</h2>
+  <h2>Klima-Automatik & Bewässerungssystem – Einstellungen</h2>
 
   <form method="POST" action="/update">
     <div class="form-container">
@@ -176,14 +176,15 @@
 
     <div class="button-bar">
       <button type="submit">💾 Speichern & Neustarten</button>
-      <button type="button" onclick="location.href='/chart'">📈 Feuchte-Zeit-Diagramm</button>
-      <button type="button" onclick="location.href='/moisture-data'">💧 Feuchtigkeits-Datenbank</button>
+      <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
+      <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
       <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
       <button type="button" onclick="location.href='/status'">🩺 System-Status</button>
       <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
       <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
       <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
-      <button type="button" onclick="location.href='/shelly-control'">🌡️💧 Shelly-Steuerung</button>
+      <button type="button" onclick="location.href='/shelly-control'">🌱 Klima-Automatisierung </button>
+      <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
     </div>
   </form>
 

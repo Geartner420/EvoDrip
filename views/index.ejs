@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>🌱 Shelly-Regelsteuerung</title>
+  <title>🌱</Klima-Automatisierung>🌱</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
@@ -14,11 +14,13 @@
       flex-direction: column;
       min-height: 100vh;
     }
+
     h1, h2, h3 {
       color: #4CAF50;
       text-align: center;
       margin-bottom: 20px;
     }
+
     .form-container {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -30,16 +32,19 @@
       margin: auto;
       border: 1px solid #ddd;
     }
+
     .field-group {
       display: flex;
       flex-direction: column;
     }
+
     input, select {
       padding: 8px;
       border: 1px solid #ccc;
       border-radius: 5px;
       font-size: 14px;
     }
+
     .rule-list {
       margin: 0 auto 20px auto;
       max-width: 1100px;
@@ -48,12 +53,14 @@
       border: 1px solid #ddd;
       border-radius: 8px;
     }
+
     .rule-item {
       display: flex;
       justify-content: space-between;
       padding: 8px 0;
       border-bottom: 1px solid #eee;
     }
+
     .button-bar {
       display: flex;
       flex-wrap: wrap;
@@ -62,6 +69,7 @@
       margin-top: 20px;
       padding: 10px;
     }
+
     button {
       background: #4CAF50;
       color: #fff;
@@ -72,41 +80,71 @@
       font-size: 14px;
       transition: background 0.3s;
     }
+
     button:hover {
       background: #45a049;
     }
+
     .delete-btn {
       background: #d9534f;
       font-size: 12px;
       padding: 4px 10px;
     }
+
     .delete-btn:hover {
       background: #c9302c;
     }
+
     .success-msg {
       color: green;
       margin-top: 6px;
       font-size: 14px;
     }
-    @media (max-width: 900px) {
-      .form-container {
-        grid-template-columns: 1fr 1fr;
+
+    /* CSS für die Container-Karten */
+    .card-container {
+      display: flex;
+      flex-wrap: wrap; /* Karten umbrechen, wenn der Platz nicht ausreicht */
+      justify-content: space-evenly; /* Gleichmäßige Verteilung der Karten */
+      gap: 20px; /* Abstand zwischen den Karten */
+      width: 100%; /* Container nimmt den gesamten Platz ein */
+      margin-top: 30px;
+    }
+
+    /* CSS für die einzelnen Karten */
+    .card {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 230px; /* Breite der Karten */
+      text-align: center;
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      border: 2px solid #e0e0e0;
+      margin-bottom: 20px;
+    }
+
+    /* Hover-Effekt für die Karten */
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Responsive Anpassung für kleinere Bildschirme */
+    @media (max-width: 768px) {
+      .card-container {
+        justify-content: center;  /* Karten zentrieren auf kleineren Bildschirmen */
+      }
+
+      .card {
+        width: 200px;  /* Kleinere Kartenbreite für kleinere Bildschirme */
       }
     }
+
     @media (max-width: 600px) {
-      .form-container {
-        grid-template-columns: 1fr;
-      }
-      .field-group {
-        margin-bottom: 15px;
-      }
-      .button-bar {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 15px;
-      }
-      button {
-        width: 100%;
+      .card {
+        width: 100%;             /* Karten füllen den Container auf sehr kleinen Bildschirmen */
+        margin-bottom: 10px;     /* Etwas Abstand zwischen den Karten */
       }
     }
   </style>
@@ -115,11 +153,11 @@
   </div>
 </head>
 <body>
-  <h1>🌡️💧 Shelly-Regelsteuerung</h1>
+  <h1>🌱Klima-Automatisierung</h1>
   <div style="text-align: center; padding: 10px;">
     <button onclick="location.href='/'"
       style="background: #4CAF50; 
-              display: block;
+              display: flex;
               margin: 20px auto;
               text-align: center;
               background-color: #4CAF50;
@@ -129,10 +167,60 @@
               text-decoration: none;
               width: max-content;
              cursor: pointer;"> Zurück zur Übersicht
+        
     </button>
+    <h2 class="section-title"></h2>
+    <div class="card-container" id="sensor-cards-container">
+      <!-- Wird durch JS befüllt -->
+    </div>
   </div>
   <div id="root"></div>
+</div>
 
+
+  <script>
+/**
+ * Fetches sensor status data from the server and updates the UI.
+ * 
+ * This function retrieves the latest sensor data via a GET request to the '/api/sensor-status' endpoint.
+ * Upon successful response, it parses the data and dynamically creates and appends sensor cards
+ * to a container element identified by 'sensor-cards-container'. Each card displays the sensor's ID,
+ * temperature, humidity, and the last updated timestamp. If an error occurs during the fetch operation,
+ * it logs an error message to the console.
+ */
+ async function fetchSensorData() {
+  try {
+    const res = await fetch('/api/sensor-status');
+    const sensors = await res.json();
+
+    const container = document.getElementById('sensor-cards-container');
+    container.innerHTML = ''; // Container wird vor dem Hinzufügen der neuen Daten geleert
+
+    for (const [id, data] of Object.entries(sensors)) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-title">Sensor ${id}</div>
+        <div class="card-value">🌡️ ${data.temperature} °C</div>
+        <div class="card-value">💧 ${data.humidity} %</div>
+        <div class="card-footer">🕛 ${new Date(data.timestamp).toLocaleString('de-DE')}</div>
+      `;
+      container.appendChild(card);
+    }
+  } catch (err) {
+    console.error('Fehler beim Laden der Sensorwerte:', err);
+  }
+}
+
+fetchSensorData();
+setInterval(fetchSensorData, 10_000); // alle 10 Sekunden aktualisieren
+
+
+  </script>
+  
+
+  
+  
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -188,20 +276,24 @@ function EditableRuleItem({ r, operatorLabels, onDelete, onUpdate }) {
   const [success, setSuccess] = useState(false);
 
   function saveEdit() {
-    fetch('/api/rules/update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ oldRule: r, newRule: editRule })
-    }).then(() => {
-      onUpdate(r, editRule);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
-      setEditMode(false);
-    });
-  }
+  const updatedRule = convertCommaToDot(editRule);  // Umwandlung der Werte
+
+  fetch('/api/rules/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ oldRule: r, newRule: updatedRule })
+  }).then(() => {
+    onUpdate(r, updatedRule);
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 2000);
+    setEditMode(false);
+  });
+}
+
 
   function addCondition() {
-    setEditRule({ ...editRule, conditions: [...editRule.conditions, { param: 'vpd', op: '>', value: '' }] });
+    setEditRule({ ...editRule, conditions: [...editRule.conditions, { param: 'vpd', op: '>', value: '', hysteresis: '' }]
+  });
   }
 
   function removeCondition(i) {
@@ -260,6 +352,18 @@ function EditableRuleItem({ r, operatorLabels, onDelete, onUpdate }) {
                   cond[i].value = e.target.value;
                   setEditRule({ ...editRule, conditions: cond });
                 }} />
+                <input
+                  type="number"
+                  step="0.1"
+                  placeholder="Hysterese"
+                  value={c.hysteresis || ''}
+                  onChange={e => {
+                    const cond = [...editRule.conditions];
+                    cond[i].hysteresis = e.target.value;
+                    setEditRule({ ...editRule, conditions: cond });
+                  }}
+                />
+
                 <button className="delete-btn" onClick={() => removeCondition(i)}>🗑️</button>
               </div>
             ))}
@@ -299,7 +403,7 @@ function App() {
     action: '',
     activeFrom: '',
     activeTo: '',
-    conditions: [{ param: 'vpd', op: '>', value: '' }]
+    conditions: [{ param: 'vpd', op: '>', value: '' , hysteresis: ''}]
   });
 
   useEffect(() => {
@@ -318,22 +422,25 @@ function App() {
   }
 
   function addRule() {
-    fetch('/api/rules/add', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newRule)
-    }).then(() => {
-      setRules([...rules, newRule]);
-      setNewRule({
-        sensor: '',
-        relay: '',
-        action: '',
-        activeFrom: '',
-        activeTo: '',
-        conditions: [{ param: 'vpd', op: '>', value: '' }]
-      });
+  const updatedRule = convertCommaToDot(newRule);  // Umwandlung der Werte
+
+  fetch('/api/rules/add', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updatedRule)
+  }).then(() => {
+    setRules([...rules, updatedRule]);
+    setNewRule({
+      sensor: '',
+      relay: '',
+      action: '',
+      activeFrom: '',
+      activeTo: '',
+      conditions: [{ param: 'vpd', op: '>', value: '', hysteresis: '' }]
     });
-  }
+  });
+}
+
 
   function deleteRule(ruleToDelete) {
     fetch('/api/rules/delete', {
@@ -353,6 +460,19 @@ function App() {
       setRules(updated);
     }
   }
+  function convertCommaToDot(rule) {
+  const updatedConditions = rule.conditions.map(cond => ({
+    ...cond,
+    value: cond.value.replace(',', '.'),
+    hysteresis: cond.hysteresis ? cond.hysteresis.replace(',', '.') : ''
+  }));
+
+  return {
+    ...rule,
+    conditions: updatedConditions
+  };
+}
+
 
   const grouped = rules.reduce((acc, rule) => {
     if (!acc[rule.sensor]) acc[rule.sensor] = [];
@@ -362,7 +482,7 @@ function App() {
   return (
     <div>
       <div className="rule-list">
-        <h2>Regeln pro Sensor</h2>
+        <h2></h2>
         {Object.entries(grouped).map(([sensorId, sensorRules]) => (
           <SensorRuleGroup
             key={sensorId}
@@ -416,51 +536,71 @@ function App() {
         </div>
 
         {newRule.conditions.map((cond, i) => (
-          <div key={i} className="field-group">
-            <label>Bedingung {i + 1}</label>
-            <div style={{ display: 'flex', gap: '6px' }}>
-              <select value={cond.param} onChange={e => {
-                const updated = [...newRule.conditions];
-                updated[i].param = e.target.value;
-                setNewRule({ ...newRule, conditions: updated });
-              }}>
-                <option value="vpd">VPD</option>
-                <option value="temperature">Temperatur</option>
-                <option value="humidity">Luftfeuchtigkeit</option>
-              </select>
-              <select value={cond.op} onChange={e => {
-                const updated = [...newRule.conditions];
-                updated[i].op = e.target.value;
-                setNewRule({ ...newRule, conditions: updated });
-              }}>
-                <option value=">">größer als</option>
-                <option value="<">kleiner als</option>
-                <option value=">=">größer oder gleich</option>
-                <option value="<=">kleiner oder gleich</option>
-                <option value="==">gleich</option>
-              </select>
-              <input type="text" placeholder="Wert" value={cond.value} onChange={e => {
-                const updated = [...newRule.conditions];
-                updated[i].value = e.target.value;
-                setNewRule({ ...newRule, conditions: updated });
-              }} />
-              <button className="delete-btn" onClick={() => {
-                const updated = [...newRule.conditions];
-                updated.splice(i, 1);
-                setNewRule({ ...newRule, conditions: updated });
-              }}>🗑️</button>
-            </div>
-          </div>
-        ))}
+  <div key={i} style={{ 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '6px', 
+    marginBottom: '10px', 
+    flexWrap: 'wrap' 
+  }}>
+    <label style={{ minWidth: '90px' }}>Bedingung {i + 1}</label>
+    <select value={cond.param} onChange={e => {
+      const updated = [...newRule.conditions];
+      updated[i].param = e.target.value;
+      setNewRule({ ...newRule, conditions: updated });
+    }}>
+      <option value="vpd">VPD</option>
+      <option value="temperature">Temperatur</option>
+      <option value="humidity">Luftfeuchtigkeit</option>
+    </select>
+
+    <select value={cond.op} onChange={e => {
+      const updated = [...newRule.conditions];
+      updated[i].op = e.target.value;
+      setNewRule({ ...newRule, conditions: updated });
+    }}>
+      <option value=">">größer als</option>
+      <option value="<">kleiner als</option>
+      <option value=">=">größer oder gleich</option>
+      <option value="<=">kleiner oder gleich</option>
+      <option value="==">gleich</option>
+    </select>
+
+    <input type="text" placeholder="Wert" value={cond.value} onChange={e => {
+      const updated = [...newRule.conditions];
+      updated[i].value = e.target.value;
+      setNewRule({ ...newRule, conditions: updated });
+    }} />
+
+    <input
+      type="number"
+      step="0.1"
+      placeholder="Hysterese"
+      value={cond.hysteresis}
+      onChange={e => {
+        const updated = [...newRule.conditions];
+        updated[i].hysteresis = e.target.value;
+        setNewRule({ ...newRule, conditions: updated });
+      }}
+    />
+
+    <button className="delete-btn" onClick={() => {
+      const updated = [...newRule.conditions];
+      updated.splice(i, 1);
+      setNewRule({ ...newRule, conditions: updated });
+    }}>🗑️</button>
+  </div>
+))}
+
 
         <div className="field-group">
-          <button onClick={() => setNewRule({ ...newRule, conditions: [...newRule.conditions, { param: 'vpd', op: '>', value: '' }] })}>
+          <button onClick={() => setNewRule({ ...newRule, conditions: [...newRule.conditions, { param: 'vpd', op: '>', value: '', hysteresis: '' }] })
+          }>
             ➕ Bedingung
           </button>
         </div>
 
         <div className="field-group">
-          <label>Neue Regel speichern</label>
           <button onClick={addRule}>➕ Regel hinzufügen</button>
         </div>
       </div>
@@ -473,7 +613,7 @@ function App() {
           ))}
         </ul>
 
-        <h3>Neues Relais hinzufügen</h3>
+        <h3></h3>
         <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
           <input type="text" placeholder="Relaisname" value={newRelay.name}
             onChange={e => setNewRelay({ ...newRelay, name: e.target.value })} />
@@ -481,6 +621,7 @@ function App() {
             onChange={e => setNewRelay({ ...newRelay, ip: e.target.value })} />
           <button onClick={() => {
             const updated = [...relays, newRelay];
+           
             fetch('/api/relays', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },

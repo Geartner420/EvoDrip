@@ -19,7 +19,7 @@ const lastUpdateTime = new Map();
 const latestValues = new Map();
 
 // Lade persistente Zuordnung
-function loadSensorIdMapping() {
+export function loadSensorIdMapping() {
   if (fs.existsSync(ID_FILE)) {
     const raw = fs.readFileSync(ID_FILE);
     try {
@@ -47,7 +47,7 @@ function loadSensorIdMapping() {
 }
 
 // Speichere die Zuordnung von Sensor-IDs
-function saveSensorIdMapping() {
+export function saveSensorIdMapping() {
   // Umwandeln der Map in ein Array von Objekten
   const arr = Array.from(deviceToSensorId.entries()).map(([uuid, id]) => ({ uuid, id }));
 
@@ -149,24 +149,70 @@ function checkForOfflineSensors() {
 // Überprüfe alle 10 Minuten auf Offline-Sensoren
 setInterval(checkForOfflineSensors, OFFLINE_CHECK_INTERVAL_MS);
 
+// Funktion, die die Daten aus den JSON-Dateien liest
+function getSensorDataFromFile(sensorId) {
+  const filepath = path.join(DATA_DIR, `sensor_${sensorId}.json`);
+
+  if (!fs.existsSync(filepath)) {
+    console.warn(`⚠️ Keine Daten gefunden für Sensor ${sensorId}`);
+    return null;
+  }
+
+  let data = [];
+  try {
+    const raw = fs.readFileSync(filepath);
+    data = JSON.parse(raw);
+
+    if (!Array.isArray(data)) {
+      console.warn(`Warnung: Daten von Sensor ${sensorId} sind kein Array. Setze als leeres Array.`);
+      data = [];
+    }
+  } catch (err) {
+    console.error(`❌ Fehler beim Laden der Datei für Sensor ${sensorId}:`, err.message);
+    data = [];
+  }
+
+  return data[data.length - 1]; // Gibt die letzten gespeicherten Daten zurück
+}
+
+// Neue Version von getLatestSensorValues, die keine Sensor-IDs braucht
 export function getLatestSensorValues() {
   const result = {};
-  for (const [sensorId, data] of latestValues.entries()) {
-    result[sensorId] = data;
+  const files = fs.readdirSync(DATA_DIR);
+
+  for (const file of files) {
+    const match = file.match(/^sensor_(\d+)\.json$/); // Sensor-ID aus Dateinamen extrahieren
+    if (!match) continue;
+
+    const sensorId = match[1]; // Die Sensor-ID
+    const filepath = path.join(DATA_DIR, file); // Vollständiger Pfad zur Datei
+    const raw = fs.readFileSync(filepath, 'utf-8'); // Lese die Datei
+
+    try {
+      const data = JSON.parse(raw); // Parsen der JSON-Daten
+
+      if (Array.isArray(data) && data.length > 0) {
+        result[sensorId] = data[data.length - 1]; // Füge nur die neuesten Daten hinzu
+      }
+    } catch (err) {
+      console.error(`Fehler beim Parsen der Datei ${file}:`, err.message);
+    }
   }
-  return result;
+
+  console.log(`Aktuelle Sensordaten aus JSON-Dateien:`, result);
+  return result; // Gibt die gesammelten Daten zurück
 }
 
 export function cta() {
-  loadSensorIdMapping();
+  loadSensorIdMapping();  // Stellt sicher, dass die Sensor-IDs geladen werden
 
   noble.on('stateChange', (state) => {
     if (state === 'poweredOn') {
       console.log('🟢 BLE aktiv – TP357S-Scan läuft...');
-      noble.startScanning([], true);
+      noble.startScanning([], true);  // Starten des Scannens ohne den Status zu stoppen
     } else {
       console.log('🔴 BLE nicht bereit:', state);
-      noble.stopScanning();
+      // Hier können wir den Status ignorieren und das Scannen weiterhin fortsetzen
     }
   });
 
@@ -190,7 +236,7 @@ export function cta() {
 
     latestValues.set(sensorId, decoded);
 
-    console.log(`📡 [Sensor ${sensorId}] 🌡️ ${decoded.temperature} °C | 💧 ${decoded.humidity} %`);
+   console.log(`📡 [Sensor ${sensorId}] 🌡️ ${decoded.temperature} °C | 💧 ${decoded.humidity} %`);
     writeSensorData(sensorId, decoded);
   });
 }

@@ -34,6 +34,12 @@ const schema = Joi.object({
   TELEGRAM_BOT_TOKEN: Joi.string().required(),       
   TELEGRAM_CHAT_ID: Joi.string().required(),
   LEAF_TEMP_DIFF: Joi.number().min(-20).max(20).default(-2),
+  initialOffset: Joi.number().optional(),  // Hier optional machen, wenn nicht benötigt
+  minOnDuration: Joi.number().optional(), // Hier optional machen, wenn nicht benötigt
+  maxOnDuration: Joi.number().optional(), // Hier optional machen, wenn nicht benötigt
+  minOffDuration: Joi.number().optional(), // Hier optional machen, wenn nicht benötigt
+  maxOffDuration: Joi.number().optional(), // Hier optional machen, wenn nicht benötigt
+  simultaneousCycleInterval: Joi.number().optional(), // Hier optional machen, wenn nicht benötigt
 }).unknown();
 
 // Validierung der Umgebungsvariablen

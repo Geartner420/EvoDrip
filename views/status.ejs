@@ -17,34 +17,30 @@
       text-align: center;
       transition: transform 0.2s;
     }
-    .card:hover {
-      transform: scale(1.05);
-    }
-    .card-title {
-      font-size: 18px;
+    .card:hover { transform: scale(1.05); }
+    .card-title { font-size: 18px; color: #333; margin-bottom: 10px; }
+    .card-value { font-size: 20px; font-weight: bold; color: #4CAF50; margin: 5px 0; }
+    .section-title {
+      text-align: center;
+      font-size: 22px;
+      margin-top: 60px;
       color: #333;
-      margin-bottom: 10px;
-    }
-    .card-value {
-      font-size: 24px;
-      font-weight: bold;
-      color: #4CAF50;
     }
     .back-link {
       display: block;
       text-align: center;
-      margin-top: 30px;
+      margin-top: 40px;
       color: #4CAF50;
       text-decoration: none;
       font-size: 18px;
     }
-    .back-link:hover {
-      text-decoration: underline;
-    }
+    .back-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <h1>🌱 System Status</h1>
+
+  <!-- Statische Systemkarten -->
   <div class="card-container">
     <div class="card">
       <div class="card-title">🔢 Letzter Feuchtigkeitswert</div>
@@ -67,6 +63,42 @@
       <div class="card-value"><%= status.moistureSummaryIntervalMin %> min</div>
     </div>
   </div>
-  <a class="back-link" href="/">&larr; Zurück zur Hauptseite</a>
+
+  <!-- Dynamischer Sensorbereich -->
+  <h2 class="section-title">📡 Aktive Sensorwerte</h2>
+  <div class="card-container" id="sensor-cards-container">
+    <!-- Wird durch JS befüllt -->
+  </div>
+
+  <a class="back-link" href="/">&larr; Zurück zur Übersicht</a>
+
+  <script>
+    async function fetchSensorData() {
+      try {
+        const res = await fetch('/api/sensor-status');
+        const sensors = await res.json();
+
+        const container = document.getElementById('sensor-cards-container');
+        container.innerHTML = '';
+
+        for (const [id, data] of Object.entries(sensors)) {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="card-title">Sensor ${id}</div>
+            <div class="card-value">🌡️ ${data.temperature} °C</div>
+            <div class="card-value">💧 ${data.humidity} %</div>
+            <div class="card-value">🕛 ${new Date(data.timestamp).toLocaleString('de-DE')}</div>
+          `;
+          container.appendChild(card);
+        }
+      } catch (err) {
+        console.error('Fehler beim Laden der Sensorwerte:', err);
+      }
+    }
+
+    fetchSensorData();
+    setInterval(fetchSensorData, 10_000); // alle 10 Sekunden aktualisieren
+  </script>
 </body>
 </html>

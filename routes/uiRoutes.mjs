@@ -36,7 +36,7 @@ const felder = [
   ['WAIT_AFTER_WATER_MINUTES', 'Wartezeit nach Gießen (Min)', 'number'],
   ['UI_PASSWORD', 'Passwort', 'password'],
   ['DEBUG', 'Debug-Modus', 'checkbox'],
-  ['LEAF_TEMP_DIFF', 'Temperaturdifferenz', 'number'],
+  ['LEAF_TEMP_DIFF', 'Delta Blatt-Temperatur', 'number'],
 ];
 
 router.get('/', (req, res) => {

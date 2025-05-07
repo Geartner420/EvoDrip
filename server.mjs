@@ -1,5 +1,3 @@
-// server.mjs – Verbesserte Bewässerungssteuerung
-
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
@@ -17,7 +15,7 @@ import { buildWateringOptions } from './helper/wateringOptions.mjs';
 import config from './helper/config.mjs';
 import logger from './helper/logger.mjs';
 import { cta } from './services/connectAll.mjs';
-import {getLatestSensorValues} from './services/connectAll.mjs'
+import { getLatestSensorValues } from './services/connectAll.mjs';
 import sensorDataRoutes from './routes/sensorDataRoutes.mjs';
 import { startSensorProcessing } from './services/vpdService.mjs';
 import historyRoute from './routes/historyRoute.mjs';
@@ -26,12 +24,8 @@ import rulesRoutes from './routes/api/rules.mjs';
 import relaysRoutes from './routes/api/relays.mjs';
 import sensorsRoutes from './routes/api/sensors.mjs';
 import { startRuleEngine } from './services/rule_engine.mjs';
-
-console.log('[DEBUG] CWD:', process.cwd());
-console.log('[DEBUG] __dirname:', import.meta.url);
-
-
-
+import sensorStatusRoute from './routes/api/sensorStatus.mjs';
+import { controlRelays } from './services/umluftContol.mjs'; // Relaissteuerung importieren
 
 const {
   UI_USERNAME,
@@ -55,39 +49,57 @@ async function startServer() {
   app.use('/api/rules', rulesRoutes);
   app.use('/api/relays', relaysRoutes);
   app.use('/api/sensors', sensorsRoutes);
- 
+  app.use('/api/sensor-status', sensorStatusRoute);
+
   const filePath = './sensor_data/sensorNames.json';
+  
   // GET: Alle Namen zurückgeben
-app.get('/api/sensor-names', (req, res) => {
-  fs.readFile(filePath, (err, data) => {
-    if (err) return res.status(500).json({});
-    res.json(JSON.parse(data));
-  });
-});
-
-app.get('/shelly-control', (req, res) => {
-  res.render('index');
-});
-
-// POST: Einen Namen speichern
-app.post('/api/sensor-names', (req, res) => {
-  const { id, name } = req.body;
-  if (!id || typeof name !== 'string') {
-    return res.status(400).json({ success: false, message: 'Ungültige Daten' });
-  }
-
-  fs.readFile(filePath, (err, data) => {
-    const current = err ? {} : JSON.parse(data);
-    current[id] = name;
-
-    fs.writeFile(filePath, JSON.stringify(current, null, 2), err => {
-      if (err) return res.status(500).json({ success: false });
-      res.json({ success: true });
+  app.get('/api/sensor-names', (req, res) => {
+    fs.readFile(filePath, (err, data) => {
+      if (err) return res.status(500).json({});
+      res.json(JSON.parse(data));
     });
   });
-});
 
-   // Feuchtigkeitsdaten initial laden
+    // Rendern der neuen UI-Datei shellyControl.ejs
+    app.get('/shelly-control', (req, res) => {
+      res.render('index'); // Das Formular für Relaissteuerung
+    });
+
+  // Rendern der neuen UI-Datei shellyControl.ejs
+  app.get('/relay-cycle', (req, res) => {
+    res.render('shellyControl'); // Das Formular für Relaissteuerung
+  });
+
+  // Route zum Starten des Relaiszyklus
+  app.post('/start-relay-cycle', async (req, res) => {
+    try {
+        await controlRelays();  // Relaissteuerung aus umluftContol.mjs aufrufen
+        res.status(200).send('Relaissteuerung gestartet.');
+    } catch (error) {
+        res.status(500).send('Fehler beim Starten der Relaissteuerung: ' + error.message);
+    }
+  });
+
+  // POST: Einen Namen speichern
+  app.post('/api/sensor-names', (req, res) => {
+    const { id, name } = req.body;
+    if (!id || typeof name !== 'string') {
+      return res.status(400).json({ success: false, message: 'Ungültige Daten' });
+    }
+
+    fs.readFile(filePath, (err, data) => {
+      const current = err ? {} : JSON.parse(data);
+      current[id] = name;
+
+      fs.writeFile(filePath, JSON.stringify(current, null, 2), err => {
+        if (err) return res.status(500).json({ success: false });
+        res.json({ success: true });
+      });
+    });
+  });
+
+  // Feuchtigkeitsdaten initial laden
   let lastTriggerTime = loadState();
   loadMoistureData();
 
@@ -121,9 +133,34 @@ startSensorProcessing();
 startRuleEngine();
 watchEnvAndRestart();
 
-//sudo launchctl start com.evodrip.service
-//sudo launchctl bootout system /Library/LaunchDaemons/com.evodrip.service.plist
 
+//------------------------------------------------------------------------------------------------
+//Status anzeigen
 //sudo launchctl list | grep com.evodrip.service
+
+//------------------------------------------------------------------------------------------------
+//Reguläres Log einsehen
 //tail -f /Users/Peter_Pan/evo/newdrip.log 
 
+//------------------------------------------------------------------------------------------------
+// Alles anzeigen
+//------------------------------------------------------------------------------------------------
+// sudo tail -f /tmp/evodrip/out.log /tmp/evodrip/err.log
+
+//------------------------------------------------------------------------------------------------
+//Nur Fehler
+//------------------------------------------------------------------------------------------------
+// sudo tail -f /tmp/evodrip/err.log
+
+//------------------------------------------------------------------------------------------------
+// Nur normale Ausgaben
+//------------------------------------------------------------------------------------------------
+// sudo tail -f /tmp/evodrip/out.log
+
+//------------------------------------------------------------------------------------------------
+// Starten und stoppen
+//------------------------------------------------------------------------------------------------
+// sudo launchctl bootout system /Library/LaunchDaemons/com.evodrip.service.plist
+// sudo launchctl bootstrap system /Library/LaunchDaemons/com.evodrip.service.plist
+
+//------------------------------------------------------------------------------------------------

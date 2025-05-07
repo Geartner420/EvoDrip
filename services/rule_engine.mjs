@@ -14,6 +14,14 @@ const relayLogFile = path.join(dataDir, 'relay_log.json');
 
 const lastStates = {}; // Merkt sich den letzten Schaltzustand pro Relais
 
+const operatorMap = {
+  '>': 'größer als',
+  '<': 'kleiner als',
+  '>=': 'größer oder gleich',
+  '<=': 'kleiner oder gleich',
+  '==': 'gleich'
+};
+
 function loadJson(filePath) {
   if (!fs.existsSync(filePath)) return [];
   try {
@@ -46,18 +54,26 @@ function saveRelayLogEntry(entry) {
   }
 }
 
-function evaluateCondition(sensorValue, { param, op, value }) {
+function evaluateCondition(sensorValue, { param, op, value, hysteresis }, currentState) {
   const actual = sensorValue[param];
   const expected = parseFloat(value);
   if (actual == null || isNaN(expected)) return false;
 
+  const h = parseFloat(hysteresis) || 0;
+
   switch (op) {
-    case '>': return actual > expected;
-    case '<': return actual < expected;
-    case '>=': return actual >= expected;
-    case '<=': return actual <= expected;
-    case '==': return actual == expected;
-    default: return false;
+    case '>':
+      return currentState === 'off' ? actual > expected : actual > (expected - h);
+    case '<':
+      return currentState === 'off' ? actual < expected : actual < (expected + h);
+    case '>=':
+      return currentState === 'off' ? actual >= expected : actual > (expected - h);
+    case '<=':
+      return currentState === 'off' ? actual <= expected : actual < (expected + h);
+    case '==':
+      return actual === expected;
+    default:
+      return false;
   }
 }
 
@@ -66,7 +82,7 @@ function getShellyUrl(ip, state) {
 }
 
 function isWithinTimeWindow(from, to) {
-  if (!from || !to) return true; // keine Einschränkung
+  if (!from || !to) return true;
   const now = new Date();
   const [fromH, fromM] = from.split(':').map(Number);
   const [toH, toM] = to.split(':').map(Number);
@@ -75,6 +91,11 @@ function isWithinTimeWindow(from, to) {
   start.setHours(fromH, fromM, 0, 0);
   const end = new Date(now);
   end.setHours(toH, toM, 0, 0);
+
+  if (end < start) {
+    // Zeitfenster über Mitternacht
+    return now >= start || now <= end;
+  }
 
   return now >= start && now <= end;
 }
@@ -90,34 +111,53 @@ function runRuleEngine() {
   for (const rule of rules) {
     const sensorData = sensorMap[rule.sensor];
     if (!sensorData) {
-      logger.warn(`[rule_engine] Sensor "${rule.sensor}" nicht gefunden.`);
+      logger.warn(`[rule_engine] ❗ Sensor "${rule.sensor}" nicht gefunden.`);
       continue;
     }
 
     if (!isWithinTimeWindow(rule.activeFrom, rule.activeTo)) {
-     //logger.debug(`[rule_engine] Regel für ${rule.relay} aktuell nicht im Zeitfenster.`);
       continue;
     }
 
-    const shouldActivate = rule.conditions.every(cond => evaluateCondition(sensorData, cond));
-    if (!shouldActivate) continue;
+    const lastState = lastStates[rule.relay] || 'off';
 
-    const desiredState = rule.action; // 'on' oder 'off'
+    const conditionResults = rule.conditions.map(cond => {
+      const actual = sensorData[cond.param];
+      const passed = evaluateCondition(sensorData, cond, lastState);
+      const hStr = cond.hysteresis ? ` ±${cond.hysteresis}` : '';
+      const operatorText = operatorMap[cond.op] || cond.op;
+      const label = cond.param === 'temperature' ? '🌡' :
+                    cond.param === 'humidity' ? '💧' :
+                    cond.param === 'vpd' ? '📈' : '📊';
+      const desc = `${label} ${cond.param} ${operatorText} ${cond.value}${hStr} → aktuell: ${actual}`;
+      return { passed, desc };
+    });
+
+    const shouldActivate = conditionResults.every(r => r.passed);
+    if (!shouldActivate) {
+      const failed = conditionResults.filter(r => !r.passed).map(r => r.desc).join(' UND ');
+      // logger.debug(`[rule_engine] 💤 Keine Aktion für "${rule.relay}". Bedingungen nicht erfüllt:\n${failed}`);
+      continue;
+    }
+
+    const desiredState = rule.action;
     const ip = relayMap[rule.relay];
     if (!ip) {
-      logger.warn(`[rule_engine] Keine IP für Relais "${rule.relay}".`);
+      logger.warn(`[rule_engine] ⚠️ Keine IP für Relais "${rule.relay}".`);
       continue;
     }
 
-    const lastState = lastStates[rule.relay];
     if (desiredState !== lastState) {
+      const conditionStr = conditionResults.map(r => r.desc).join(' UND ');
+      const emoji = desiredState === 'on' ? '🟢' : '🔴';
+
       const url = getShellyUrl(ip, desiredState);
       fetch(url)
         .then(res => {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          logger.info(`[rule_engine] Relais "${rule.relay}" geschaltet: ${desiredState}`);
+          logger.info(`${emoji} Relais "${rule.relay}" wurde ${desiredState === 'on' ? 'eingeschaltet' : 'ausgeschaltet'}📄 Bedingungen: ${conditionStr}`);
 
-          const logEntry = {
+          saveRelayLogEntry({
             timestamp: new Date().toISOString(),
             relay: rule.relay,
             ip,
@@ -126,20 +166,19 @@ function runRuleEngine() {
             conditions: rule.conditions,
             activeFrom: rule.activeFrom,
             activeTo: rule.activeTo
-          };
-          saveRelayLogEntry(logEntry);
+          });
 
           lastStates[rule.relay] = desiredState;
         })
         .catch(err => {
-          logger.error(`[rule_engine] Fehler beim Schalten von ${rule.relay}: ${err.message}`);
+          logger.error(`[rule_engine] ❌ Fehler beim Schalten von ${rule.relay}: ${err.message}`);
         });
     }
   }
 }
 
 export function startRuleEngine() {
-  logger.info('[rule_engine] Regel-Engine gestartet (alle 10s)');
+  logger.info('🚀 Regel-Engine gestartet (alle 10s)');
   runRuleEngine();
   setInterval(runRuleEngine, 10000);
 }
