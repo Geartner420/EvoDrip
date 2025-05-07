@@ -22,6 +22,7 @@ const operatorMap = {
   '==': 'gleich'
 };
 
+// Sicheres Laden von JSON-Dateien mit Fehlerbehandlung
 function loadJson(filePath) {
   if (!fs.existsSync(filePath)) return [];
   try {
@@ -33,6 +34,7 @@ function loadJson(filePath) {
   }
 }
 
+// Sicheres Speichern von Log-Einträgen
 function saveRelayLogEntry(entry) {
   let log = [];
   try {
@@ -54,6 +56,15 @@ function saveRelayLogEntry(entry) {
   }
 }
 
+// Abgebrochene fetch-Anfragen mit Timeout-Management
+function fetchWithTimeout(url, timeout = 5000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  return fetch(url, { signal: controller.signal })
+    .finally(() => clearTimeout(id));
+}
+
+// Bedingungsüberprüfung mit Hysterese
 function evaluateCondition(sensorValue, { param, op, value, hysteresis }, currentState) {
   const actual = sensorValue[param];
   const expected = parseFloat(value);
@@ -77,10 +88,12 @@ function evaluateCondition(sensorValue, { param, op, value, hysteresis }, curren
   }
 }
 
+// Abrufen der Shelly-URL für Relaissteuerung
 function getShellyUrl(ip, state) {
   return `http://${ip}/relay/0?turn=${state}`;
 }
 
+// Prüfen, ob das aktuelle Zeitfenster gültig ist
 function isWithinTimeWindow(from, to) {
   if (!from || !to) return true;
   const now = new Date();
@@ -100,6 +113,7 @@ function isWithinTimeWindow(from, to) {
   return now >= start && now <= end;
 }
 
+// Hauptlogik der Regel-Engine
 function runRuleEngine() {
   const rules = loadJson(rulesFile);
   const relays = loadJson(relaysFile);
@@ -136,7 +150,6 @@ function runRuleEngine() {
     const shouldActivate = conditionResults.every(r => r.passed);
     if (!shouldActivate) {
       const failed = conditionResults.filter(r => !r.passed).map(r => r.desc).join(' UND ');
-      // logger.debug(`[rule_engine] 💤 Keine Aktion für "${rule.relay}". Bedingungen nicht erfüllt:\n${failed}`);
       continue;
     }
 
@@ -152,7 +165,7 @@ function runRuleEngine() {
       const emoji = desiredState === 'on' ? '🟢' : '🔴';
 
       const url = getShellyUrl(ip, desiredState);
-      fetch(url)
+      fetchWithTimeout(url)
         .then(res => {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           logger.info(`${emoji} Relais "${rule.relay}" wurde ${desiredState === 'on' ? 'eingeschaltet' : 'ausgeschaltet'}📄 Bedingungen: ${conditionStr}`);
@@ -177,8 +190,19 @@ function runRuleEngine() {
   }
 }
 
+// Lebenszeichen und Überwachung des Skripts
+let tick = 0;
+function runRuleEngineSafe() {
+  try {
+    logger.debug(`[rule_engine] ⏲ Lebenszeichen Tick ${++tick}`);
+    runRuleEngine();
+  } catch (err) {
+    logger.error(`[rule_engine] ❌ Ungefangener Fehler: ${err.message}`);
+  }
+}
+
 export function startRuleEngine() {
   logger.info('🚀 Regel-Engine gestartet (alle 10s)');
-  runRuleEngine();
-  setInterval(runRuleEngine, 10000);
+  runRuleEngineSafe();
+  setInterval(runRuleEngineSafe, 10000);
 }

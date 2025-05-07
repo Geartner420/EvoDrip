@@ -128,6 +128,7 @@ async function startServer() {
 // Server starten
 startServer();
 cta();
+controlRelays();
 getLatestSensorValues();
 startSensorProcessing();
 startRuleEngine();
@@ -164,3 +165,4 @@ watchEnvAndRestart();
 // sudo launchctl bootstrap system /Library/LaunchDaemons/com.evodrip.service.plist
 
 //------------------------------------------------------------------------------------------------
+//sudo pkill bluetoothd

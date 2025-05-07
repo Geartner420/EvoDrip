@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import logger from '../helper/logger.mjs';
 
 // Konfiguration der Relais
 const relays = [
@@ -54,13 +55,13 @@ async function sendRequest(url) {
 async function turnOn(relay) {
     await sendRequest(relay.relayUrlOn);
     relay.isOn = true;
-    console.log(`[${new Date().toLocaleTimeString()}] ${relay.name} eingeschaltet.`);
+   logger.info(`[${new Date().toLocaleTimeString()}] ${relay.name} eingeschaltet.`);
 }
 
 async function turnOff(relay) {
     await sendRequest(relay.relayUrlOff);
     relay.isOn = false;
-    console.log(`[${new Date().toLocaleTimeString()}] ${relay.name} ausgeschaltet.`);
+    logger.info(`[${new Date().toLocaleTimeString()}] ${relay.name} ausgeschaltet.`);
 }
 
 function getRandomNormal(mean, stdDev) {
@@ -94,21 +95,21 @@ async function startRelayCycle(relay) {
             relay.cycleCount++;
 
             if (relay.cycleCount % SIMULTANEOUS_CYCLE_INTERVAL === 0) {
-                console.log(`[${new Date().toLocaleTimeString()}] Zyklusintervall erreicht. Beide Relais werden gleichzeitig eingeschaltet.`);
+                logger.info(`[${new Date().toLocaleTimeString()}] Zyklusintervall erreicht. Beide Relais werden gleichzeitig eingeschaltet.`);
                 await ensureSimultaneousOn();
                 SIMULTANEOUS_CYCLE_INTERVAL = getRandomInterval(5, 10);
-                console.log(`[${new Date().toLocaleTimeString()}] Neues Zyklusintervall für gleichzeitige Einschaltung: ${SIMULTANEOUS_CYCLE_INTERVAL}`);
+                logger.info(`[${new Date().toLocaleTimeString()}] Neues Zyklusintervall für gleichzeitige Einschaltung: ${SIMULTANEOUS_CYCLE_INTERVAL}`);
             }
 
             const offDuration = getNormalDuration(MEAN_OFF, STDDEV_OFF, MIN_OFF_DURATION, MAX_OFF_DURATION);
-            console.log(`[${new Date().toLocaleTimeString()}] ${relay.name} bleibt für ${Math.round(offDuration / 60000 * 10) / 10} Minuten ausgeschaltet.`);
+            logger.info(`[${new Date().toLocaleTimeString()}] ${relay.name} bleibt für ${Math.round(offDuration / 60000 * 10) / 10} Minuten ausgeschaltet.`);
             await sleep(offDuration);
 
         } else {
             await turnOn(relay);
 
             const onDuration = getNormalDuration(MEAN_ON, STDDEV_ON, MIN_ON_DURATION, MAX_ON_DURATION);
-            console.log(`[${new Date().toLocaleTimeString()}] ${relay.name} bleibt für ${Math.round(onDuration / 60000 * 10) / 10} Minuten eingeschaltet.`);
+            logger.info(`[${new Date().toLocaleTimeString()}] ${relay.name} bleibt für ${Math.round(onDuration / 60000 * 10) / 10} Minuten eingeschaltet.`);
             await sleep(onDuration);
         }
     }
@@ -118,8 +119,8 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function ensureSimultaneousOn(duration = 2 * 60 * 1000) {
-    console.log(`[${new Date().toLocaleTimeString()}] Beide Relais werden gleichzeitig für mindestens 2 Minuten eingeschaltet.`);
+async function ensureSimultaneousOn(duration = 4 * 60 * 1000) {
+    console.log(`[${new Date().toLocaleTimeString()}] Beide Relais werden gleichzeitig für mindestens 4 Minuten eingeschaltet.`);
     await Promise.all(relays.map(relay => turnOn(relay)));
     await sleep(duration);
 }
