@@ -11,7 +11,7 @@ const relays = [
         isOn: false,
         timer: null,
         cycleCount: 0,
-        initialOffset: 0
+        initialOffset: 10000 // z. B. 10 Sekunden Versatz
     },
     {
         name: 'Umluft 2',
@@ -43,25 +43,25 @@ async function sendRequest(url) {
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            console.error(`Fehler beim Senden der Anfrage an ${url}: ${response.statusText}`);
+            logger.error(`❌ Fehler beim Senden der Anfrage an ${url}: ${response.statusText}`);
         } else {
-            console.log(`[${new Date().toLocaleTimeString()}] Anfrage erfolgreich gesendet an ${url}`);
+            logger.debug(`✅ Anfrage erfolgreich gesendet an ${url}`);
         }
     } catch (error) {
-        console.error(`Fehler beim Senden der Anfrage an ${url}:`, error);
+       logger.error(`❌ Fehler beim Senden der Anfrage an ${url}:`, error);
     }
 }
 
 async function turnOn(relay) {
     await sendRequest(relay.relayUrlOn);
     relay.isOn = true;
-   logger.info(`[${new Date().toLocaleTimeString()}] ${relay.name} eingeschaltet.`);
+   logger.info(`🟢 ${relay.name} eingeschaltet.`);
 }
 
 async function turnOff(relay) {
     await sendRequest(relay.relayUrlOff);
     relay.isOn = false;
-    logger.info(`[${new Date().toLocaleTimeString()}] ${relay.name} ausgeschaltet.`);
+    logger.info(`🔴 ${relay.name} ausgeschaltet.`);
 }
 
 function getRandomNormal(mean, stdDev) {
@@ -85,7 +85,7 @@ function getRandomInterval(min, max) {
 
 async function startRelayCycle(relay) {
     if (relay.initialOffset && relay.initialOffset > 0) {
-        console.log(`[${new Date().toLocaleTimeString()}] Warte initial ${relay.initialOffset / 1000} Sekunden bevor ${relay.name} startet.`);
+        logger.info(` Warte initial ${relay.initialOffset / 1000} Sekunden bevor ${relay.name} startet.`);
         await sleep(relay.initialOffset);
     }
 
@@ -95,10 +95,10 @@ async function startRelayCycle(relay) {
             relay.cycleCount++;
 
             if (relay.cycleCount % SIMULTANEOUS_CYCLE_INTERVAL === 0) {
-                logger.info(`[${new Date().toLocaleTimeString()}] Zyklusintervall erreicht. Beide Relais werden gleichzeitig eingeschaltet.`);
+                logger.info(`Zyklusintervall erreicht. Beide Relais werden gleichzeitig eingeschaltet.`);
                 await ensureSimultaneousOn();
                 SIMULTANEOUS_CYCLE_INTERVAL = getRandomInterval(5, 10);
-                logger.info(`[${new Date().toLocaleTimeString()}] Neues Zyklusintervall für gleichzeitige Einschaltung: ${SIMULTANEOUS_CYCLE_INTERVAL}`);
+                logger.info(`Neues Zyklusintervall für gleichzeitige Einschaltung: ${SIMULTANEOUS_CYCLE_INTERVAL}`);
             }
 
             const offDuration = getNormalDuration(MEAN_OFF, STDDEV_OFF, MIN_OFF_DURATION, MAX_OFF_DURATION);
@@ -120,7 +120,7 @@ function sleep(ms) {
 }
 
 async function ensureSimultaneousOn(duration = 4 * 60 * 1000) {
-    console.log(`[${new Date().toLocaleTimeString()}] Beide Relais werden gleichzeitig für mindestens 4 Minuten eingeschaltet.`);
+    logger.info(`Beide Relais werden gleichzeitig für mindestens 4 Minuten eingeschaltet.`);
     await Promise.all(relays.map(relay => turnOn(relay)));
     await sleep(duration);
 }
@@ -128,7 +128,7 @@ async function ensureSimultaneousOn(duration = 4 * 60 * 1000) {
 async function controlRelays() {
     relays.forEach(relay => {
         startRelayCycle(relay).catch(error => {
-            console.error(`Fehler im Zyklus von ${relay.name}:`, error);
+            logger.error(`Fehler im Zyklus von ${relay.name}:`, error);
         });
     });
 }

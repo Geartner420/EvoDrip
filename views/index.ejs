@@ -1,8 +1,9 @@
+<!-- ✨ Cleaned and Refactored index.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>🌱</Klima-Automatisierung>🌱</title>
+  <title>🌱 Klima-Automatisierung 🌱</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
@@ -101,245 +102,451 @@
       font-size: 14px;
     }
 
-    /* CSS für die Container-Karten */
+    .error-msg {
+      color: red;
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    .back-button {
+      background: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 20px auto;
+      display: block;
+      text-align: center;
+      width: max-content;
+    }
+
     .card-container {
       display: flex;
-      flex-wrap: wrap; /* Karten umbrechen, wenn der Platz nicht ausreicht */
-      justify-content: space-evenly; /* Gleichmäßige Verteilung der Karten */
-      gap: 20px; /* Abstand zwischen den Karten */
-      width: 100%; /* Container nimmt den gesamten Platz ein */
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      gap: 20px;
+      width: 100%;
       margin-top: 30px;
     }
 
-    /* CSS für die einzelnen Karten */
     .card {
       background: #ffffff;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 230px; /* Breite der Karten */
+      width: 230px;
       text-align: center;
       transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
       border: 2px solid #e0e0e0;
       margin-bottom: 20px;
     }
 
-    /* Hover-Effekt für die Karten */
     .card:hover {
       transform: scale(1.05);
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     }
 
-    /* Responsive Anpassung für kleinere Bildschirme */
     @media (max-width: 768px) {
       .card-container {
-        justify-content: center;  /* Karten zentrieren auf kleineren Bildschirmen */
+        justify-content: center;
       }
 
       .card {
-        width: 200px;  /* Kleinere Kartenbreite für kleinere Bildschirme */
+        width: 200px;
       }
     }
 
     @media (max-width: 600px) {
       .card {
-        width: 100%;             /* Karten füllen den Container auf sehr kleinen Bildschirmen */
-        margin-bottom: 10px;     /* Etwas Abstand zwischen den Karten */
+        width: 100%;
+        margin-bottom: 10px;
       }
     }
   </style>
-  <div style="text-align: center; margin-bottom: 20px;">
-
-  </div>
 </head>
 <body>
   <h1>🌱Klima-Automatisierung</h1>
-  <div style="text-align: center; padding: 10px;">
-    <button onclick="location.href='/'"
-      style="background: #4CAF50; 
-              display: flex;
-              margin: 20px auto;
-              text-align: center;
-              background-color: #4CAF50;
-              color: white;
-              padding: 10px 20px;
-              border-radius: 5px;
-              text-decoration: none;
-              width: max-content;
-             cursor: pointer;"> Zurück zur Übersicht
-        
-    </button>
-    <h2 class="section-title"></h2>
-    <div class="card-container" id="sensor-cards-container">
-      <!-- Wird durch JS befüllt -->
-    </div>
-  </div>
-  <div id="root"></div>
-</div>
 
+  <button onclick="location.href='/'" class="back-button">Zurück zur Übersicht</button>
+
+  <div class="card-container" id="sensor-cards-container">
+    <!-- Populated via JS -->
+  </div>
+
+  <div id="root"></div>
 
   <script>
-/**
- * Fetches sensor status data from the server and updates the UI.
- * 
- * This function retrieves the latest sensor data via a GET request to the '/api/sensor-status' endpoint.
- * Upon successful response, it parses the data and dynamically creates and appends sensor cards
- * to a container element identified by 'sensor-cards-container'. Each card displays the sensor's ID,
- * temperature, humidity, and the last updated timestamp. If an error occurs during the fetch operation,
- * it logs an error message to the console.
- */
- async function fetchSensorData() {
-  try {
-    const res = await fetch('/api/sensor-status');
-    const sensors = await res.json();
+let sensorNameMap = {};
 
-    const container = document.getElementById('sensor-cards-container');
-    container.innerHTML = ''; // Container wird vor dem Hinzufügen der neuen Daten geleert
+fetch('/api/sensor-names')
+  .then(res => res.json())
+  .then(data => {
+    sensorNameMap = data;
+    fetchSensorData(); // Nur laden, wenn Map da ist
+    setInterval(fetchSensorData, 10_000);
+  });
+    async function fetchSensorData() {
+      try {
+        const res = await fetch('/api/sensor-status');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const sensors = await res.json();
 
-    for (const [id, data] of Object.entries(sensors)) {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="card-title">Sensor ${id}</div>
-        <div class="card-value">🌡️ ${data.temperature} °C</div>
-        <div class="card-value">💧 ${data.humidity} %</div>
-        <div class="card-footer">🕛 ${new Date(data.timestamp).toLocaleString('de-DE')}</div>
-      `;
-      container.appendChild(card);
+        const container = document.getElementById('sensor-cards-container');
+        if (!container) return console.warn('❗ Kein Container mit ID sensor-cards-container gefunden.');
+
+        container.innerHTML = '';
+        for (const [id, data] of Object.entries(sensors)) {
+          const card = document.createElement('div');
+          const nameKey = id.replace('sensor_', '').replace('.json', '');
+          const sensorName = sensorNameMap[nameKey] || `Sensor ${id}`;
+
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="card-title">${sensorName}</div>
+
+            <div class="card-value">🌡️ ${data.temperature} °C</div>
+            <div class="card-value">💧 ${data.humidity} %</div>
+            <div class="card-footer">🕛 ${new Date(data.timestamp).toLocaleString('de-DE')}</div>
+          `;
+          container.appendChild(card);
+        }
+      } catch (err) {
+        console.error('Fehler beim Laden der Sensorwerte:', err);
+        const container = document.getElementById('sensor-cards-container');
+        if (container) {
+          container.innerHTML = '<div class="error-msg">Sensorwerte konnten nicht geladen werden.</div>';
+        }
+      }
     }
-  } catch (err) {
-    console.error('Fehler beim Laden der Sensorwerte:', err);
-  }
-}
 
-fetchSensorData();
-setInterval(fetchSensorData, 10_000); // alle 10 Sekunden aktualisieren
-
-
+    fetchSensorData();
+    setInterval(fetchSensorData, 10_000);
   </script>
-  
 
-  
-  
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script type="text/babel">
-const { useState, useEffect } = React;
+    const { useState, useEffect } = React;
 
-const operatorLabels = {
-  '>': 'größer als',
-  '<': 'kleiner als',
-  '>=': 'größer oder gleich',
-  '<=': 'kleiner oder gleich',
-  '==': 'gleich'
-};
+    const operatorLabels = {
+      '>': 'größer als',
+      '<': 'kleiner als',
+      '>=': 'größer oder gleich',
+      '<=': 'kleiner oder gleich',
+      '==': 'gleich'
+    };
 
-function SensorRuleGroup({ sensor, rules, operatorLabels, onDelete, onUpdate }) {
-  const [expanded, setExpanded] = useState(false);
+    const normalizeFloat = (value) => (value || '').replace(',', '.');
 
-  return (
-    <div style={{ marginBottom: '12px' }}>
-      <div
-        onClick={() => setExpanded(!expanded)}
-        style={{
-          cursor: 'pointer',
-          background: '#e9f5e9',
-          padding: '8px',
-          borderRadius: '5px',
-          fontWeight: 'bold',
-          border: '1px solid #ccc'
-        }}
-      >
-        {expanded ? '▼' : '▶'} {sensor} ({rules.length} Regel{rules.length !== 1 ? 'n' : ''})
-      </div>
-      {expanded && (
-        <div style={{ paddingLeft: '10px', marginTop: '6px' }}>
-          {rules.map((r, i) => (
-            <EditableRuleItem
-              key={i}
-              r={r}
-              operatorLabels={operatorLabels}
-              onDelete={onDelete}
-              onUpdate={onUpdate}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function EditableRuleItem({ r, operatorLabels, onDelete, onUpdate }) {
+    function convertCommaToDot(rule) {
+      return {
+        ...rule,
+        conditions: rule.conditions.map(cond => ({
+          ...cond,
+          value: normalizeFloat(cond.value),
+          hysteresis: normalizeFloat(cond.hysteresis)
+        }))
+      };
+    }
+    function EditableRuleItem({ r, operatorLabels, onDelete, onUpdate }) {
   const [editMode, setEditMode] = useState(false);
   const [editRule, setEditRule] = useState(r);
+  const [originalRule] = useState(() => structuredClone(r));
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
 
   function saveEdit() {
-  const updatedRule = convertCommaToDot(editRule);  // Umwandlung der Werte
+    const updatedRule = convertCommaToDot(editRule);
 
-  fetch('/api/rules/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ oldRule: r, newRule: updatedRule })
-  }).then(() => {
-    onUpdate(r, updatedRule);
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 2000);
-    setEditMode(false);
-  });
-}
-
-
-  function addCondition() {
-    setEditRule({ ...editRule, conditions: [...editRule.conditions, { param: 'vpd', op: '>', value: '', hysteresis: '' }]
-  });
+    fetch('/api/rules/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ oldRule: originalRule, newRule: updatedRule })
+    }).then(res => {
+      if (res.ok) {
+        onUpdate(originalRule, updatedRule);
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 2000);
+        setEditMode(false);
+      } else {
+        throw new Error('Serverfehler');
+      }
+    }).catch(() => {
+      setError(true);
+      setTimeout(() => setError(false), 2000);
+    });
   }
 
-  function removeCondition(i) {
-    const updated = [...editRule.conditions];
-    updated.splice(i, 1);
-    setEditRule({ ...editRule, conditions: updated });
-  }
-
-  return (
-    <div className="rule-item">
-      <div style={{ flex: 1 }}>
-        {!editMode ? (
-          <>
-            <strong>{r.relay}</strong> {r.action === 'on' ? 'einschalten' : 'ausschalten'}<br />
-            Wenn {r.conditions.map(c =>
-              `${c.param} ${operatorLabels[c.op] || c.op} ${c.value}`
-            ).join(' UND ')}
-            {r.activeFrom && r.activeTo && (
-              <div style={{ fontSize: '12px', color: '#555' }}>
-                (aktiv von {r.activeFrom} bis {r.activeTo})
-              </div>
+      return (
+        <div className="rule-item">
+          <div style={{ flex: 1 }}>
+            {!editMode ? (
+              <>
+                <strong>{r.relay}</strong> {r.action === 'on' ? 'einschalten' : 'ausschalten'}<br />
+                Wenn {r.conditions.map(c =>
+                  `${c.param} ${operatorLabels[c.op] || c.op} ${c.value}`
+                ).join(' UND ')}
+                {r.activeFrom && r.activeTo && (
+                  <div style={{ fontSize: '12px', color: '#555' }}>
+                    (aktiv von {r.activeFrom} bis {r.activeTo})
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <select value={editRule.action} onChange={e => setEditRule({ ...editRule, action: e.target.value })}>
+                  <option value="on">einschalten</option>
+                  <option value="off">ausschalten</option>
+                </select>
+                <input type="time" value={editRule.activeFrom} onChange={e => setEditRule({ ...editRule, activeFrom: e.target.value })} />
+                <input type="time" value={editRule.activeTo} onChange={e => setEditRule({ ...editRule, activeTo: e.target.value })} />
+                {editRule.conditions.map((c, i) => (
+                  <div key={i} style={{ display: 'flex', gap: '6px', marginBottom: '4px' }}>
+                    <select value={c.param} onChange={e => {
+                      const cond = [...editRule.conditions];
+                      cond[i].param = e.target.value;
+                      setEditRule({ ...editRule, conditions: cond });
+                    }}>
+                      <option value="vpd">VPD</option>
+                      <option value="temperature">Temperatur</option>
+                      <option value="humidity">Luftfeuchtigkeit</option>
+                    </select>
+                    <select value={c.op} onChange={e => {
+                      const cond = [...editRule.conditions];
+                      cond[i].op = e.target.value;
+                      setEditRule({ ...editRule, conditions: cond });
+                    }}>
+                      <option value=">">größer als</option>
+                      <option value="<">kleiner als</option>
+                      <option value=">=">größer oder gleich</option>
+                      <option value="<=">kleiner oder gleich</option>
+                      <option value="==">gleich</option>
+                    </select>
+                    <input type="text" value={c.value} onChange={e => {
+                      const cond = [...editRule.conditions];
+                      cond[i].value = e.target.value;
+                      setEditRule({ ...editRule, conditions: cond });
+                    }} />
+                    <input type="number" step="0.1" placeholder="Hysterese" value={c.hysteresis || ''} onChange={e => {
+                      const cond = [...editRule.conditions];
+                      cond[i].hysteresis = e.target.value;
+                      setEditRule({ ...editRule, conditions: cond });
+                    }} />
+                    <button className="delete-btn" onClick={() => {
+                      const updated = [...editRule.conditions];
+                      updated.splice(i, 1);
+                      setEditRule({ ...editRule, conditions: updated });
+                    }}>🗑️</button>
+                  </div>
+                ))}
+                <button onClick={() => setEditRule({ ...editRule, conditions: [...editRule.conditions, { param: 'vpd', op: '>', value: '', hysteresis: '' }] })}>➕ Bedingung</button>
+              </>
             )}
-          </>
-        ) : (
-          <>
-            <select value={editRule.action} onChange={e => setEditRule({ ...editRule, action: e.target.value })}>
-              <option value="on">einschalten</option>
-              <option value="off">ausschalten</option>
-            </select>
-            <input type="time" value={editRule.activeFrom} onChange={e => setEditRule({ ...editRule, activeFrom: e.target.value })} />
-            <input type="time" value={editRule.activeTo} onChange={e => setEditRule({ ...editRule, activeTo: e.target.value })} />
-            {editRule.conditions.map((c, i) => (
-              <div key={i} style={{ display: 'flex', gap: '6px', marginBottom: '4px' }}>
-                <select value={c.param} onChange={e => {
-                  const cond = [...editRule.conditions];
-                  cond[i].param = e.target.value;
-                  setEditRule({ ...editRule, conditions: cond });
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '10px', gap: '4px' }}>
+            {!editMode ? (
+              <>
+                <button onClick={() => setEditMode(true)}>✏️ bearbeiten</button>
+                <button className="delete-btn" onClick={() => {
+                         if (confirm('⚠️ Bist du sicher, dass du diese Regel löschen möchtest?')) {onDelete(r);}}}>🗑️ löschen</button></>
+            ) : (
+              <>
+                <button onClick={saveEdit}>💾 speichern</button>
+                <button onClick={() => {
+                  setEditRule(r);
+                  setEditMode(false);
+                }}>✖️ abbrechen</button>
+              </>
+            )}
+            {success && <div className="success-msg">✅ Gespeichert</div>}
+            {error && <div className="error-msg">❌ Fehler beim Speichern</div>}
+          </div>
+        </div>
+      );
+    }
+
+    function SensorRuleGroup({ sensor, rules, operatorLabels, onDelete, onUpdate }) {
+      const [expanded, setExpanded] = useState(false);
+
+      return (
+        <div style={{ marginBottom: '12px' }}>
+          <div
+            onClick={() => setExpanded(!expanded)}
+            style={{
+              cursor: 'pointer',
+              background: '#e9f5e9',
+              padding: '8px',
+              borderRadius: '5px',
+              fontWeight: 'bold',
+              border: '1px solid #ccc'
+            }}
+          >
+            {expanded ? '▼' : '▶'} {sensor} ({rules.length} Regel{rules.length !== 1 ? 'n' : ''})
+          </div>
+          {expanded && (
+            <div style={{ paddingLeft: '10px', marginTop: '6px' }}>
+              {rules.map((r, i) => (
+                <EditableRuleItem
+                  key={i}
+                  r={r}
+                  operatorLabels={operatorLabels}
+                  onDelete={onDelete}
+                  onUpdate={onUpdate}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+    function App() {
+      const [rules, setRules] = useState([]);
+      const [relays, setRelays] = useState([]);
+      const [sensors, setSensors] = useState([]);
+      const [sensorNameMap, setSensorNameMap] = useState({});
+      const [newRelay, setNewRelay] = useState({ name: '', ip: '' });
+      const [newRule, setNewRule] = useState({
+        sensor: '',
+        relay: '',
+        action: '',
+        activeFrom: '',
+        activeTo: '',
+        conditions: [{ param: 'vpd', op: '>', value: '', hysteresis: '' }]
+      });
+      const [saveMessage, setSaveMessage] = useState('');
+
+      useEffect(() => {
+        fetch('/api/relays').then(res => res.json()).then(setRelays);
+        fetch('/api/rules').then(res => res.json()).then(setRules);
+        fetch('/api/sensors').then(res => res.json()).then(setSensors);
+        fetch('/api/sensor-names').then(res => res.json()).then(setSensorNameMap);
+      }, []);
+
+      function addRule() {
+        const updatedRule = convertCommaToDot(newRule);
+
+        fetch('/api/rules/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedRule)
+        }).then(res => {
+          if (res.ok) {
+            setRules(prev => [...prev, updatedRule]);
+            setNewRule({
+              sensor: '',
+              relay: '',
+              action: '',
+              activeFrom: '',
+              activeTo: '',
+              conditions: [{ param: 'vpd', op: '>', value: '', hysteresis: '' }]
+            });
+            setSaveMessage('✅ Regel hinzugefügt');
+            setTimeout(() => setSaveMessage(''), 2000);
+          } else {
+            throw new Error();
+          }
+        }).catch(() => {
+          setSaveMessage('❌ Fehler beim Hinzufügen');
+          setTimeout(() => setSaveMessage(''), 2000);
+        });
+      }
+
+      function deleteRule(ruleToDelete) {
+        fetch('/api/rules/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ruleToDelete)
+        }).then(() => {
+          setRules(rules => rules.filter(rule => JSON.stringify(rule) !== JSON.stringify(ruleToDelete)));
+        });
+      }
+
+      function updateRuleInUI(oldRule, newRule) {
+        setRules(rules => rules.map(r =>
+          JSON.stringify(r) === JSON.stringify(oldRule) ? newRule : r
+        ));
+      }
+
+      const grouped = rules.reduce((acc, rule) => {
+        acc[rule.sensor] = acc[rule.sensor] || [];
+        acc[rule.sensor].push(rule);
+        return acc;
+      }, {});
+
+      return (
+        <div>
+          <div className="rule-list">
+            <h2>Regeln</h2>
+            {Object.entries(grouped).map(([sensorId, sensorRules]) => (
+              <SensorRuleGroup
+                key={sensorId}
+                sensor={sensorNameMap[sensorId.replace('sensor_', '').replace('.json', '')] || sensorId}
+                rules={sensorRules}
+                operatorLabels={operatorLabels}
+                onDelete={deleteRule}
+                onUpdate={updateRuleInUI}
+              />
+            ))}
+          </div>
+
+          <div className="form-container">
+            <div className="field-group">
+              <label>Sensor</label>
+              <select value={newRule.sensor} onChange={e => setNewRule({ ...newRule, sensor: e.target.value })}>
+                <option value="">Sensor wählen</option>
+                {sensors.map(s => (
+                  <option key={s} value={s}>
+                    {sensorNameMap[s.replace('sensor_', '').replace('.json', '')] || s}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="field-group">
+              <label>Relais</label>
+              <select value={newRule.relay} onChange={e => setNewRule({ ...newRule, relay: e.target.value })}>
+                <option value="">Relais wählen</option>
+                {relays.map(r => <option key={r.name} value={r.name}>{r.name}</option>)}
+              </select>
+            </div>
+
+            <div className="field-group">
+              <label>Aktion</label>
+              <select value={newRule.action} onChange={e => setNewRule({ ...newRule, action: e.target.value })}>
+                <option value="">Aktion wählen</option>
+                <option value="on">einschalten</option>
+                <option value="off">ausschalten</option>
+              </select>
+            </div>
+
+            <div className="field-group">
+              <label>Aktiv von</label>
+              <input type="time" value={newRule.activeFrom} onChange={e => setNewRule({ ...newRule, activeFrom: e.target.value })} />
+            </div>
+
+            <div className="field-group">
+              <label>Aktiv bis</label>
+              <input type="time" value={newRule.activeTo} onChange={e => setNewRule({ ...newRule, activeTo: e.target.value })} />
+            </div>
+
+            {newRule.conditions.map((cond, i) => (
+              <div key={i} style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <label>Bedingung {i + 1}</label>
+                <select value={cond.param} onChange={e => {
+                  const updated = [...newRule.conditions];
+                  updated[i].param = e.target.value;
+                  setNewRule({ ...newRule, conditions: updated });
                 }}>
                   <option value="vpd">VPD</option>
                   <option value="temperature">Temperatur</option>
                   <option value="humidity">Luftfeuchtigkeit</option>
                 </select>
-                <select value={c.op} onChange={e => {
-                  const cond = [...editRule.conditions];
-                  cond[i].op = e.target.value;
-                  setEditRule({ ...editRule, conditions: cond });
+
+                <select value={cond.op} onChange={e => {
+                  const updated = [...newRule.conditions];
+                  updated[i].op = e.target.value;
+                  setNewRule({ ...newRule, conditions: updated });
                 }}>
                   <option value=">">größer als</option>
                   <option value="<">kleiner als</option>
@@ -347,297 +554,74 @@ function EditableRuleItem({ r, operatorLabels, onDelete, onUpdate }) {
                   <option value="<=">kleiner oder gleich</option>
                   <option value="==">gleich</option>
                 </select>
-                <input type="text" value={c.value} onChange={e => {
-                  const cond = [...editRule.conditions];
-                  cond[i].value = e.target.value;
-                  setEditRule({ ...editRule, conditions: cond });
-                }} />
-                <input
-                  type="number"
-                  step="0.1"
-                  placeholder="Hysterese"
-                  value={c.hysteresis || ''}
-                  onChange={e => {
-                    const cond = [...editRule.conditions];
-                    cond[i].hysteresis = e.target.value;
-                    setEditRule({ ...editRule, conditions: cond });
-                  }}
-                />
 
-                <button className="delete-btn" onClick={() => removeCondition(i)}>🗑️</button>
+                <input type="text" value={cond.value} onChange={e => {
+                  const updated = [...newRule.conditions];
+                  updated[i].value = e.target.value;
+                  setNewRule({ ...newRule, conditions: updated });
+                }} />
+
+                <input type="number" step="0.1" placeholder="Hysterese" value={cond.hysteresis || ''} onChange={e => {
+                  const updated = [...newRule.conditions];
+                  updated[i].hysteresis = e.target.value;
+                  setNewRule({ ...newRule, conditions: updated });
+                }} />
+
+                <button className="delete-btn" onClick={() => {
+                  const updated = [...newRule.conditions];
+                  updated.splice(i, 1);
+                  setNewRule({ ...newRule, conditions: updated });
+                }}>🗑️</button>
               </div>
             ))}
-            <button onClick={addCondition}>➕ Bedingung</button>
-          </>
-        )}
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '10px', gap: '4px' }}>
-        {!editMode ? (
-          <>
-            <button onClick={() => setEditMode(true)}>✏️ bearbeiten</button>
-            <button className="delete-btn" onClick={() => onDelete(r)}>🗑️ löschen</button>
-          </>
-        ) : (
-          <>
-            <button onClick={saveEdit}>💾 speichern</button>
-            <button onClick={() => {
-              setEditRule(r);
-              setEditMode(false);
-            }}>✖️ abbrechen</button>
-          </>
-        )}
-        {success && <div className="success-msg">✅ Gespeichert</div>}
-      </div>
-    </div>
-  );
-}
-function App() {
-  const [rules, setRules] = useState([]);
-  const [relays, setRelays] = useState([]);
-  const [sensors, setSensors] = useState([]);
-  const [sensorNameMap, setSensorNameMap] = useState({});
-  const [newRelay, setNewRelay] = useState({ name: '', ip: '' });
-  const [newRule, setNewRule] = useState({
-    sensor: '',
-    relay: '',
-    action: '',
-    activeFrom: '',
-    activeTo: '',
-    conditions: [{ param: 'vpd', op: '>', value: '' , hysteresis: ''}]
-  });
 
-  useEffect(() => {
-    fetch('/api/relays').then(res => res.json()).then(setRelays);
-    fetch('/api/rules').then(res => res.json()).then(setRules);
-    fetch('/api/sensors').then(res => res.json()).then(setSensors);
-    fetch('/api/sensor-names').then(res => res.json()).then(setSensorNameMap);
-  }, []);
+            <div className="field-group">
+              <button onClick={() => setNewRule({ ...newRule, conditions: [...newRule.conditions, { param: 'vpd', op: '>', value: '', hysteresis: '' }] })}>
+                ➕ Bedingung
+              </button>
+            </div>
 
-  function saveRules(updated) {
-    fetch('/api/rules', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updated)
-    }).then(() => setRules(updated));
-  }
+            <div className="field-group">
+              <button onClick={addRule}>➕ Regel hinzufügen</button>
+              {saveMessage && <div className={saveMessage.startsWith('✅') ? 'success-msg' : 'error-msg'}>{saveMessage}</div>}
+            </div>
+          </div>
 
-  function addRule() {
-  const updatedRule = convertCommaToDot(newRule);  // Umwandlung der Werte
+          <div className="rule-list">
+            <h2>Bekannte Relais</h2>
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+              {relays.map(r => (
+                <li key={r.name}><strong>{r.name}</strong> → {r.ip}</li>
+              ))}
+            </ul>
 
-  fetch('/api/rules/add', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updatedRule)
-  }).then(() => {
-    setRules([...rules, updatedRule]);
-    setNewRule({
-      sensor: '',
-      relay: '',
-      action: '',
-      activeFrom: '',
-      activeTo: '',
-      conditions: [{ param: 'vpd', op: '>', value: '', hysteresis: '' }]
-    });
-  });
-}
-
-
-  function deleteRule(ruleToDelete) {
-    fetch('/api/rules/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(ruleToDelete)
-    }).then(() => {
-      setRules(rules.filter(rule => rule !== ruleToDelete));
-    });
-  }
-
-  function updateRuleInUI(oldRule, newRule) {
-    const updated = [...rules];
-    const index = updated.findIndex(r => r === oldRule);
-    if (index !== -1) {
-      updated[index] = newRule;
-      setRules(updated);
+            <h3>Neues Relais</h3>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
+              <input type="text" placeholder="Relaisname" value={newRelay.name} onChange={e => setNewRelay({ ...newRelay, name: e.target.value })} />
+              <input type="text" placeholder="IP-Adresse" value={newRelay.ip} onChange={e => setNewRelay({ ...newRelay, ip: e.target.value })} />
+              <button onClick={() => {
+                const updated = [...relays, newRelay];
+                fetch('/api/relays', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(updated)
+                }).then(() => {
+                  setRelays(updated);
+                  setNewRelay({ name: '', ip: '' });
+                });
+              }}>➕ Hinzufügen</button>
+            </div>
+          </div>
+        </div>
+      );
     }
-  }
-  function convertCommaToDot(rule) {
-  const updatedConditions = rule.conditions.map(cond => ({
-    ...cond,
-    value: cond.value.replace(',', '.'),
-    hysteresis: cond.hysteresis ? cond.hysteresis.replace(',', '.') : ''
-  }));
 
-  return {
-    ...rule,
-    conditions: updatedConditions
-  };
-}
-
-
-  const grouped = rules.reduce((acc, rule) => {
-    if (!acc[rule.sensor]) acc[rule.sensor] = [];
-    acc[rule.sensor].push(rule);
-    return acc;
-  }, {});
-  return (
-    <div>
-      <div className="rule-list">
-        <h2></h2>
-        {Object.entries(grouped).map(([sensorId, sensorRules]) => (
-          <SensorRuleGroup
-            key={sensorId}
-            sensor={sensorNameMap[sensorId.replace('sensor_', '').replace('.json', '')] || sensorId}
-            rules={sensorRules}
-            operatorLabels={operatorLabels}
-            onDelete={deleteRule}
-            onUpdate={updateRuleInUI}
-          />
-        ))}
-      </div>
-
-      <div className="form-container">
-        <div className="field-group">
-          <label>Sensor</label>
-          <select value={newRule.sensor} onChange={e => setNewRule({ ...newRule, sensor: e.target.value })}>
-            <option value="">Sensor wählen</option>
-            {sensors.map(s => (
-              <option key={s} value={s}>
-                {sensorNameMap[s.replace('sensor_', '').replace('.json', '')] || s}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="field-group">
-          <label>Relais</label>
-          <select value={newRule.relay} onChange={e => setNewRule({ ...newRule, relay: e.target.value })}>
-            <option value="">Relais wählen</option>
-            {relays.map(r => <option key={r.name} value={r.name}>{r.name}</option>)}
-          </select>
-        </div>
-
-        <div className="field-group">
-          <label>Aktion</label>
-          <select value={newRule.action} onChange={e => setNewRule({ ...newRule, action: e.target.value })}>
-            <option value="">Aktion wählen</option>
-            <option value="on">einschalten</option>
-            <option value="off">ausschalten</option>
-          </select>
-        </div>
-
-        <div className="field-group">
-          <label>Aktiv von</label>
-          <input type="time" value={newRule.activeFrom} onChange={e => setNewRule({ ...newRule, activeFrom: e.target.value })} />
-        </div>
-
-        <div className="field-group">
-          <label>Aktiv bis</label>
-          <input type="time" value={newRule.activeTo} onChange={e => setNewRule({ ...newRule, activeTo: e.target.value })} />
-        </div>
-
-        {newRule.conditions.map((cond, i) => (
-  <div key={i} style={{ 
-    display: 'flex', 
-    alignItems: 'center', 
-    gap: '6px', 
-    marginBottom: '10px', 
-    flexWrap: 'wrap' 
-  }}>
-    <label style={{ minWidth: '90px' }}>Bedingung {i + 1}</label>
-    <select value={cond.param} onChange={e => {
-      const updated = [...newRule.conditions];
-      updated[i].param = e.target.value;
-      setNewRule({ ...newRule, conditions: updated });
-    }}>
-      <option value="vpd">VPD</option>
-      <option value="temperature">Temperatur</option>
-      <option value="humidity">Luftfeuchtigkeit</option>
-    </select>
-
-    <select value={cond.op} onChange={e => {
-      const updated = [...newRule.conditions];
-      updated[i].op = e.target.value;
-      setNewRule({ ...newRule, conditions: updated });
-    }}>
-      <option value=">">größer als</option>
-      <option value="<">kleiner als</option>
-      <option value=">=">größer oder gleich</option>
-      <option value="<=">kleiner oder gleich</option>
-      <option value="==">gleich</option>
-    </select>
-
-    <input type="text" placeholder="Wert" value={cond.value} onChange={e => {
-      const updated = [...newRule.conditions];
-      updated[i].value = e.target.value;
-      setNewRule({ ...newRule, conditions: updated });
-    }} />
-
-    <input
-      type="number"
-      step="0.1"
-      placeholder="Hysterese"
-      value={cond.hysteresis}
-      onChange={e => {
-        const updated = [...newRule.conditions];
-        updated[i].hysteresis = e.target.value;
-        setNewRule({ ...newRule, conditions: updated });
-      }}
-    />
-
-    <button className="delete-btn" onClick={() => {
-      const updated = [...newRule.conditions];
-      updated.splice(i, 1);
-      setNewRule({ ...newRule, conditions: updated });
-    }}>🗑️</button>
-  </div>
-))}
-
-
-        <div className="field-group">
-          <button onClick={() => setNewRule({ ...newRule, conditions: [...newRule.conditions, { param: 'vpd', op: '>', value: '', hysteresis: '' }] })
-          }>
-            ➕ Bedingung
-          </button>
-        </div>
-
-        <div className="field-group">
-          <button onClick={addRule}>➕ Regel hinzufügen</button>
-        </div>
-      </div>
-
-      <div className="rule-list">
-        <h2>Bekannte Relais</h2>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {relays.map(r => (
-            <li key={r.name}><strong>{r.name}</strong> → {r.ip}</li>
-          ))}
-        </ul>
-
-        <h3></h3>
-        <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
-          <input type="text" placeholder="Relaisname" value={newRelay.name}
-            onChange={e => setNewRelay({ ...newRelay, name: e.target.value })} />
-          <input type="text" placeholder="IP-Adresse" value={newRelay.ip}
-            onChange={e => setNewRelay({ ...newRelay, ip: e.target.value })} />
-          <button onClick={() => {
-            const updated = [...relays, newRelay];
-           
-            fetch('/api/relays', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(updated)
-            }).then(() => {
-              setRelays(updated);
-              setNewRelay({ name: '', ip: '' });
-            });
-          }}>➕ Hinzufügen</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    const root = document.getElementById('root');
+    if (!root) {
+      console.error('💥 Kein Root-Element für React gefunden!');
+    } else {
+      ReactDOM.createRoot(root).render(<App />);
+    }
   </script>
 </body>
 </html>

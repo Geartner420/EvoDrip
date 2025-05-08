@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const STATE_FILE = path.resolve(process.cwd(), 'state.json');
+const STATE_FILE = path.resolve(process.cwd(), 'sensor_data', 'state.json');
 
 export function loadState() {
   try {

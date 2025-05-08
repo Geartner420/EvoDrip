@@ -8,7 +8,7 @@ import fs from 'fs';
 const router = express.Router();
 
 router.delete('/delete-moisture-file', (req, res) => {
-  const filePath = '/Users/Peter_Pan/newdrip/moisture.json';
+  const filePath = '/Users/Peter_Pan/evo/sensor_data/moisture.json';
 
   try {
     clearMoistureHistory();

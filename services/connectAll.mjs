@@ -2,6 +2,8 @@ import noble from 'noble-mac';
 import fs from 'fs';
 import path from 'path';
 import { sendTelegramMessage } from './telegramService.mjs';
+import logger from '../helper/logger.mjs';
+
 
 // Verzeichnisse für Sensor-Daten und IDs
 const ID_FILE = path.join('./sensor_data/sensor_ids.json');
@@ -37,11 +39,11 @@ export function loadSensorIdMapping() {
         console.log(`📁 Sensor-Zuordnung geladen (${deviceToSensorId.size} bekannt)`);
       }
     } catch (err) {
-      console.error('❌ Fehler beim Laden der sensor_ids.json:', err.message);
+      logger.error('❌ Fehler beim Laden der sensor_ids.json:', err.message);
       deviceToSensorId.clear(); // Bei Fehlern wird die Zuordnung geleert
     }
   } else {
-    console.warn('sensor_ids.json existiert nicht. Erstelle eine neue Zuordnung.');
+    logger.warn('sensor_ids.json existiert nicht. Erstelle eine neue Zuordnung.');
     saveSensorIdMapping(); // Lege eine neue Datei mit einem leeren Array an
   }
 }
@@ -52,12 +54,12 @@ export function saveSensorIdMapping() {
   const arr = Array.from(deviceToSensorId.entries()).map(([uuid, id]) => ({ uuid, id }));
 
   if (!Array.isArray(arr)) {
-    console.error('❌ Fehler: sensor_ids.json Zuordnung ist ungültig.');
+    logger.error('❌ Fehler: sensor_ids.json Zuordnung ist ungültig.');
     return;
   }
 
   fs.writeFileSync(ID_FILE, JSON.stringify(arr, null, 2), 'utf-8');
-  console.log('💾 sensor_ids.json erfolgreich gespeichert.');
+  logger.debug('💾 sensor_ids.json erfolgreich gespeichert.');
 }
 
 // Die Funktion zur Verarbeitung und Speicherung von Sensordaten
@@ -81,7 +83,7 @@ function writeSensorData(sensorId, data) {
       existingData = JSON.parse(raw);
 
       if (!Array.isArray(existingData)) {
-        console.warn(`Warnung: Daten von Sensor ${sensorId} sind kein Array. Setze als leeres Array.`);
+        logger.warn(`Warnung: Daten von Sensor ${sensorId} sind kein Array. Setze als leeres Array.`);
         existingData = [];
       }
     } catch (err) {
@@ -98,9 +100,9 @@ function writeSensorData(sensorId, data) {
 
   fs.writeFile(filepath, JSON.stringify(existingData, null, 2), (err) => {
     if (err) {
-      console.error(`❌ Fehler beim Schreiben von ${filename}:`, err.message);
+     logger.error(`❌ Fehler beim Schreiben von ${filename}:`, err.message);
     } else {
-      console.log(`💾 Gespeichert in ${filename}`);
+      logger.debug(`💾 Gespeichert in ${filename}`);
     }
   });
 }
@@ -131,7 +133,7 @@ function checkForOfflineSensors() {
       const minutes = Math.floor((inactiveFor % (60 * 60 * 1000)) / (60 * 1000));
 
       const message = `⚠️ *Sensor ${sensorId}* wurde seit *${hours}h ${minutes}min* nicht mehr empfangen.`;
-      console.warn(message);
+      logger.warn(message);
       sendTelegramMessage(message);
 
       offlineNotified.add(sensorId);
@@ -139,7 +141,7 @@ function checkForOfflineSensors() {
 
     if (inactiveFor <= OFFLINE_TIMEOUT_MS && offlineNotified.has(sensorId)) {
       const message = `✅ *Sensor ${sensorId}* ist wieder aktiv.`;
-      console.log(message);
+      logger.info (message);
       sendTelegramMessage(message);
       offlineNotified.delete(sensorId);
     }
@@ -154,7 +156,7 @@ function getSensorDataFromFile(sensorId) {
   const filepath = path.join(DATA_DIR, `sensor_${sensorId}.json`);
 
   if (!fs.existsSync(filepath)) {
-    console.warn(`⚠️ Keine Daten gefunden für Sensor ${sensorId}`);
+    logger.warn(`⚠️ Keine Daten gefunden für Sensor ${sensorId}`);
     return null;
   }
 
@@ -164,11 +166,11 @@ function getSensorDataFromFile(sensorId) {
     data = JSON.parse(raw);
 
     if (!Array.isArray(data)) {
-      console.warn(`Warnung: Daten von Sensor ${sensorId} sind kein Array. Setze als leeres Array.`);
+      logger.warn(`Warnung: Daten von Sensor ${sensorId} sind kein Array. Setze als leeres Array.`);
       data = [];
     }
   } catch (err) {
-    console.error(`❌ Fehler beim Laden der Datei für Sensor ${sensorId}:`, err.message);
+    logger.error(`❌ Fehler beim Laden der Datei für Sensor ${sensorId}:`, err.message);
     data = [];
   }
 
@@ -195,11 +197,11 @@ export function getLatestSensorValues() {
         result[sensorId] = data[data.length - 1]; // Füge nur die neuesten Daten hinzu
       }
     } catch (err) {
-      console.error(`Fehler beim Parsen der Datei ${file}:`, err.message);
+      logger.error(`Fehler beim Parsen der Datei ${file}:`, err.message);
     }
   }
 
-  console.log(`Aktuelle Sensordaten aus JSON-Dateien:`, result);
+  logger.debug(`Aktuelle Sensordaten aus JSON-Dateien:`, result);
   return result; // Gibt die gesammelten Daten zurück
 }
 
@@ -208,10 +210,10 @@ export function cta() {
 
   noble.on('stateChange', (state) => {
     if (state === 'poweredOn') {
-      console.log('🟢 BLE aktiv – TP357S-Scan läuft...');
+      logger.info('🟢 BLE aktiv – TP357S-Scan läuft...');
       noble.startScanning([], true);  // Starten des Scannens ohne den Status zu stoppen
     } else {
-      console.log('🔴 BLE nicht bereit:', state);
+      logger.warn('🔴 BLE nicht bereit:', state);
       // Hier können wir den Status ignorieren und das Scannen weiterhin fortsetzen
     }
   });
@@ -227,7 +229,7 @@ export function cta() {
       const sensorId = sensorCounter++;
       deviceToSensorId.set(uuid, sensorId);
       saveSensorIdMapping();
-      console.log(`🎯 Neuer TP357S erkannt: Sensor ${sensorId} (${uuid})`);
+      logger.info(`🎯 Neuer TP357S erkannt: Sensor ${sensorId} (${uuid})`);
     }
 
     const sensorId = deviceToSensorId.get(uuid);
@@ -236,7 +238,7 @@ export function cta() {
 
     latestValues.set(sensorId, decoded);
 
-   console.log(`📡 [Sensor ${sensorId}] 🌡️ ${decoded.temperature} °C | 💧 ${decoded.humidity} %`);
+   logger.debug(`📡 [Sensor ${sensorId}] 🌡️ ${decoded.temperature} °C | 💧 ${decoded.humidity} %`);
     writeSensorData(sensorId, decoded);
   });
 }

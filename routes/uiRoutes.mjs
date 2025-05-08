@@ -1,15 +1,26 @@
+// routes/uiRoutes.mjs
 import express from 'express';
 import fs from 'fs';
 import config from '../helper/config.mjs';
+import logger from '../helper/logger.mjs';
 
 const router = express.Router();
 
 function readEnv() {
-  return Object.fromEntries(
-    fs.readFileSync('.env', 'utf8').split('\n')
+  if (!fs.existsSync('.env')) {
+    logger.warn('.env Datei nicht gefunden.');
+    return {};
+  }
+
+  const env = Object.fromEntries(
+    fs.readFileSync('.env', 'utf8')
+      .split('\n')
       .filter(l => l.trim() && !l.trim().startsWith('#'))
       .map(l => l.split('=').map(s => s.trim()))
   );
+
+  logger.debug('🖥️ Konfigurations-UI geladen');
+  return env;
 }
 
 const felder = [
@@ -41,7 +52,7 @@ const felder = [
 
 router.get('/', (req, res) => {
   const cfg = readEnv();
-  const totalSec = Math.round(parseFloat(cfg.SHELLY_TIMER_MINUTES) * 60);
+  const totalSec = Math.round(parseFloat(cfg.SHELLY_TIMER_MINUTES || 0) * 60);
   const h = Math.floor(totalSec / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;

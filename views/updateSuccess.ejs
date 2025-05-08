@@ -2,23 +2,23 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Speichern...</title>
+  <title>✅ Erfolg</title>
+  <meta http-equiv="refresh" content="3; url=/" />
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f9; color: #333; text-align: center; padding: 50px; }
-    h1 { color: #4CAF50; }
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 80px;
+    }
+    .msg {
+      font-size: 1.3em;
+      color: green;
+    }
   </style>
 </head>
 <body>
-  <h1>✅ Einstellungen gespeichert</h1>
-  <p>Server wird aktualisiert... Bitte kurz warten...</p>
-  <script>
-    setTimeout(function() {
-      fetch('/restart', { method: 'POST' }).catch(() => {});
-      setTimeout(function() {
-        window.location.href = '/';
-      }, 1000);
-    }, 500);
-  </script>
+  <div class="msg">✅ Konfiguration erfolgreich gespeichert.</div>
+  <p>Die Anwendung wird automatisch neu gestartet...</p>
+  <p>Du wirst gleich zur Startseite weitergeleitet.</p>
 </body>
 </html>

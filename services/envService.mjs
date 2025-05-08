@@ -1,5 +1,6 @@
 // services/envService.mjs
 import fs from 'fs';
+import logger from '../helper/logger.mjs';
 
 const ENV_PATH = '.env';
 
@@ -75,6 +76,6 @@ export function writeEnv(updatedVars) {
   try {
     fs.writeFileSync(ENV_PATH, newLines.join('\n'), 'utf8');
   } catch (err) {
-    console.error(`❌ Fehler beim Schreiben der .env-Datei: ${err.message}`);
+    logger.error(`❌ Fehler beim Schreiben der .env-Datei: ${err.message}`);
   }
 }

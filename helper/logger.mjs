@@ -1,8 +1,10 @@
 // logger.mjs
 import winston from 'winston';
+import dotenv from 'dotenv';
+dotenv.config(); // Lade .env Datei
 
 const logger = winston.createLogger({
-  level: 'debug',
+  level: process.env.DEBUG === 'true' ? 'debug' : 'info',
   format: winston.format.combine(
     winston.format.timestamp({ format: 'DD.MM.YYYY HH:mm:ss' }),
     winston.format.printf(({ timestamp, level, message }) =>

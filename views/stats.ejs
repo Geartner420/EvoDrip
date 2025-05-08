@@ -5,9 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bewässerungs-Statistiken</title>
   <style>
-    body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
-    h1 { text-align: center; color: #4CAF50; margin-bottom: 30px; }
-    .card-container { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4CAF50;
+      margin-bottom: 30px;
+    }
+
+    .card-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
     .card {
       background: white;
       padding: 20px;
@@ -15,25 +32,92 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       width: 250px;
       text-align: center;
+      transition: transform 0.2s;
     }
-    .card-title { font-size: 18px; color: #555; margin-bottom: 10px; }
-    .card-value { font-size: 32px; font-weight: bold; color: #4CAF50; }
-    .back-button { display: block; margin: 40px auto 0; background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-size: 18px; text-align: center; width: fit-content; }
-    .back-button:hover { background-color: #45a049; }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card-title {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .card-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+
+    .meta {
+      text-align: center;
+      font-size: 14px;
+      margin-top: 20px;
+      color: #777;
+    }
+
+    .back-button {
+      display: block;
+      margin: 40px auto 0;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 18px;
+      text-align: center;
+      width: fit-content;
+    }
+
+    .back-button:hover {
+      background-color: #45a049;
+    }
+
+    .reset-form {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .reset-button {
+      background-color: #d9534f;
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .reset-button:hover {
+      background-color: #c9302c;
+    }
   </style>
 </head>
 <body>
   <h1>🚿 Bewässerungs-Statistiken</h1>
+
   <div class="card-container">
-    <div class="card">
+    <div class="card" title="Zählt wie oft nachts gegossen wurde (z. B. unter 40 %)">
       <div class="card-title">🌙 Nachtbewässerungen</div>
       <div class="card-value"><%= nightWaterCount %></div>
     </div>
-    <div class="card">
+    <div class="card" title="Zählt alle automatischen Bewässerungen am Tag">
       <div class="card-title">☀️ Tagesbewässerungen</div>
       <div class="card-value"><%= dayWaterCount %></div>
     </div>
   </div>
-  <a class="back-button" href="/"> Zurück zur Übersicht</a>
+
+  <div class="meta">Letzter Reset: <em>– wird später ergänzt –</em></div>
+
+  <div class="reset-form">
+    <form action="/stats/reset" method="POST" onsubmit="return confirm('⚠️ Statistiken wirklich zurücksetzen?');">
+      <button class="reset-button">⛔️ Statistiken zurücksetzen</button>
+    </form>
+  </div>
+
+  <a class="back-button" href="/">⬅️ Zurück zur Übersicht</a>
 </body>
 </html>

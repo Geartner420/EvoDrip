@@ -5,7 +5,7 @@ import { fetchMoisture } from '../services/fytaservice.mjs';
 import logger from '../helper/logger.mjs';
 import { readEnv } from '../services/envService.mjs';
 
-const MOISTURE_FILE = path.resolve(process.cwd(), 'moisture.json');
+const MOISTURE_FILE = path.resolve(process.cwd(), 'sensor_data','moisture.json');
 const MAX_HISTORY_LENGTH = Number.MAX_SAFE_INTEGER // Maximal gespeicherte Werte
 
 let moistureHistory = [];
@@ -24,7 +24,7 @@ export function loadMoistureData() {
       timestamp: new Date(entry.timestamp),
       value: entry.value
     }));
-    console.log(`🔁 ${moistureHistory.length} Feuchtigkeitswerte geladen.`);
+    logger.debug(`🔁 ${moistureHistory.length} Feuchtigkeitswerte geladen.`);
   } catch {
     logger.warn('⚠️ Keine vorhandene moisture.json gefunden – starte leer.');
     moistureHistory = [];
@@ -54,7 +54,7 @@ export async function saveMoistureData() {
 
 export function clearMoistureHistory() {
   moistureHistory = [];
-  console.log('📂 moistureHistory im Speicher geleert.');
+  logger.info('📂 moistureHistory im Speicher geleert.');
 }
 
 function checkAndLogSummary() {

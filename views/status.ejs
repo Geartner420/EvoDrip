@@ -35,57 +35,50 @@
       font-size: 18px;
     }
     .back-link:hover { text-decoration: underline; }
+    .error-msg { text-align: center; color: red; font-weight: bold; margin-top: 20px; }
   </style>
 </head>
 <body>
   <h1>🌱 System Status</h1>
 
-  <!-- Statische Systemkarten -->
   <div class="card-container">
-    <div class="card">
-      <div class="card-title">🔢 Letzter Feuchtigkeitswert</div>
-      <div class="card-value"><%= status.lastMoisture %></div>
-    </div>
-    <div class="card">
-      <div class="card-title">🕛 Letzter Zeitstempel</div>
-      <div class="card-value"><%= status.lastTimestamp %></div>
-    </div>
-    <div class="card">
-      <div class="card-title">📂 Gesamtanzahl Einträge</div>
-      <div class="card-value"><%= status.totalEntries %></div>
-    </div>
-    <div class="card">
-      <div class="card-title">⏱️ Speicherintervall</div>
-      <div class="card-value"><%= status.moistureSaveIntervalSec %> sek</div>
-    </div>
-    <div class="card">
-      <div class="card-title">📅 Zusammenfassungsintervall</div>
-      <div class="card-value"><%= status.moistureSummaryIntervalMin %> min</div>
-    </div>
+    <div class="card"><div class="card-title">💧🪴 Letzter Boden-Feuchtigkeitswert</div><div class="card-value"><%= status.lastMoisture %></div></div>
+    <div class="card"><div class="card-title">🕛 Letzter Zeitstempel</div><div class="card-value"><%= status.lastTimestamp %></div></div>
+    <div class="card"><div class="card-title">📂 Gesamtanzahl Einträge</div><div class="card-value"><%= status.totalEntries %></div></div>
+    <div class="card"><div class="card-title">⏱️ Speicherintervall</div><div class="card-value"><%= status.moistureSaveIntervalSec %> sek</div></div>
+    <div class="card"><div class="card-title">📅 Zusammenfassungsintervall</div><div class="card-value"><%= status.moistureSummaryIntervalMin %> min</div></div>
   </div>
 
-  <!-- Dynamischer Sensorbereich -->
   <h2 class="section-title">📡 Aktive Sensorwerte</h2>
-  <div class="card-container" id="sensor-cards-container">
-    <!-- Wird durch JS befüllt -->
-  </div>
+  <div class="card-container" id="sensor-cards-container"></div>
+  <div class="error-msg" id="error-message"></div>
 
   <a class="back-link" href="/">&larr; Zurück zur Übersicht</a>
 
   <script>
     async function fetchSensorData() {
       try {
-        const res = await fetch('/api/sensor-status');
-        const sensors = await res.json();
+        const [sensorRes, namesRes] = await Promise.all([
+          fetch('/api/sensor-status'),
+          fetch('/api/sensor-names')
+        ]);
+
+        const sensors = await sensorRes.json();
+        const sensorNames = await namesRes.json();
 
         const container = document.getElementById('sensor-cards-container');
+        const errorBox = document.getElementById('error-message');
         container.innerHTML = '';
+        errorBox.innerText = '';
 
         for (const [id, data] of Object.entries(sensors)) {
+          const cleanId = id.replace('sensor_', '').replace('.json', '');
+          const name = sensorNames[cleanId] || `Sensor ${cleanId}`;
+
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
-            <div class="card-title">Sensor ${id}</div>
+            <div class="card-title">${name}</div>
             <div class="card-value">🌡️ ${data.temperature} °C</div>
             <div class="card-value">💧 ${data.humidity} %</div>
             <div class="card-value">🕛 ${new Date(data.timestamp).toLocaleString('de-DE')}</div>
@@ -93,12 +86,13 @@
           container.appendChild(card);
         }
       } catch (err) {
-        console.error('Fehler beim Laden der Sensorwerte:', err);
+        document.getElementById('error-message').innerText = '❌ Fehler beim Laden der Sensorwerte.';
+        console.error('Sensorstatus-Fehler:', err);
       }
     }
 
     fetchSensorData();
-    setInterval(fetchSensorData, 10_000); // alle 10 Sekunden aktualisieren
+    setInterval(fetchSensorData, 10000);
   </script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 import { sendTelegramMessage } from './telegramService.mjs';
 import { incrementDayWater } from './statsService.mjs';
 import { incrementNightWater } from './statsService.mjs';
+import logger from '../helper/logger.mjs';
 
 export async function checkAndWater({
   fetchMoisture, triggerShelly, logger,
@@ -21,11 +22,11 @@ export async function checkAndWater({
       logger.info(`🌙 Nachtmodus aktiviert: Prüfe, ob Gießen erforderlich ist...`);
       
       let moisture = await fetchMoisture();
-      logger.info(`💧 Feuchtigkeit in der Nacht: ${moisture}%`);
+      logger.info(`💧 Boden-Feuchtigkeit in der Nacht: ${moisture}%`);
       
       // Gieße, wenn die Feuchtigkeit unter 40% fällt und maximal 2 Zyklen durchführen
       if (moisture < 40) {
-        logger.warn(`💧❗️ Nachtmodus: Feuchtigkeit unter 40% – Bewässerung startet 🌙`);
+        logger.warn(`💧❗️ Nachtmodus: Boden-Feuchtigkeit unter 40% – Bewässerung startet 🌙`);
 
         let attempts = 0;
         const maxAttempts = 2; // Maximal 2 Zyklen
@@ -37,7 +38,7 @@ export async function checkAndWater({
           await new Promise(r => setTimeout(r, 2 * 60000)); // 2 Minuten warten
 
           moisture = await fetchMoisture(); // Feuchtigkeit nach Gießen neu prüfen
-          logger.info(`🔁 Versuch ${attempts}: Feuchtigkeit nach Gießen: ${moisture}%`);
+          logger.info(`🔁 Versuch ${attempts}: Boden-Feuchtigkeit nach Gießen: ${moisture}%`);
 
           if (moisture >= TARGET_MOISTURE_AFTER_WATERING) {
             logger.info(`🏁 Ziel erreicht: ${moisture}%`);
@@ -57,7 +58,7 @@ export async function checkAndWater({
         saveState();
         return;
       }
-      logger.info('🌙 Nachtmodus: Feuchtigkeit ausreichend, kein Gießen notwendig.');
+      logger.info('🌙 Nachtmodus: Boden-Feuchtigkeit ausreichend, kein Gießen notwendig.');
       return;
     }
 
@@ -69,14 +70,14 @@ export async function checkAndWater({
     }
 
     let moisture = await fetchMoisture();
-    logger.info(`💧 Feuchtigkeit: ${moisture}%`);
+    logger.info(`💧 Boden-Feuchtigkeit: ${moisture}%`);
     if (moisture >= MOISTURE_THRESHOLD) {
       logger.info('💧❗️ Ausreichend feucht – kein Gießen ❌💧');
       return;
     }
 
     logger.warn(`💧❗️ Unter ${MOISTURE_THRESHOLD}% – Bewässerung startet 💧✔`);
-    await sendTelegramMessage(`💧 Bewässerung gestartet! Feuchtigkeit war zu niedrig.`);
+    await sendTelegramMessage(`💧 Bewässerung gestartet! Boden-Feuchtigkeit war zu niedrig.`);
     let attempts = 0;
     const maxAttempts = 5;
     while (moisture < TARGET_MOISTURE_AFTER_WATERING && attempts < maxAttempts) {

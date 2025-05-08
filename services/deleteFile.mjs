@@ -1,6 +1,7 @@
 // deleteFile.mjs
 
 import fs from 'fs';
+import logger from '../helper/logger.mjs';
 
 /**
  * Löscht eine Datei unter einem bestimmten Pfad
@@ -10,11 +11,11 @@ export function deleteFile(filePath) {
   try {
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
-      console.log(`🗑️ Datei erfolgreich gelöscht: ${filePath}`);
+      logger.info(`🗑️ Datei erfolgreich gelöscht: ${filePath}`);
     } else {
-      console.log(`⚠️ Datei existiert nicht: ${filePath}`);
+      logger.warn(`⚠️ Datei existiert nicht: ${filePath}`);
     }
   } catch (err) {
-    console.error(`❌ Fehler beim Löschen der Datei '${filePath}': ${err.message}`);
+    logger.error(`❌ Fehler beim Löschen der Datei '${filePath}': ${err.message}`);
   }
 }

@@ -3,6 +3,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { interval } from 'd3-timer';
 import config from '../helper/config.mjs';
+import  logger  from '../helper/logger.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -14,7 +15,7 @@ const LEAF_TEMP_DIFF = config.LEAF_TEMP_DIFF || 2;
 // Einfacher Logger mit Timestamp
 function log(msg, level = 'INFO') {
   const ts = new Date().toISOString();
-  console.log(`[${ts}] [${level}] ${msg}`);
+  logger.debug(`[${ts}] [${level}] ${msg}`);
 }
 
 // VPD-Berechnung

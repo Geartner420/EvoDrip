@@ -12,7 +12,8 @@ const relaysFile = path.join(dataDir, 'relays.json');
 const sensorFile = path.join(dataDir, 'last_entrys.json');
 const relayLogFile = path.join(dataDir, 'relay_log.json');
 
-const lastStates = {}; // Merkt sich den letzten Schaltzustand pro Relais
+const DEBUG_MODE = process.env.DEBUG === 'true';
+const lastStates = {};
 
 const operatorMap = {
   '>': 'größer als',
@@ -22,7 +23,7 @@ const operatorMap = {
   '==': 'gleich'
 };
 
-// Sicheres Laden von JSON-Dateien mit Fehlerbehandlung
+// Sicheres Laden von JSON-Dateien
 function loadJson(filePath) {
   if (!fs.existsSync(filePath)) return [];
   try {
@@ -34,12 +35,13 @@ function loadJson(filePath) {
   }
 }
 
-// Sicheres Speichern von Log-Einträgen
+// Relay-Log speichern
 function saveRelayLogEntry(entry) {
   let log = [];
   try {
     if (fs.existsSync(relayLogFile)) {
-      log = JSON.parse(fs.readFileSync(relayLogFile, 'utf-8'));
+      const raw = fs.readFileSync(relayLogFile, 'utf-8');
+      log = JSON.parse(raw);
       if (!Array.isArray(log)) log = [];
     }
   } catch (err) {
@@ -56,15 +58,32 @@ function saveRelayLogEntry(entry) {
   }
 }
 
-// Abgebrochene fetch-Anfragen mit Timeout-Management
+// Fetch mit Timeout und Logging
 function fetchWithTimeout(url, timeout = 5000) {
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-  return fetch(url, { signal: controller.signal })
-    .finally(() => clearTimeout(id));
+  const id = setTimeout(() => {
+    controller.abort();
+    logger.warn(`[rule_engine] ⚠️ Timeout beim Zugriff: ${url}`);
+  }, timeout);
+  return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(id));
 }
 
-// Bedingungsüberprüfung mit Hysterese
+// Wiederholtes Schalten mit Retry
+async function safeSwitch(url, retries = 2) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const res = await fetchWithTimeout(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return true;
+    } catch (err) {
+      logger.warn(`[rule_engine] ⚠️ Schaltversuch ${i + 1} fehlgeschlagen: ${url}`);
+      if (i === retries) throw err;
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  }
+}
+
+// Evaluierung mit Hysterese
 function evaluateCondition(sensorValue, { param, op, value, hysteresis }, currentState) {
   const actual = sensorValue[param];
   const expected = parseFloat(value);
@@ -73,54 +92,46 @@ function evaluateCondition(sensorValue, { param, op, value, hysteresis }, curren
   const h = parseFloat(hysteresis) || 0;
 
   switch (op) {
-    case '>':
-      return currentState === 'off' ? actual > expected : actual > (expected - h);
-    case '<':
-      return currentState === 'off' ? actual < expected : actual < (expected + h);
-    case '>=':
-      return currentState === 'off' ? actual >= expected : actual > (expected - h);
-    case '<=':
-      return currentState === 'off' ? actual <= expected : actual < (expected + h);
-    case '==':
-      return actual === expected;
-    default:
-      return false;
+    case '>': return currentState === 'off' ? actual > expected : actual > (expected - h);
+    case '<': return currentState === 'off' ? actual < expected : actual < (expected + h);
+    case '>=': return currentState === 'off' ? actual >= expected : actual > (expected - h);
+    case '<=': return currentState === 'off' ? actual <= expected : actual < (expected + h);
+    case '==': return actual === expected;
+    default: return false;
   }
 }
 
-// Abrufen der Shelly-URL für Relaissteuerung
 function getShellyUrl(ip, state) {
   return `http://${ip}/relay/0?turn=${state}`;
 }
 
-// Prüfen, ob das aktuelle Zeitfenster gültig ist
+// Zeitfenster prüfen
 function isWithinTimeWindow(from, to) {
   if (!from || !to) return true;
+
   const now = new Date();
   const [fromH, fromM] = from.split(':').map(Number);
   const [toH, toM] = to.split(':').map(Number);
 
-  const start = new Date(now);
-  start.setHours(fromH, fromM, 0, 0);
-  const end = new Date(now);
-  end.setHours(toH, toM, 0, 0);
+  const start = new Date(now); start.setHours(fromH, fromM, 0, 0);
+  const end = new Date(now); end.setHours(toH, toM, 0, 0);
 
-  if (end < start) {
-    // Zeitfenster über Mitternacht
-    return now >= start || now <= end;
-  }
-
-  return now >= start && now <= end;
+  return end < start ? (now >= start || now <= end) : (now >= start && now <= end);
 }
 
-// Hauptlogik der Regel-Engine
+// Hauptregel-Engine
 function runRuleEngine() {
   const rules = loadJson(rulesFile);
   const relays = loadJson(relaysFile);
   const sensors = loadJson(sensorFile);
 
   const relayMap = Object.fromEntries(relays.map(r => [r.name, r.ip]));
-  const sensorMap = Object.fromEntries(sensors.map(s => [s.sensor, s]));
+  const sensorMap = Object.fromEntries(
+    sensors.filter(s => s.sensor && typeof s === 'object').map(s => [s.sensor, s])
+  );
+
+  let checked = 0;
+  let switched = 0;
 
   for (const rule of rules) {
     const sensorData = sensorMap[rule.sensor];
@@ -130,6 +141,9 @@ function runRuleEngine() {
     }
 
     if (!isWithinTimeWindow(rule.activeFrom, rule.activeTo)) {
+      if (DEBUG_MODE) {
+        logger.debug(`[rule_engine] ⏰ Regel ${rule.relay} (${rule.action}) ignoriert – außerhalb des Zeitfensters.`);
+      }
       continue;
     }
 
@@ -139,19 +153,18 @@ function runRuleEngine() {
       const actual = sensorData[cond.param];
       const passed = evaluateCondition(sensorData, cond, lastState);
       const hStr = cond.hysteresis ? ` ±${cond.hysteresis}` : '';
+      const label = cond.param === 'Temperatur' ? '🌡' :
+                    cond.param === 'Feuchtigkeit' ? '💧' :
+                    cond.param === 'VPD' ? '📈' : '📊';
       const operatorText = operatorMap[cond.op] || cond.op;
-      const label = cond.param === 'temperature' ? '🌡' :
-                    cond.param === 'humidity' ? '💧' :
-                    cond.param === 'vpd' ? '📈' : '📊';
       const desc = `${label} ${cond.param} ${operatorText} ${cond.value}${hStr} → aktuell: ${actual}`;
       return { passed, desc };
     });
 
     const shouldActivate = conditionResults.every(r => r.passed);
-    if (!shouldActivate) {
-      const failed = conditionResults.filter(r => !r.passed).map(r => r.desc).join(' UND ');
-      continue;
-    }
+    checked++;
+
+    if (!shouldActivate) continue;
 
     const desiredState = rule.action;
     const ip = relayMap[rule.relay];
@@ -161,15 +174,18 @@ function runRuleEngine() {
     }
 
     if (desiredState !== lastState) {
-      const conditionStr = conditionResults.map(r => r.desc).join(' UND ');
-      const emoji = desiredState === 'on' ? '🟢' : '🔴';
-
       const url = getShellyUrl(ip, desiredState);
-      fetchWithTimeout(url)
-        .then(res => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          logger.info(`${emoji} Relais "${rule.relay}" wurde ${desiredState === 'on' ? 'eingeschaltet' : 'ausgeschaltet'}📄 Bedingungen: ${conditionStr}`);
+      const emoji = desiredState === 'on' ? '🟢' : '🔴';
+      const conditionStr = conditionResults.map(r => r.desc).join(' UND ');
 
+      if (!isWithinTimeWindow(rule.activeFrom, rule.activeTo)) {
+        logger.debug(`[rule_engine] ⏰ Regel ${rule.relay} übersprungen – Zeitfenster inzwischen ungültig`);
+        continue;
+      }
+
+      safeSwitch(url)
+        .then(() => {
+          logger.info(`${emoji} ${rule.relay} ${desiredState === 'on' ? '🟢' : '🔴'} → ${conditionStr}`);
           saveRelayLogEntry({
             timestamp: new Date().toISOString(),
             relay: rule.relay,
@@ -180,24 +196,28 @@ function runRuleEngine() {
             activeFrom: rule.activeFrom,
             activeTo: rule.activeTo
           });
-
           lastStates[rule.relay] = desiredState;
+          switched++;
         })
         .catch(err => {
           logger.error(`[rule_engine] ❌ Fehler beim Schalten von ${rule.relay}: ${err.message}`);
         });
     }
   }
+
+  if (DEBUG_MODE) {
+    logger.debug(`[rule_engine] ✅ ${checked} Regeln geprüft, ${switched} geschaltet`);
+  }
 }
 
-// Lebenszeichen und Überwachung des Skripts
+// Fehlerresistenter Wrapper
 let tick = 0;
 function runRuleEngineSafe() {
   try {
-    logger.debug(`[rule_engine] ⏲ Lebenszeichen Tick ${++tick}`);
+    logger.debug(`⏲ Tick ${++tick}`);
     runRuleEngine();
   } catch (err) {
-    logger.error(`[rule_engine] ❌ Ungefangener Fehler: ${err.message}`);
+    logger.error(`❌ Ungefangener Fehler: ${err.message}`);
   }
 }
 
