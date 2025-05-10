@@ -70,7 +70,7 @@ export async function checkAndWater({
     }
 
     let moisture = await fetchMoisture();
-    logger.info(`💧 Boden-Feuchtigkeit: ${moisture}%`);
+    logger.debug(`💧 Boden-Feuchtigkeit: ${moisture}%`);
     if (moisture >= MOISTURE_THRESHOLD) {
       logger.info('💧❗️ Ausreichend feucht – kein Gießen ❌💧');
       return;
@@ -96,7 +96,7 @@ export async function checkAndWater({
       setLastTriggerTime(new Date());
       saveState();
     } else {
-      logger.error(`🏁❌ Ziel nicht erreicht nach ${attempts} Versuchen`);
+      logger.warn(`🏁❌ Ziel nicht erreicht nach ${attempts} Versuchen`);
       await sendTelegramMessage(`⚠️ Ziel nicht erreicht. Letzter Wert: ${moisture}%.`);
     }
 

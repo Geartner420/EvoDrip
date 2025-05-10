@@ -238,7 +238,9 @@ export function cta() {
 
     latestValues.set(sensorId, decoded);
 
-   logger.debug(`📡 [Sensor ${sensorId}] 🌡️ ${decoded.temperature} °C | 💧 ${decoded.humidity} %`);
+    const timestamp = new Date().toISOString();
+    logger.debug(`📡 [Sensor ${sensorId}] ${timestamp} 🌡️ ${decoded.temperature} °C | 💧 ${decoded.humidity} % |[}]`);
+
     writeSensorData(sensorId, decoded);
   });
 }

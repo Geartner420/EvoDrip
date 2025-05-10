@@ -5,16 +5,40 @@
   <title>✅ Erfolg</title>
   <meta http-equiv="refresh" content="3; url=/" />
   <style>
+    :root {
+      --bg-color: #f4f4f9;
+      --text-color: #111;
+      --success-color: green;
+    }
+
+    .dark {
+      --bg-color: #1e1e1e;
+      --text-color: #eee;
+      --success-color: limegreen;
+    }
+
     body {
       font-family: sans-serif;
       text-align: center;
       margin-top: 80px;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
     }
+
     .msg {
       font-size: 1.3em;
-      color: green;
+      color: var(--success-color);
     }
   </style>
+  <script>
+    // Dark Mode beim Laden anwenden (wie im Hauptlayout)
+    (function () {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
 </head>
 <body>
   <div class="msg">✅ Konfiguration erfolgreich gespeichert.</div>

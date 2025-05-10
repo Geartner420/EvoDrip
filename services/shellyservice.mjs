@@ -11,6 +11,7 @@ export async function triggerShelly() {
 
   const res = await fetch(url);
   if (!res.ok) {
+    logger.error(`Shelly HTTP ${res.status}`);
     throw new Error(`Shelly HTTP ${res.status}`);
   }
 

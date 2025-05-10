@@ -1,43 +1,117 @@
+// routes/api/relays.mjs
 import express from 'express';
-import path from 'path';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
+import path from 'path';
 import logger from '../../helper/logger.mjs';
 
 const router = express.Router();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dataDir = path.join(__dirname, '../../sensor_data');
-const relaysFile = path.join(dataDir, 'relays.json');
+const CONFIG_FILE = path.resolve('./sensor_data/umluft_config.json');
+const STATUS_FILE = path.resolve('./sensor_data/umluft_status.json');
 
-router.get('/', (req, res) => {
-  try {
-    if (fs.existsSync(relaysFile)) {
-      const data = JSON.parse(fs.readFileSync(relaysFile, 'utf-8'));
-      return res.json(data);
-    }
-    res.json([]);
-  } catch (err) {
-    logger.error(`❌ Fehler beim Lesen von relays.json: ${err.message}`);
-    res.status(500).json({ error: 'Fehler beim Lesen der Relaisdaten' });
+function loadConfig() {
+  if (!fs.existsSync(CONFIG_FILE)) {
+    return { global: {}, relays: [] };
   }
+  try {
+    const raw = fs.readFileSync(CONFIG_FILE, 'utf-8');
+    return JSON.parse(raw);
+  } catch (err) {
+    logger.error('❌ Fehler beim Laden der Konfiguration:', err.message);
+    return { global: {}, relays: [] };
+  }
+}
+
+function saveConfig(config) {
+  try {
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+    logger.info('💾 Konfiguration gespeichert.');
+  } catch (err) {
+    logger.error('❌ Fehler beim Speichern der Konfiguration:', err.message);
+  }
+}
+
+function writeStatus(status) {
+  try {
+    fs.writeFileSync(STATUS_FILE, JSON.stringify(status, null, 2));
+  } catch (err) {
+    logger.warn('⚠️ Status konnte nicht geschrieben werden:', err.message);
+  }
+}
+
+function readStatus() {
+  try {
+    if (fs.existsSync(STATUS_FILE)) {
+      return JSON.parse(fs.readFileSync(STATUS_FILE, 'utf-8'));
+    }
+  } catch (err) {
+    logger.warn('⚠️ Status konnte nicht gelesen werden:', err.message);
+  }
+  return { status: 'unbekannt' };
+}
+
+// Konfiguration
+router.get('/', (req, res) => res.json(loadConfig()));
+router.post('/', (req, res) => {
+  const config = req.body;
+  if (!config || typeof config !== 'object' || !Array.isArray(config.relays)) {
+    return res.status(400).json({ error: 'Ungültige Konfiguration.' });
+  }
+  saveConfig(config);
+  res.status(200).json({ success: true });
 });
 
-router.post('/', (req, res) => {
-  try {
-    const relays = req.body;
+// Relaisliste verwalten
+router.put('/relays/:index', (req, res) => {
+  const config = loadConfig();
+  const idx = parseInt(req.params.index);
+  if (isNaN(idx) || !config.relays[idx]) return res.status(404).json({ error: 'Relais nicht gefunden.' });
+  config.relays[idx] = req.body;
+  saveConfig(config);
+  res.json(config.relays[idx]);
+});
 
-    // einfache Validierung
-    if (!Array.isArray(relays)) {
-      return res.status(400).json({ error: 'Ungültiges Format' });
-    }
+router.delete('/relays/:index', (req, res) => {
+  const config = loadConfig();
+  const idx = parseInt(req.params.index);
+  if (isNaN(idx) || !config.relays[idx]) return res.status(404).json({ error: 'Relais nicht gefunden.' });
+  const removed = config.relays.splice(idx, 1);
+  saveConfig(config);
+  res.json({ success: true, removed });
+});
 
-    fs.writeFileSync(relaysFile, JSON.stringify(relays, null, 2), 'utf-8');
-    logger.info(`💾 Relaisdaten gespeichert (${relays.length} Einträge)`);
-    res.json({ success: true });
-  } catch (err) {
-    logger.error(`❌ Fehler beim Schreiben von relays.json: ${err.message}`);
-    res.status(500).json({ error: 'Fehler beim Speichern' });
+router.post('/relays', (req, res) => {
+  const config = loadConfig();
+  const newRelay = req.body;
+  if (!newRelay.name || !newRelay.ip) {
+    return res.status(400).json({ error: 'Name und IP sind erforderlich.' });
   }
+  config.relays.push(newRelay);
+  saveConfig(config);
+  res.status(201).json(newRelay);
+});
+
+// Globale Einstellungen
+router.put('/global', (req, res) => {
+  const config = loadConfig();
+  config.global = req.body;
+  saveConfig(config);
+  res.json({ success: true });
+});
+
+// Steuerung neustarten (nur Marker schreiben – echtes Neustarten extern lösen)
+router.post('/restart-umluft', (req, res) => {
+  const status = readStatus();
+  status.restartRequested = true;
+  status.timestamp = new Date().toISOString();
+  writeStatus(status);
+  logger.info('🔁 Neustart der Umluftsteuerung angefordert.');
+  res.json({ success: true });
+});
+
+// Status abfragen
+router.get('/status', (req, res) => {
+  const status = readStatus();
+  res.json(status);
 });
 
 export default router;

@@ -39,7 +39,7 @@
       {
         "param": "humidity",
         "op": ">=",
-        "value": "63",
+        "value": "62",
         "hysteresis": "3"
       }
     ]

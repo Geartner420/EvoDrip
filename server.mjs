@@ -26,6 +26,13 @@ import sensorsRoutes from './routes/api/sensors.mjs';
 import { startRuleEngine } from './services/rule_engine.mjs';
 import sensorStatusRoute from './routes/api/sensorStatus.mjs';
 import { controlRelays } from './services/umluftContol.mjs'; // Relaissteuerung importieren
+import relayRulesRoutes from './routes/api/relaysRules.mjs';
+import { fileURLToPath } from 'url';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 const {
   UI_USERNAME,
@@ -50,6 +57,9 @@ async function startServer() {
   app.use('/api/relays', relaysRoutes);
   app.use('/api/sensors', sensorsRoutes);
   app.use('/api/sensor-status', sensorStatusRoute);
+  app.use('/api/relaysRules', relayRulesRoutes);
+  app.use(express.static(path.join(__dirname, 'public')));
+
 
   const filePath = './sensor_data/sensorNames.json';
   

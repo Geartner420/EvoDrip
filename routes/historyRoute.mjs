@@ -2,6 +2,7 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
+import logger from '../helper/logger.mjs';
 
 const router = express.Router();
 
@@ -9,6 +10,7 @@ const HISTORY_FILE = path.join('./sensor_data/history_entrys.json');
 
 router.get('/api/history', (req, res) => {
   if (!fs.existsSync(HISTORY_FILE)) {
+    logger.warn('⚠️ Datei nicht gefunden:', HISTORY_FILE);
     return res.status(404).json({ error: 'Datei nicht gefunden' });
   }
 
@@ -27,7 +29,7 @@ router.get('/api/history', (req, res) => {
 
     res.json(grouped); // { "1": [...], "2": [...], ... }
   } catch (err) {
-    console.error('❌ Fehler beim Laden von history_entries:', err.message);
+   logger.error('❌ Fehler beim Laden von history_entries:', err.message);
     res.status(500).json({ error: 'Fehler beim Parsen der Datei' });
   }
 });

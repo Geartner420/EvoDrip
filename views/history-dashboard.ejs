@@ -3,71 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <title>TP357S History Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script src="/scripts/darkmode.js" defer></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
-    body { font-family: Arial; background: #f9f9f9; padding: 20px; }
-    h1 { text-align: center; color: #4CAF50; }
-    .container { max-width: 1200px; margin: auto; }
-    .tab { cursor: pointer; background: #eee; margin: 5px; padding: 10px; border-radius: 6px; display: inline-block; }
-    .tab.active { background: #4CAF50; color: white; font-weight: bold; }
-    .charts { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; }
-    .chart-box { background: white; border: 1px solid #ccc; border-radius: 10px; padding: 10px; flex: 1 1 45%; }
-    @media(max-width: 768px){ .chart-box { flex: 1 1 100%; } }
-    .back-btn {
-      display: block;
-      margin: 20px auto;
-      text-align: center;
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      text-decoration: none;
-      width: max-content;
+    #intervalTabs {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
     }
-    .back-btn:hover {
-      background-color: #45a049;
-    }
-    .tab.dragging {
-      opacity: 0.5;
-    }
-    .name-input {
-      margin-left: 10px;
-      padding: 5px;
+
+    #intervalSelect {
+      padding: 6px 10px;
       font-size: 14px;
-    }
-    .save-btn {
-      margin-left: 5px;
-      padding: 5px 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .save-btn:hover {
-      background-color: #45a049;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
+
   <div class="container">
-    <h1>📈 TP357S Klima-Diagramme</h1>
-    <a class="back-btn" href="/">Zurück zur Übersicht</a>
-    <div id="tabs"></div>
-    <div id="charts" class="charts"></div>
+    <div class="tabs" style="display: flex; justify-content: center;">
+      <h2 style="margin: auto;">📈 TP357S Klima-Diagramme</h2> 
+    </div> 
+    <div class="tabs">
+      <a class="button back-btn" href="/">Zurück zur Übersicht</a>
+    </div>
+
+    <!-- Sensorauswahl -->
+    <div id="sensorTabs" class="tabs"></div>
+
+    <!-- Diagrammtyp Tabs -->
+    <div id="metricTabs" class="tabs"></div>
+
+    <!-- Aggregationsintervall -->
+    <div class="tabs" id="intervalTabs">
+      <label for="intervalSelect">🔁 Aggregationsintervall:</label>
+      <select id="intervalSelect">
+        <option value="1">1 Minute</option>
+        <option value="5">5 Minuten</option>
+        <option value="10" selected>10 Minuten</option>
+        <option value="30">30 Minuten</option>
+        <option value="60">1 Stunde</option>
+      </select>
+    </div>
+
+    <!-- Diagrammfläche -->
+    <div class="chart-container" style="width: 100%; max-width: none;">
+      <div id="mainChart" style="height: 500px;"></div>
+    </div>
   </div>
 
   <script>
     const sensorNames = {};
     let historyData = {};
-    let selectedSensor = "";
+    let selectedSensor = '';
+    let selectedMetric = 'vpd';
+    let aggregationInterval = 10;
+
+    const metricDefinitions = {
+      vpd: '🌬️ VPD',
+      leaf_vpd: '🍃 Leaf VPD',
+      dew_point: '❄️ Taupunkt (°C)',
+      absolute_humidity: '💧 Absolute Feuchte (g/m³)'
+    };
 
     function fetchSensorNames() {
       fetch('/api/sensor-names')
         .then(res => res.json())
         .then(data => {
           Object.assign(sensorNames, data);
-          fetchHistory(); // danach History laden
+          fetchHistory();
         })
         .catch(err => console.error('Fehler beim Laden der Namen:', err));
     }
@@ -77,164 +87,142 @@
         .then(res => res.json())
         .then(data => {
           historyData = data;
-          const sensorIds = Object.keys(data);
+          const ids = Object.keys(data);
           if (!selectedSensor || !historyData[selectedSensor]) {
-            selectedSensor = sensorIds[0];
+            selectedSensor = ids[0];
           }
-          renderTabs(sensorIds);
-          renderCharts();
+          renderSensorTabs(ids);
+          renderMetricTabs();
+          renderChart();
         })
         .catch(err => console.error('Fehler beim Laden der Historie:', err));
     }
 
-    function saveSensorName(id, newName) {
-      fetch('/api/sensor-names', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, name: newName })
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            sensorNames[id] = newName;
-            renderTabs(Object.keys(historyData));
-            renderCharts();
-          } else {
-            alert("Fehler beim Speichern des Namens.");
-          }
-        })
-        .catch(err => {
-          console.error('Fehler beim Speichern:', err);
-          alert("Fehler beim Speichern.");
-        });
-    }
-
-    /**
-     * Rendered die Tabs f r die verschiedenen Sensoren.
-     * Gibt die Sensoren in der Reihenfolge aus, die im LocalStorage
-     * unter "historyTabOrder" gespeichert ist.
-     * @param {string[]} ids Die IDs der Sensoren
-     */
-    function renderTabs(ids) {
-      const tabsDiv = document.getElementById('tabs');
+    function renderSensorTabs(ids) {
+      const tabsDiv = document.getElementById('sensorTabs');
       tabsDiv.innerHTML = '';
 
-      const savedOrder = JSON.parse(localStorage.getItem('historyTabOrder') || '[]');
-      if (savedOrder.length) {
-        ids.sort((a, b) => savedOrder.indexOf(a) - savedOrder.indexOf(b));
-      }
-
       ids.forEach(id => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'tab';
-        wrapper.setAttribute('draggable', 'true');
-        wrapper.dataset.sensorId = id;
-        if (id === selectedSensor) wrapper.classList.add('active');
+        const tab = document.createElement('div');
+        tab.className = 'tab';
+        tab.textContent = sensorNames[id] || `Sensor ${id}`;
+        tab.dataset.sensorId = id;
+        if (id === selectedSensor) tab.classList.add('active');
 
-        const name = sensorNames[id] || `Sensor ${id}`;
-        wrapper.textContent = name;
-
-
-        // Setzt den aktuell ausgew hlte Sensor und
-        // aktualisiert die Darstellung der Tabs und Charts
-
-        wrapper.onclick = () => {
+        tab.onclick = () => {
           selectedSensor = id;
-          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-          wrapper.classList.add('active');
-          renderCharts();
+          renderSensorTabs(ids);
+          renderChart();
         };
 
-        // Rechtsklick zum Umbenennen
-        wrapper.addEventListener('contextmenu', e => {
-          e.preventDefault();
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.value = sensorNames[id] || `Sensor ${id}`;
-          input.className = 'name-input';
-
-          const saveBtn = document.createElement('button');
-          saveBtn.textContent = 'Speichern';
-          saveBtn.className = 'save-btn';
-
-          wrapper.innerHTML = '';
-          wrapper.appendChild(input);
-          wrapper.appendChild(saveBtn);
-
-          saveBtn.onclick = () => {
-            saveSensorName(id, input.value.trim());
-          };
-        });
-
-        // Drag-Events
-        wrapper.addEventListener('dragstart', e => {
-          wrapper.classList.add('dragging');
-          e.dataTransfer.setData('text/plain', id);
-        });
-
-        wrapper.addEventListener('dragend', () => {
-          wrapper.classList.remove('dragging');
-          const newOrder = Array.from(document.querySelectorAll('#tabs .tab'))
-                                .map(t => t.dataset.sensorId);
-          localStorage.setItem('historyTabOrder', JSON.stringify(newOrder));
-        });
-
-        wrapper.addEventListener('dragover', e => {
-          e.preventDefault();
-          const dragging = document.querySelector('.tab.dragging');
-          if (dragging && dragging !== wrapper) {
-            const rect = wrapper.getBoundingClientRect();
-            const offset = e.clientX - rect.left;
-            if (offset < rect.width / 2) {
-              tabsDiv.insertBefore(dragging, wrapper);
-            } else {
-              tabsDiv.insertBefore(dragging, wrapper.nextSibling);
-            }
-          }
-        });
-
-        tabsDiv.appendChild(wrapper);
+        tabsDiv.appendChild(tab);
       });
     }
 
-    function renderCharts() {
-      const entrys = historyData[selectedSensor];
-      if (!entrys) return;
+    function renderMetricTabs() {
+      const metricTabs = document.getElementById('metricTabs');
+      metricTabs.innerHTML = '';
 
-      const timestamps = entrys.map(e => new Date(e.timestamp));
-      const vpd = entrys.map(e => e.vpd);
-      const leafVpd = entrys.map(e => e.leaf_vpd);
-      const dewPoint = entrys.map(e => e.dew_point);
-      const absHumidity = entrys.map(e => e.absolute_humidity);
+      Object.entries(metricDefinitions).forEach(([key, label]) => {
+        const tab = document.createElement('div');
+        tab.className = 'tab';
+        tab.textContent = label;
+        tab.dataset.metric = key;
+        if (key === selectedMetric) tab.classList.add('active');
 
-      const charts = [
-        { id: 'vpdChart', title: '🌬️ VPD', y: vpd },
-        { id: 'leafVpdChart', title: '🍃 Leaf VPD', y: leafVpd },
-        { id: 'dewPointChart', title: '❄️ Taupunkt (°C)', y: dewPoint },
-        { id: 'absHumChart', title: '💧 Absolute Feuchte (g/m³)', y: absHumidity }
-      ];
+        tab.onclick = () => {
+          selectedMetric = key;
+          renderMetricTabs();
+          renderChart();
+        };
 
-      const chartsDiv = document.getElementById('charts');
-      chartsDiv.innerHTML = '';
-
-      charts.forEach(({ id, title, y }) => {
-        const box = document.createElement('div');
-        box.className = 'chart-box';
-        box.innerHTML = `<h4>${title}</h4><div id="${id}" style="height:300px;"></div>`;
-        chartsDiv.appendChild(box);
-
-        Plotly.newPlot(id, [{
-          x: timestamps, y, type: 'scatter', mode: 'lines', line: { width: 2 }
-        }], {
-          margin: { t: 30 },
-          xaxis: { title: 'Zeit', type: 'date' },
-          yaxis: { title }
-        });
+        metricTabs.appendChild(tab);
       });
     }
 
-    fetchSensorNames(); // Startpunkt
-    setInterval(fetchHistory, 60000); // alle 60 Sekunden
+    function aggregateByInterval(data, metric, intervalMinutes = 10) {
+      const grouped = {};
+
+      data.forEach(entry => {
+        const time = new Date(entry.timestamp);
+        const roundedTime = new Date(Math.floor(time.getTime() / (intervalMinutes * 60 * 1000)) * intervalMinutes * 60 * 1000);
+        const key = roundedTime.toISOString();
+
+        if (!grouped[key]) {
+          grouped[key] = { sum: 0, count: 0 };
+        }
+
+        const value = parseFloat(entry[metric]);
+        if (!isNaN(value)) {
+          grouped[key].sum += value;
+          grouped[key].count += 1;
+        }
+      });
+
+      return Object.entries(grouped)
+        .map(([timestamp, { sum, count }]) => ({
+          timestamp,
+          avg: sum / count
+        }))
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    }
+
+    function renderChart() {
+      const entries = historyData[selectedSensor];
+      if (!entries) return;
+
+      const aggregated = aggregateByInterval(entries, selectedMetric, aggregationInterval);
+
+      const timestamps = aggregated.map(e => new Date(e.timestamp));
+      const y = aggregated.map(e => e.avg);
+
+      const layout = {
+        title: '',
+        xaxis: {
+          title: 'Zeit',
+          type: 'date',
+          color: getComputedStyle(document.body).getPropertyValue('--text-color').trim()
+        },
+        yaxis: {
+          title: metricDefinitions[selectedMetric],
+          color: getComputedStyle(document.body).getPropertyValue('--text-color').trim()
+        },
+        plot_bgcolor: 'transparent',
+        paper_bgcolor: 'transparent',
+        margin: { t: 30, r: 20, b: 60, l: 60 }
+      };
+
+      const trace = {
+        x: timestamps,
+        y,
+        type: 'scatter',
+        mode: 'lines',
+        line: { width: 2 }
+      };
+
+      Plotly.newPlot('mainChart', [trace], layout, { responsive: true });
+    }
+
+    document.getElementById('intervalSelect').addEventListener('change', (e) => {
+      aggregationInterval = parseInt(e.target.value, 10);
+      renderChart();
+    });
+
+    fetchSensorNames();
+    setInterval(fetchHistory, 60000);
   </script>
+    <div class="button-bar">
+      <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
+      <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
+      <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
+      <button type="button" onclick="location.href='/status'">🩺 System-Status</button>
+      <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
+      <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
+      <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
+      <button type="button" onclick="location.href='/shelly-control'">🌱 Klima-Automatisierung</button>
+      <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
+      <button type="button" onclick="location.href='/'">Zur Übersicht</button>
+    </div>
+  </body>
 </body>
 </html>

@@ -1,190 +1,41 @@
-<!-- ✨ Cleaned and Refactored index.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <title>🌱 Klima-Automatisierung 🌱</title>
+  <link rel="stylesheet" href="/styles/card.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f9;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    h1, h2, h3 {
-      color: #4CAF50;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .form-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 1100px;
-      margin: auto;
-      border: 1px solid #ddd;
-    }
-
-    .field-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    input, select {
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-
-    .rule-list {
-      margin: 0 auto 20px auto;
-      max-width: 1100px;
-      background: #fff;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
-
-    .rule-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    .button-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 20px;
-      padding: 10px;
-    }
-
-    button {
-      background: #4CAF50;
-      color: #fff;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #45a049;
-    }
-
-    .delete-btn {
-      background: #d9534f;
-      font-size: 12px;
-      padding: 4px 10px;
-    }
-
-    .delete-btn:hover {
-      background: #c9302c;
-    }
-
-    .success-msg {
-      color: green;
-      margin-top: 6px;
-      font-size: 14px;
-    }
-
-    .error-msg {
-      color: red;
-      margin-top: 6px;
-      font-size: 14px;
-    }
-
-    .back-button {
-      background: #4CAF50;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin: 20px auto;
-      display: block;
-      text-align: center;
-      width: max-content;
-    }
-
-    .card-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-evenly;
-      gap: 20px;
-      width: 100%;
-      margin-top: 30px;
-    }
-
-    .card {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 230px;
-      text-align: center;
-      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-      border: 2px solid #e0e0e0;
-      margin-bottom: 20px;
-    }
-
-    .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    @media (max-width: 768px) {
-      .card-container {
-        justify-content: center;
-      }
-
-      .card {
-        width: 200px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .card {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-    }
-  </style>
 </head>
 <body>
   <h1>🌱Klima-Automatisierung</h1>
-
   <button onclick="location.href='/'" class="back-button">Zurück zur Übersicht</button>
-
-  <div class="card-container" id="sensor-cards-container">
-    <!-- Populated via JS -->
-  </div>
-
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
+  <div class="card-container" id="sensor-cards-container"></div>
   <div id="root"></div>
-
+  <!-- Sensor-Daten laden -->
   <script>
-let sensorNameMap = {};
+  function toggleDarkMode() {
+    document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+  }
 
-fetch('/api/sensor-names')
-  .then(res => res.json())
-  .then(data => {
-    sensorNameMap = data;
-    fetchSensorData(); // Nur laden, wenn Map da ist
-    setInterval(fetchSensorData, 10_000);
-  });
+  // Theme beim Laden anwenden
+  (function () {
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  })();
+  
+    let sensorNameMap = {};
+
+    fetch('/api/sensor-names')
+      .then(res => res.json())
+      .then(data => {
+        sensorNameMap = data;
+        fetchSensorData();
+        setInterval(fetchSensorData, 10000);
+      });
+
     async function fetchSensorData() {
       try {
         const res = await fetch('/api/sensor-status');
@@ -192,18 +43,16 @@ fetch('/api/sensor-names')
         const sensors = await res.json();
 
         const container = document.getElementById('sensor-cards-container');
-        if (!container) return console.warn('❗ Kein Container mit ID sensor-cards-container gefunden.');
+        if (!container) return;
 
         container.innerHTML = '';
         for (const [id, data] of Object.entries(sensors)) {
           const card = document.createElement('div');
           const nameKey = id.replace('sensor_', '').replace('.json', '');
           const sensorName = sensorNameMap[nameKey] || `Sensor ${id}`;
-
           card.className = 'card';
           card.innerHTML = `
             <div class="card-title">${sensorName}</div>
-
             <div class="card-value">🌡️ ${data.temperature} °C</div>
             <div class="card-value">💧 ${data.humidity} %</div>
             <div class="card-footer">🕛 ${new Date(data.timestamp).toLocaleString('de-DE')}</div>
@@ -211,18 +60,16 @@ fetch('/api/sensor-names')
           container.appendChild(card);
         }
       } catch (err) {
-        console.error('Fehler beim Laden der Sensorwerte:', err);
+        console.error('Sensorwerte konnten nicht geladen werden:', err);
         const container = document.getElementById('sensor-cards-container');
         if (container) {
-          container.innerHTML = '<div class="error-msg">Sensorwerte konnten nicht geladen werden.</div>';
+          container.innerHTML = '<div class="error-msg">Fehler beim Laden der Sensorwerte.</div>';
         }
       }
     }
-
-    fetchSensorData();
-    setInterval(fetchSensorData, 10_000);
   </script>
 
+  <!-- React & Babel Setup -->
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -249,34 +96,37 @@ fetch('/api/sensor-names')
         }))
       };
     }
+
     function EditableRuleItem({ r, operatorLabels, onDelete, onUpdate }) {
-  const [editMode, setEditMode] = useState(false);
-  const [editRule, setEditRule] = useState(r);
-  const [originalRule] = useState(() => structuredClone(r));
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(false);
+      const [editMode, setEditMode] = useState(false);
+      const [editRule, setEditRule] = useState(r);
+      const [originalRule] = useState(() => structuredClone(r));
+      const [success, setSuccess] = useState(false);
+      const [error, setError] = useState(false);
 
-  function saveEdit() {
-    const updatedRule = convertCommaToDot(editRule);
+      function saveEdit() {
+        const updatedRule = convertCommaToDot(editRule);
 
-    fetch('/api/rules/update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ oldRule: originalRule, newRule: updatedRule })
-    }).then(res => {
-      if (res.ok) {
-        onUpdate(originalRule, updatedRule);
-        setSuccess(true);
-        setTimeout(() => setSuccess(false), 2000);
-        setEditMode(false);
-      } else {
-        throw new Error('Serverfehler');
+        fetch('/api/rules/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ oldRule: originalRule, newRule: updatedRule })
+        })
+        .then(res => {
+          if (res.ok) {
+            onUpdate(originalRule, updatedRule);
+            setSuccess(true);
+            setTimeout(() => setSuccess(false), 2000);
+            setEditMode(false);
+          } else {
+            throw new Error('Serverfehler');
+          }
+        })
+        .catch(() => {
+          setError(true);
+          setTimeout(() => setError(false), 2000);
+        });
       }
-    }).catch(() => {
-      setError(true);
-      setTimeout(() => setError(false), 2000);
-    });
-  }
 
       return (
         <div className="rule-item">
@@ -349,7 +199,11 @@ fetch('/api/sensor-names')
               <>
                 <button onClick={() => setEditMode(true)}>✏️ bearbeiten</button>
                 <button className="delete-btn" onClick={() => {
-                         if (confirm('⚠️ Bist du sicher, dass du diese Regel löschen möchtest?')) {onDelete(r);}}}>🗑️ löschen</button></>
+                  if (confirm('⚠️ Bist du sicher, dass du diese Regel löschen möchtest?')) {
+                    onDelete(r);
+                  }
+                }}>🗑️ löschen</button>
+              </>
             ) : (
               <>
                 <button onClick={saveEdit}>💾 speichern</button>
@@ -365,25 +219,18 @@ fetch('/api/sensor-names')
         </div>
       );
     }
-
     function SensorRuleGroup({ sensor, rules, operatorLabels, onDelete, onUpdate }) {
       const [expanded, setExpanded] = useState(false);
 
       return (
         <div style={{ marginBottom: '12px' }}>
           <div
-            onClick={() => setExpanded(!expanded)}
-            style={{
-              cursor: 'pointer',
-              background: '#e9f5e9',
-              padding: '8px',
-              borderRadius: '5px',
-              fontWeight: 'bold',
-              border: '1px solid #ccc'
-            }}
-          >
-            {expanded ? '▼' : '▶'} {sensor} ({rules.length} Regel{rules.length !== 1 ? 'n' : ''})
-          </div>
+  onClick={() => setExpanded(!expanded)}
+  className={`sensor-header ${expanded ? 'expanded' : ''}`}
+>
+  {expanded ? '▼' : '▶'} {sensor} ({rules.length} Regel{rules.length !== 1 ? 'n' : ''})
+</div>
+
           {expanded && (
             <div style={{ paddingLeft: '10px', marginTop: '6px' }}>
               {rules.map((r, i) => (
@@ -400,6 +247,7 @@ fetch('/api/sensor-names')
         </div>
       );
     }
+
     function App() {
       const [rules, setRules] = useState([]);
       const [relays, setRelays] = useState([]);
@@ -417,12 +265,35 @@ fetch('/api/sensor-names')
       const [saveMessage, setSaveMessage] = useState('');
 
       useEffect(() => {
-        fetch('/api/relays').then(res => res.json()).then(setRelays);
-        fetch('/api/rules').then(res => res.json()).then(setRules);
-        fetch('/api/sensors').then(res => res.json()).then(setSensors);
-        fetch('/api/sensor-names').then(res => res.json()).then(setSensorNameMap);
-      }, []);
+        fetch('/api/relaysRules')
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              setRelays(data);
+            } else if (Array.isArray(data.relays)) {
+              setRelays(data.relays);
+            } else {
+              console.error("Relays-API Formatfehler:", data);
+              setRelays([]);
+            }
+          })
+          .catch(err => {
+            console.error("Relays-API Fehler:", err);
+            setRelays([]);
+          });
 
+        fetch('/api/rules')
+          .then(res => res.json())
+          .then(data => setRules(Array.isArray(data) ? data : []));
+
+        fetch('/api/sensors')
+          .then(res => res.json())
+          .then(data => setSensors(Array.isArray(data) ? data : []));
+
+        fetch('/api/sensor-names')
+          .then(res => res.json())
+          .then(data => setSensorNameMap(data || {}));
+      }, []);
       function addRule() {
         const updatedRule = convertCommaToDot(newRule);
 
@@ -473,7 +344,6 @@ fetch('/api/sensor-names')
         acc[rule.sensor].push(rule);
         return acc;
       }, {});
-
       return (
         <div>
           <div className="rule-list">
@@ -495,7 +365,7 @@ fetch('/api/sensor-names')
               <label>Sensor</label>
               <select value={newRule.sensor} onChange={e => setNewRule({ ...newRule, sensor: e.target.value })}>
                 <option value="">Sensor wählen</option>
-                {sensors.map(s => (
+                {Array.isArray(sensors) && sensors.map(s => (
                   <option key={s} value={s}>
                     {sensorNameMap[s.replace('sensor_', '').replace('.json', '')] || s}
                   </option>
@@ -507,7 +377,9 @@ fetch('/api/sensor-names')
               <label>Relais</label>
               <select value={newRule.relay} onChange={e => setNewRule({ ...newRule, relay: e.target.value })}>
                 <option value="">Relais wählen</option>
-                {relays.map(r => <option key={r.name} value={r.name}>{r.name}</option>)}
+                {Array.isArray(relays) && relays.map(r => (
+                  <option key={r.name} value={r.name}>{r.name}</option>
+                ))}
               </select>
             </div>
 
@@ -529,7 +401,6 @@ fetch('/api/sensor-names')
               <label>Aktiv bis</label>
               <input type="time" value={newRule.activeTo} onChange={e => setNewRule({ ...newRule, activeTo: e.target.value })} />
             </div>
-
             {newRule.conditions.map((cond, i) => (
               <div key={i} style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <label>Bedingung {i + 1}</label>
@@ -590,7 +461,7 @@ fetch('/api/sensor-names')
           <div className="rule-list">
             <h2>Bekannte Relais</h2>
             <ul style={{ listStyle: 'none', padding: 0 }}>
-              {relays.map(r => (
+              {Array.isArray(relays) && relays.map(r => (
                 <li key={r.name}><strong>{r.name}</strong> → {r.ip}</li>
               ))}
             </ul>
@@ -601,7 +472,7 @@ fetch('/api/sensor-names')
               <input type="text" placeholder="IP-Adresse" value={newRelay.ip} onChange={e => setNewRelay({ ...newRelay, ip: e.target.value })} />
               <button onClick={() => {
                 const updated = [...relays, newRelay];
-                fetch('/api/relays', {
+                fetch('/api/relaysRules', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify(updated)
@@ -618,10 +489,22 @@ fetch('/api/sensor-names')
 
     const root = document.getElementById('root');
     if (!root) {
-      console.error('💥 Kein Root-Element für React gefunden!');
+      console.error("💥 Kein Root-Element für React gefunden!");
     } else {
       ReactDOM.createRoot(root).render(<App />);
     }
   </script>
+      <div class="button-bar">
+        <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
+        <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
+        <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
+        <button type="button" onclick="location.href='/status'">🩺 System-Status</button>
+        <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
+        <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
+        <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
+        <button type="button" onclick="location.href='/shelly-control'">🌱 Klima-Automatisierung</button>
+        <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
+        <button type="button" onclick="location.href='/'">Zur Übersicht</button>
+      </div>
 </body>
 </html>

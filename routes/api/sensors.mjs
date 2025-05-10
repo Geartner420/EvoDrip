@@ -2,6 +2,7 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import logger from '../../helper/logger.mjs';
 
 const router = express.Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,6 +15,7 @@ router.get('/', (req, res) => {
     const sensors = data.map(d => d.sensor).filter(Boolean);
     res.json(sensors);
   } catch (err) {
+    logger.error(`❌ Fehler beim Einlesen von ${sensorDataPath}: ${err.message}`);  
     res.status(500).json({ error: 'Fehler beim Einlesen von Sensordaten' });
   }
 });

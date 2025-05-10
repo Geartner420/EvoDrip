@@ -1,144 +1,18 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Klima-Automatik & Bewässerungssystem – Einstellungen</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f9;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    h2 {
-      color: #4CAF50;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    form {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .form-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 1100px;
-      margin: auto;
-      border: 1px solid #ddd;
-    }
-
-    label {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .field-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    input[type="password"] {
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-
-    .timer-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .timer-row input[type="number"] {
-      width: 80px;
-      text-align: right;
-    }
-
-    .button-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 20px;
-      background: #f4f4f9;
-      padding: 10px;
-    }
-
-    button {
-      background: #4CAF50;
-      color: #fff;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #45a049;
-    }
-
-    @media (max-width: 900px) {
-      .form-container {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .form-container {
-        grid-template-columns: 1fr;
-      }
-
-      .field-group {
-        margin-bottom: 15px;
-      }
-
-      .timer-row {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .timer-row input[type="number"] {
-        width: 100%;
-        text-align: left;
-      }
-
-      .button-bar {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 15px;
-      }
-
-      .button-bar button {
-        width: 100%;
-        padding: 8px 16px;
-        font-size: 14px;
-      }
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Umluft-Automatik</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script src="/scripts/darkmode.js" defer></script>
 </head>
 <body>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
   <h2>Umluft-Automatik</h2>
 
   <form method="POST" action="/start-relay-cycle">
     <div class="form-container">
-      <!-- Eingabefelder für Relaissteuerung in Minuten -->
       <div class="field-group">
         <label for="initialOffset">Initialer Versatz (Minuten):</label>
         <input type="number" id="initialOffset" name="initialOffset" value="2" step="1" />
@@ -179,8 +53,8 @@
       <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
       <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
       <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
-      <button type="button" onclick="location.href='/shelly-control'">🌱 Klima-Automatisierung </button>
-      <button type="button" onclick="location.href='/'">Zur Übersicht </button>
+      <button type="button" onclick="location.href='/shelly-control'">🌱 Klima-Automatisierung</button>
+      <button type="button" onclick="location.href='/'">Zur Übersicht</button>
     </div>
   </form>
 </body>

@@ -1,0 +1,20 @@
+{
+  "global": {
+    "initialOffset": 120000,
+    "minOn": 240000,
+    "maxOn": 480000,
+    "minOff": 120000,
+    "maxOff": 300000,
+    "simultaneousCycleInterval": 5
+  },
+  "relays": [
+    {
+      "name": "Umluft 1",
+      "ip": "192.168.178.67"
+    },
+    {
+      "name": "Umluft 2",
+      "ip": "192.168.178.69"
+    }
+  ]
+}

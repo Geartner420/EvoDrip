@@ -105,19 +105,30 @@ function getShellyUrl(ip, state) {
   return `http://${ip}/relay/0?turn=${state}`;
 }
 
-// Zeitfenster prüfen
-function isWithinTimeWindow(from, to) {
-  if (!from || !to) return true;
+function isWithinTimeWindow(startTime, endTime) {
+  if (!startTime || !endTime) return true;
+
 
   const now = new Date();
-  const [fromH, fromM] = from.split(':').map(Number);
-  const [toH, toM] = to.split(':').map(Number);
+  const [startHour, startMinute] = startTime.split(':').map(Number);
+  const [endHour, endMinute] = endTime.split(':').map(Number);
 
-  const start = new Date(now); start.setHours(fromH, fromM, 0, 0);
-  const end = new Date(now); end.setHours(toH, toM, 0, 0);
 
-  return end < start ? (now >= start || now <= end) : (now >= start && now <= end);
+  const start = new Date(now);
+  start.setHours(startHour, startMinute, 0, 0);
+
+
+  const end = new Date(now);
+  end.setHours(endHour, endMinute, 0, 0);
+
+  if (end < start) {
+    return now >= start || now <= end;
+  } else {
+    return now >= start && now <= end;
+  }
+
 }
+
 
 // Hauptregel-Engine
 function runRuleEngine() {
@@ -137,13 +148,6 @@ function runRuleEngine() {
     const sensorData = sensorMap[rule.sensor];
     if (!sensorData) {
       logger.warn(`[rule_engine] ❗ Sensor "${rule.sensor}" nicht gefunden.`);
-      continue;
-    }
-
-    if (!isWithinTimeWindow(rule.activeFrom, rule.activeTo)) {
-      if (DEBUG_MODE) {
-        logger.debug(`[rule_engine] ⏰ Regel ${rule.relay} (${rule.action}) ignoriert – außerhalb des Zeitfensters.`);
-      }
       continue;
     }
 
@@ -177,6 +181,7 @@ function runRuleEngine() {
       const url = getShellyUrl(ip, desiredState);
       const emoji = desiredState === 'on' ? '🟢' : '🔴';
       const conditionStr = conditionResults.map(r => r.desc).join(' UND ');
+      logger.debug(`[rule_engine] Regel ${rule.relay} wird jetzt geschaltet – Zeitfenster gültig`);
 
       if (!isWithinTimeWindow(rule.activeFrom, rule.activeTo)) {
         logger.debug(`[rule_engine] ⏰ Regel ${rule.relay} übersprungen – Zeitfenster inzwischen ungültig`);
@@ -185,7 +190,7 @@ function runRuleEngine() {
 
       safeSwitch(url)
         .then(() => {
-          logger.info(`${emoji} ${rule.relay} ${desiredState === 'on' ? '🟢' : '🔴'} → ${conditionStr}`);
+          logger.info(`${emoji} ${rule.relay} ${desiredState === 'on' ? '' : ''} → ${conditionStr}`);
           saveRelayLogEntry({
             timestamp: new Date().toISOString(),
             relay: rule.relay,

@@ -1,0 +1,217 @@
+:root {
+  --bg-color: #f4f4f9;
+  --text-color: #111;
+  --card-bg: #fff;
+  --border-color: #ddd;
+  --button-bg: #4CAF50;
+  --button-hover: #45a049;
+  --danger-bg: #d9534f;
+  --danger-hover: #c9302c;
+  --sensor-header-bg: #e9f5e9;
+  --sensor-header-color: #000;
+}
+
+.dark {
+  --bg-color: #1e1e1e;
+  --text-color: #eee;
+  --card-bg: #2c2c2c;
+  --border-color: #444;
+  --button-bg: #2e7d32;
+  --button-hover: #388e3c;
+  --danger-bg: #c62828;
+  --danger-hover: #b71c1c;
+  --sensor-header-bg: #2e2e2e;
+  --sensor-header-color: #fff;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+h1, h2, h3 {
+  color: var(--button-bg);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 1100px;
+  margin: auto;
+  border: 1px solid var(--border-color);
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+}
+
+input, select {
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 14px;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+.rule-list {
+  margin: 0 auto 20px auto;
+  max-width: 1100px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.rule-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.button-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 10px;
+}
+
+button {
+  background: var(--button-bg);
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background: var(--button-hover);
+}
+
+.delete-btn {
+  background: var(--danger-bg);
+  font-size: 12px;
+  padding: 4px 10px;
+}
+
+.delete-btn:hover {
+  background: var(--danger-hover);
+}
+
+.success-msg {
+  color: limegreen;
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.error-msg {
+  color: red;
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.back-button {
+  background: var(--button-bg);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 20px auto;
+  display: block;
+  text-align: center;
+  width: max-content;
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  gap: 20px;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.card {
+  background: var(--card-bg);
+  color: var(--text-color); /* ✅ WICHTIG: Jetzt korrekt */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 230px;
+  text-align: center;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border: 2px solid var(--border-color);
+  margin-bottom: 20px;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.dark-toggle {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.sensor-header {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 5px;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  background: #e9f5e9;
+  color: #000;
+}
+
+.dark .sensor-header {
+  background: #2e2e2e;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .card-container {
+    justify-content: center;
+  }
+
+  .card {
+    width: 200px;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .card {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
