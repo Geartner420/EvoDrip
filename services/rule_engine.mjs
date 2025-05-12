@@ -23,7 +23,6 @@ const operatorMap = {
   '==': 'gleich'
 };
 
-// Sicheres Laden von JSON-Dateien
 function loadJson(filePath) {
   if (!fs.existsSync(filePath)) return [];
   try {
@@ -35,7 +34,6 @@ function loadJson(filePath) {
   }
 }
 
-// Relay-Log speichern
 function saveRelayLogEntry(entry) {
   let log = [];
   try {
@@ -58,8 +56,7 @@ function saveRelayLogEntry(entry) {
   }
 }
 
-// Fetch mit Timeout und Logging
-function fetchWithTimeout(url, timeout = 5000) {
+async function fetchWithTimeout(url, timeout = 5000) {
   const controller = new AbortController();
   const id = setTimeout(() => {
     controller.abort();
@@ -68,7 +65,6 @@ function fetchWithTimeout(url, timeout = 5000) {
   return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(id));
 }
 
-// Wiederholtes Schalten mit Retry
 async function safeSwitch(url, retries = 2) {
   for (let i = 0; i <= retries; i++) {
     try {
@@ -83,7 +79,6 @@ async function safeSwitch(url, retries = 2) {
   }
 }
 
-// Evaluierung mit Hysterese
 function evaluateCondition(sensorValue, { param, op, value, hysteresis }, currentState) {
   const actual = sensorValue[param];
   const expected = parseFloat(value);
@@ -108,30 +103,24 @@ function getShellyUrl(ip, state) {
 function isWithinTimeWindow(startTime, endTime) {
   if (!startTime || !endTime) return true;
 
-
   const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
   const [startHour, startMinute] = startTime.split(':').map(Number);
   const [endHour, endMinute] = endTime.split(':').map(Number);
 
+  const startMinutes = startHour * 60 + startMinute;
+  const endMinutes = endHour * 60 + endMinute;
 
-  const start = new Date(now);
-  start.setHours(startHour, startMinute, 0, 0);
+  const inWindow = startMinutes <= endMinutes
+    ? nowMinutes >= startMinutes && nowMinutes <= endMinutes
+    : nowMinutes >= startMinutes || nowMinutes <= endMinutes;
 
-
-  const end = new Date(now);
-  end.setHours(endHour, endMinute, 0, 0);
-
-  if (end < start) {
-    return now >= start || now <= end;
-  } else {
-    return now >= start && now <= end;
-  }
-
+  logger.debug(`[zeitfenster] ${startTime}–${endTime} | now=${now.getHours()}:${now.getMinutes()} → ${inWindow}`);
+  return inWindow;
 }
 
-
-// Hauptregel-Engine
-function runRuleEngine() {
+async function runRuleEngine() {
   const rules = loadJson(rulesFile);
   const relays = loadJson(relaysFile);
   const sensors = loadJson(sensorFile);
@@ -144,6 +133,8 @@ function runRuleEngine() {
   let checked = 0;
   let switched = 0;
 
+  const pendingStates = {}; // relay → { rule, action, desc }
+
   for (const rule of rules) {
     const sensorData = sensorMap[rule.sensor];
     if (!sensorData) {
@@ -151,83 +142,93 @@ function runRuleEngine() {
       continue;
     }
 
+    const inTimeWindow = isWithinTimeWindow(rule.activeFrom, rule.activeTo);
     const lastState = lastStates[rule.relay] || 'off';
 
     const conditionResults = rule.conditions.map(cond => {
       const actual = sensorData[cond.param];
       const passed = evaluateCondition(sensorData, cond, lastState);
       const hStr = cond.hysteresis ? ` ±${cond.hysteresis}` : '';
-      const label = cond.param === 'Temperatur' ? '🌡' :
-                    cond.param === 'Feuchtigkeit' ? '💧' :
-                    cond.param === 'VPD' ? '📈' : '📊';
-      const operatorText = operatorMap[cond.op] || cond.op;
-      const desc = `${label} ${cond.param} ${operatorText} ${cond.value}${hStr} → aktuell: ${actual}`;
+      const label = cond.param === 'temperature' ? '🌡' :
+                    cond.param === 'humidity' ? '💧' :
+                    cond.param === 'vpd' ? '📈' : '📊';
+      const opText = operatorMap[cond.op] || cond.op;
+      const desc = `${label} ${cond.param} ${opText} ${cond.value}${hStr} → aktuell: ${actual}`;
       return { passed, desc };
     });
 
-    const shouldActivate = conditionResults.every(r => r.passed);
+    const shouldActivate = inTimeWindow && conditionResults.every(r => r.passed);
     checked++;
 
-    if (!shouldActivate) continue;
-
-    const desiredState = rule.action;
-    const ip = relayMap[rule.relay];
-    if (!ip) {
-      logger.warn(`[rule_engine] ⚠️ Keine IP für Relais "${rule.relay}".`);
+    if (!shouldActivate) {
+      const reason = !inTimeWindow ? '⏰ Zeitfenster ungültig' : '❌ Bedingungen nicht erfüllt';
+      logger.debug(`[rule_engine] Regel ${rule.relay} (${rule.action}) übersprungen – ${reason}`);
       continue;
     }
 
-    if (desiredState !== lastState) {
-      const url = getShellyUrl(ip, desiredState);
-      const emoji = desiredState === 'on' ? '🟢' : '🔴';
-      const conditionStr = conditionResults.map(r => r.desc).join(' UND ');
-      logger.debug(`[rule_engine] Regel ${rule.relay} wird jetzt geschaltet – Zeitfenster gültig`);
+    const existing = pendingStates[rule.relay];
+    if (existing?.action === 'on') continue; // already requested ON
+    if (rule.action === 'on' || !existing) {
+      pendingStates[rule.relay] = {
+        rule,
+        action: rule.action,
+        desc: conditionResults.map(r => r.desc).join(' UND ')
+      };
+    }
+  }
 
-      if (!isWithinTimeWindow(rule.activeFrom, rule.activeTo)) {
-        logger.debug(`[rule_engine] ⏰ Regel ${rule.relay} übersprungen – Zeitfenster inzwischen ungültig`);
-        continue;
-      }
+  for (const [relayName, { rule, action, desc }] of Object.entries(pendingStates)) {
+    const ip = relayMap[relayName];
+    if (!ip) {
+      logger.warn(`[rule_engine] ⚠️ Keine IP für Relais "${relayName}".`);
+      continue;
+    }
+    if (lastStates[relayName] === action) {
+  logger.debug(`[rule_engine] ${relayName} ist bereits ${action.toUpperCase()} – kein neuer Befehl`);
+  continue;
+}
+    const url = getShellyUrl(ip, action);
+    const emoji = action === 'on' ? '🟢' : '🔴';
 
-      safeSwitch(url)
-        .then(() => {
-          logger.info(`${emoji} ${rule.relay} ${desiredState === 'on' ? '' : ''} → ${conditionStr}`);
-          saveRelayLogEntry({
-            timestamp: new Date().toISOString(),
-            relay: rule.relay,
-            ip,
-            state: desiredState,
-            sourceSensor: rule.sensor,
-            conditions: rule.conditions,
-            activeFrom: rule.activeFrom,
-            activeTo: rule.activeTo
-          });
-          lastStates[rule.relay] = desiredState;
-          switched++;
-        })
-        .catch(err => {
-          logger.error(`[rule_engine] ❌ Fehler beim Schalten von ${rule.relay}: ${err.message}`);
-        });
+    logger.debug(`[rule_engine] Regel ${relayName} wird jetzt geschaltet – Zeitfenster gültig`);
+
+try {
+  await safeSwitch(url);
+      logger.info(`${emoji} ${relayName} → ${desc}`);
+      saveRelayLogEntry({
+        timestamp: new Date().toISOString(),
+        relay: relayName,
+        ip,
+        state: action,
+        sourceSensor: rule.sensor,
+        conditions: rule.conditions,
+        activeFrom: rule.activeFrom,
+        activeTo: rule.activeTo
+      });
+      lastStates[relayName] = action;
+      switched++;
+    } catch (err) {
+
+      logger.error(`[rule_engine] ❌ Fehler beim Schalten von ${relayName}: ${err.message}`);
     }
   }
 
   if (DEBUG_MODE) {
-    logger.debug(`[rule_engine] ✅ ${checked} Regeln geprüft, ${switched} geschaltet`);
+    logger.debug(`[rule_engine] ✅ ${checked} Regeln geprüft, ${switched} geschaltet`);      
+
   }
 }
 
-// Fehlerresistenter Wrapper
 let tick = 0;
 function runRuleEngineSafe() {
-  try {
-    logger.debug(`⏲ Tick ${++tick}`);
-    runRuleEngine();
-  } catch (err) {
-    logger.error(`❌ Ungefangener Fehler: ${err.message}`);
-  }
+  logger.debug(`⏲ Tick ${++tick}`);
+  runRuleEngine().catch(err =>
+    logger.error(`❌ Ungefangener Fehler: ${err.message}`)
+  );
 }
 
 export function startRuleEngine() {
-  logger.info('🚀 Regel-Engine gestartet (alle 10s)');
+  logger.info('🚀 Regel-Engine gestartet (alle 45s)');
   runRuleEngineSafe();
-  setInterval(runRuleEngineSafe, 10000);
+  setInterval(runRuleEngineSafe, 45000);
 }
