@@ -1,19 +1,42 @@
 // logger.mjs
 import winston from 'winston';
 import dotenv from 'dotenv';
-dotenv.config(); // Lade .env Datei
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+dotenv.config(); // Lade .env-Datei
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Gemeinsames Log-Format
+const logFormat = winston.format.printf(({ timestamp, level, message }) =>
+  `[${timestamp}] ${level.toUpperCase()}: ${message}`
+);
+
+// Haupt-Logger (newdrip.log)
 const logger = winston.createLogger({
   level: process.env.DEBUG === 'true' ? 'debug' : 'info',
   format: winston.format.combine(
     winston.format.timestamp({ format: 'DD.MM.YYYY HH:mm:ss' }),
-    winston.format.printf(({ timestamp, level, message }) =>
-      `[${timestamp}] ${level.toUpperCase()}: ${message}`)
+    logFormat
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: 'newdrip.log' })
+    new winston.transports.File({ filename: path.join(__dirname, '../newdrip.log') })
   ]
 });
 
-export default logger;
+// Zusätzlicher Logger speziell für die Regel-Engine (rule_engine.log)
+const ruleEngineLogger = winston.createLogger({
+  level: 'debug',
+  format: winston.format.combine(
+    winston.format.timestamp({ format: 'DD.MM.YYYY HH:mm:ss' }),
+    logFormat
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: path.join(__dirname, '../logs/rule_engine.log') })
+  ]
+});
+
+export { logger as default, ruleEngineLogger };

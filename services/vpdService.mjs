@@ -24,7 +24,7 @@ function calculateVpd(data) {
   const rh = data.humidity;
   const es = 0.6108 * Math.exp((17.27 * temp) / (temp + 237.3));
   const ea = es * (rh / 100);
-  return parseFloat((es - ea).toFixed(3));
+  return parseFloat((es - ea).toFixed(1));
 }
 
 function calculateLeafVpd(data, leafTemp) {

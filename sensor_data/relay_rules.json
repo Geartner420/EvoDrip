@@ -24,7 +24,7 @@
       {
         "param": "humidity",
         "op": "<=",
-        "value": "55",
+        "value": "58",
         "hysteresis": "3"
       }
     ]
@@ -54,7 +54,7 @@
       {
         "param": "humidity",
         "op": "<=",
-        "value": "58",
+        "value": "52",
         "hysteresis": "3"
       }
     ]
@@ -70,28 +70,13 @@
         "param": "vpd",
         "op": ">",
         "value": "1.2",
-        "hysteresis": ""
+        "hysteresis": "0.05"
       },
       {
         "param": "humidity",
         "op": "<=",
         "value": "58",
-        "hysteresis": ""
-      }
-    ]
-  },
-  {
-    "sensor": "sensor_1.json",
-    "relay": "Befeuchter",
-    "action": "off",
-    "activeFrom": "06:00",
-    "activeTo": "18:00",
-    "conditions": [
-      {
-        "param": "humidity",
-        "op": ">",
-        "value": "65",
-        "hysteresis": "2"
+        "hysteresis": "3"
       }
     ]
   },
@@ -106,7 +91,7 @@
         "param": "humidity",
         "op": ">=",
         "value": "69",
-        "hysteresis": ""
+        "hysteresis": "3"
       }
     ]
   },
@@ -121,67 +106,104 @@
         "param": "humidity",
         "op": "<=",
         "value": "54",
+        "hysteresis": "3"
+      }
+    ]
+  },
+  {
+    "sensor": "sensor_2.json",
+    "relay": "Dunstabzug",
+    "action": "on",
+    "activeFrom": "18:00",
+    "activeTo": "06:00",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "54",
+        "hysteresis": "3"
+      }
+    ]
+  },
+  {
+    "sensor": "sensor_2.json",
+    "relay": "Dunstabzug",
+    "action": "off",
+    "activeFrom": "18:00",
+    "activeTo": "06:00",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "51",
+        "hysteresis": "3"
+      }
+    ]
+  },
+  {
+    "sensor": "sensor_1.json",
+    "relay": "Abluft",
+    "action": "on",
+    "activeFrom": "18:00",
+    "activeTo": "06:00",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">",
+        "value": "59",
+        "hysteresis": "2"
+      },
+      {
+        "param": "temperature",
+        "op": ">",
+        "value": "22",
+        "hysteresis": "3"
+      }
+    ],
+    "logic": "OR"
+  },
+  {
+    "sensor": "sensor_2.json",
+    "relay": "Abluft",
+    "action": "on",
+    "activeFrom": "06:00",
+    "activeTo": "18:00",
+    "conditions": [
+      {
+        "param": "temperature",
+        "op": ">=",
+        "value": "25.5",
         "hysteresis": "2"
       }
     ]
   },
   {
-    "sensor": "sensor_1.json",
-    "relay": "Abluft",
-    "action": "on",
-    "activeFrom": "18:00",
-    "activeTo": "06:00",
-    "conditions": [
-      {
-        "param": "humidity",
-        "op": "==",
-        "value": "65",
-        "hysteresis": "3"
-      }
-    ]
-  },
-  {
-    "sensor": "sensor_1.json",
+    "sensor": "sensor_2.json",
     "relay": "Abluft",
     "action": "off",
-    "activeFrom": "18:00",
-    "activeTo": "06:00",
+    "activeFrom": "06:00",
+    "activeTo": "18:00",
     "conditions": [
       {
-        "param": "humidity",
-        "op": "==",
-        "value": "52",
-        "hysteresis": "3"
+        "param": "temperature",
+        "op": "<=",
+        "value": "23",
+        "hysteresis": "1"
       }
     ]
   },
   {
-    "sensor": "sensor_2.json",
-    "relay": "Dunstabzug",
-    "action": "on",
-    "activeFrom": "18:00",
-    "activeTo": "06:00",
-    "conditions": [
-      {
-        "param": "humidity",
-        "op": "==",
-        "value": "56",
-        "hysteresis": "3"
-      }
-    ]
-  },
-  {
-    "sensor": "sensor_2.json",
-    "relay": "Dunstabzug",
+    "sensor": "sensor_3.json",
+    "relay": "Befeuchter",
     "action": "off",
-    "activeFrom": "18:00",
-    "activeTo": "06:00",
+    "activeFrom": "06:00",
+    "activeTo": "18:00",
     "conditions": [
       {
         "param": "humidity",
-        "op": "==",
-        "value": "50",
-        "hysteresis": "3"
+        "op": ">=",
+        "value": "68",
+        "hysteresis": "1"
       }
     ]
   }

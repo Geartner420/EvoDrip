@@ -8,6 +8,7 @@
   <script src="/scripts/darkmode.js" defer></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
+
     #intervalTabs {
       display: flex;
       justify-content: center;
@@ -21,6 +22,7 @@
       font-size: 14px;
       border-radius: 5px;
     }
+
   </style>
 </head>
 <body>
@@ -30,9 +32,6 @@
     <div class="tabs" style="display: flex; justify-content: center;">
       <h2 style="margin: auto;">📈 TP357S Klima-Diagramme</h2> 
     </div> 
-    <div class="tabs">
-      <a class="button back-btn" href="/">Zurück zur Übersicht</a>
-    </div>
 
     <!-- Sensorauswahl -->
     <div id="sensorTabs" class="tabs"></div>
@@ -46,8 +45,8 @@
       <select id="intervalSelect">
         <option value="1">1 Minute</option>
         <option value="5">5 Minuten</option>
-        <option value="10" selected>10 Minuten</option>
-        <option value="30">30 Minuten</option>
+        <option value="10" >10 Minuten</option>
+        <option value="30"selected>30 Minuten</option>
         <option value="60">1 Stunde</option>
       </select>
     </div>
@@ -221,6 +220,7 @@
       <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
       <button type="button" onclick="location.href='/shelly-control'">🌱 Klima-Automatisierung</button>
       <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
+      <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
       <button type="button" onclick="location.href='/'">Zur Übersicht</button>
     </div>
   </body>

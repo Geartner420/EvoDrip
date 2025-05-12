@@ -1,4 +1,4 @@
-import { cta } from '../services/connectAll.mjs';
+import { cta } from './services/connectAll.mjs';
 
 console.log('[BLE Reader] startet...');
 cta();

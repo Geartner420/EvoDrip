@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📜 System-Log</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script src="/scripts/darkmode.js" defer></script>
+  <style>
+    .filter-box {
+      max-width: 800px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      justify-content: center;
+    }
+    .filter-box input {
+      padding: 8px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+  </style>
+</head>
+<body>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
+  <h2>📜 Regel-Log</h2>
+  <div class="button-bar">  
+    <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
+    <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
+    <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
+    <button type="button" onclick="location.href='/status'">🩺 System-Status</button>
+    <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
+    <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
+    <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
+    <button type="button" onclick="location.href='/shelly-control'">🌱 Klima-Automatisierung</button>
+    <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>    
+    <button type="button" onclick="location.href='/'">Zur Übersicht</button>
+  </div>
+</body>
+
+  <div class="filter-box">
+    <input type="text" id="log-filter" placeholder="🔍 Logeinträge filtern...">
+  </div>
+
+  <div class="card log-card">
+    <pre id="log-output"><%= logContent %></pre>
+  </div>
+
+  <script>
+    const logOutput = document.getElementById('log-output');
+    const filterInput = document.getElementById('log-filter');
+  
+    let originalText = logOutput.textContent;
+  
+    // Holt neue Logs von der API
+    async function reloadLog() {
+      try {
+        const res = await fetch('/rulelog/raw?limit=1000');
+        const lines = await res.json();
+        const newText = lines.join('\n');
+  
+        // Nur wenn sich was geändert hat
+        if (newText !== originalText) {
+          originalText = newText;
+  
+          // Filter übernehmen
+          applyFilter();
+        }
+      } catch (err) {
+        console.error('❌ Fehler beim Nachladen:', err);
+      }
+    }
+  
+    // Filterfunktion
+    function applyFilter() {
+      const keyword = filterInput.value.trim().toLowerCase();
+      const filtered = originalText
+        .split('\n')
+        .filter(line => line.toLowerCase().includes(keyword))
+        .join('\n');
+  
+      logOutput.textContent = filtered || '⚠️ Keine Übereinstimmungen';
+    }
+  
+    // Listener für Filter
+    filterInput.addEventListener('input', applyFilter);
+  
+    // Intervall für automatisches Nachladen
+    setInterval(reloadLog, 10000); // alle 10 Sekunden
+    reloadLog(); 
+  </script>
+  
+  
+  
+  
+</html>

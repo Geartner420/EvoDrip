@@ -2,7 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
-import logger from '../helper/logger.mjs';
+import { ruleEngineLogger as logger } from '../helper/logger.mjs';
+
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(__dirname, '../sensor_data');
@@ -157,7 +158,13 @@ async function runRuleEngine() {
       return { passed, desc };
     });
 
-    const shouldActivate = inTimeWindow && conditionResults.every(r => r.passed);
+    const logic = (rule.logic || 'AND').toUpperCase();
+    const conditionsPassed = logic === 'OR'
+      ? conditionResults.some(r => r.passed)
+      : conditionResults.every(r => r.passed);
+    
+    const shouldActivate = inTimeWindow && conditionsPassed;
+    
     checked++;
 
     if (!shouldActivate) {
@@ -165,14 +172,15 @@ async function runRuleEngine() {
       logger.debug(`[rule_engine] Regel ${rule.relay} (${rule.action}) übersprungen – ${reason}`);
       continue;
     }
-
     const existing = pendingStates[rule.relay];
-    if (existing?.action === 'on') continue; // already requested ON
+    if (existing?.action === 'on') continue; // bereits ON angefordert
     if (rule.action === 'on' || !existing) {
       pendingStates[rule.relay] = {
         rule,
         action: rule.action,
-        desc: conditionResults.map(r => r.desc).join(' UND ')
+        desc: logic === 'OR'
+          ? conditionResults.filter(r => r.passed).map(r => r.desc).join(' ODER ')
+          : conditionResults.map(r => r.desc).join(' UND ')
       };
     }
   }
@@ -190,9 +198,11 @@ async function runRuleEngine() {
     const url = getShellyUrl(ip, action);
     const emoji = action === 'on' ? '🟢' : '🔴';
 
-    logger.debug(`[rule_engine] Regel ${relayName} wird jetzt geschaltet – Zeitfenster gültig`);
 
-try {
+
+    logger.debug(`[rule_engine] Regel ${relayName} wird jetzt geschaltet – Zeitfenster gültig`);
+    try {
+
   await safeSwitch(url);
       logger.info(`${emoji} ${relayName} → ${desc}`);
       saveRelayLogEntry({
@@ -208,14 +218,12 @@ try {
       lastStates[relayName] = action;
       switched++;
     } catch (err) {
-
       logger.error(`[rule_engine] ❌ Fehler beim Schalten von ${relayName}: ${err.message}`);
     }
   }
 
   if (DEBUG_MODE) {
-    logger.debug(`[rule_engine] ✅ ${checked} Regeln geprüft, ${switched} geschaltet`);      
-
+    logger.debug(`[rule_engine] ✅ ${checked} Regeln geprüft, ${switched} geschaltet`);
   }
 }
 
@@ -228,7 +236,7 @@ function runRuleEngineSafe() {
 }
 
 export function startRuleEngine() {
-  logger.info('🚀 Regel-Engine gestartet (alle 45s)');
+  logger.info('🚀 Regel-Engine gestartet (alle 5s)');
   runRuleEngineSafe();
-  setInterval(runRuleEngineSafe, 45000);
+  setInterval(runRuleEngineSafe, 5000);
 }

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>🌱 Kombi-Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script src="/scripts/darkmode.js" defer></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
+  <div class="container">
+    <h1>🌡 Kombiniertes Sensor-Dashboard</h1>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+      <div id="tabsContainer" class="tabs"></div>
+      <label>
+        Aggregation:
+        <select id="aggSelect">
+          <option value="1">1 Minute</option>
+          <option value="10">10 Minuten</option>
+          <option value="30">30 Minuten</option>
+          <option value="60">1 Stunde</option>
+        </select>
+      </label>
+    </div>
+    <div id="chart" style="height: 600px; margin-top: 20px;"></div>
+    <div id="lastUpdate" style="margin-top: 10px; font-size: 0.9em; opacity: 0.7;"></div>
+  </div>
+
+  <script>
+    let sensorData = {};
+    let relayLog = [];
+    let selectedSensor = '';
+    let aggregationMinutes = 1;
+
+    function roundTimestampTo(date, minutes) {
+      const ms = minutes * 60 * 1000;
+      return new Date(Math.floor(date.getTime() / ms) * ms);
+    }
+
+    function aggregate(data, minutes) {
+      const grouped = {};
+      data.forEach(entry => {
+        const key = roundTimestampTo(new Date(entry.timestamp), minutes).toISOString();
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(entry);
+      });
+      return Object.entries(grouped).map(([ts, group]) => {
+        const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+        return {
+          timestamp: ts,
+          temperature: avg(group.map(e => e.temperature)),
+          humidity: avg(group.map(e => e.humidity))
+        };
+      });
+    }
+
+    function movingAverage(arr, windowSize) {
+      return arr.map((_, i, a) => {
+        const start = Math.max(0, i - windowSize + 1);
+        const window = a.slice(start, i + 1);
+        return window.reduce((sum, val) => sum + val, 0) / window.length;
+      });
+    }
+
+    function updateTabs() {
+      const container = document.getElementById('tabsContainer');
+      container.innerHTML = '';
+      Object.keys(sensorData).forEach(id => {
+        const btn = document.createElement('button');
+        btn.textContent = id;
+        btn.className = 'tab';
+        if (id === selectedSensor) btn.classList.add('active');
+        btn.onclick = () => {
+          selectedSensor = id;
+          updateTabs();
+          drawChart();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function drawChart() {
+      if (!sensorData[selectedSensor]) return;
+
+    const twelveHoursAgo = Date.now() - 12 * 60 * 60 * 1000;
+    const rawData = sensorData[selectedSensor].filter(entry =>
+    new Date(entry.timestamp).getTime() >= twelveHoursAgo
+);
+
+
+      const data = aggregate(rawData, aggregationMinutes);
+
+      const timestamps = data.map(d => new Date(d.timestamp));
+      const temps = movingAverage(data.map(d => d.temperature), 3);
+      const hums = movingAverage(data.map(d => d.humidity), 3);
+      const filteredRelayLog = relayLog.filter(r => new Date(r.timestamp).getTime() >= twelveHoursAgo
+);
+
+      const logSensorKey = `sensor_${selectedSensor}.json`;
+      const switches = relayLog
+      .filter(r => r.sensor === logSensorKey && new Date(r.timestamp).getTime() >= twelveHoursAgo)
+
+        .map(r => ({
+          x: [new Date(r.timestamp)],
+          y: [ r.state === 'on'
+                 ? (r.reason.includes('💧') ? 95 : 30)
+                 : (r.reason.includes('💧') ? 5  : 10) ],
+          type: 'scatter',
+          mode: 'markers',
+          name: `🔌 ${r.relay} (${r.state})`,
+          marker: {
+            size: 12,
+            symbol: r.state === 'on' ? 'triangle-up' : 'triangle-down',
+            color: r.state === 'on' ? '#28a745' : '#dc3545',
+            line: { width: 1, color: '#333' }
+          },
+          hovertemplate: `🔌 ${r.relay} (${r.state})<br>${r.reason}<br>%{x}<extra></extra>`,
+          yaxis: r.reason.includes('💧') ? 'y2' : 'y'
+        }));
+
+      const sensorLabel = selectedSensor.replace('sensor_', '').replace('.json', '');
+
+      Plotly.newPlot('chart', [
+        {
+          x: timestamps,
+          y: temps,
+          name: '🌡 Temperatur (°C)',
+          type: 'scatter',
+          mode: 'lines+markers',
+          marker: { color: 'orange' },
+          hovertemplate: 'Zeit: %{x}<br>🌡 %{y:.2f} °C<extra></extra>'
+        },
+        {
+          x: timestamps,
+          y: hums,
+          name: '💧 Luftfeuchte (%)',
+          type: 'scatter',
+          mode: 'lines+markers',
+          yaxis: 'y2',
+          marker: { color: 'blue' },
+          hovertemplate: 'Zeit: %{x}<br>💧 %{y:.2f} %<extra></extra>'
+        },
+        ...switches
+      ], {
+        title: `📊 Daten für ${sensorLabel}`,
+        xaxis: {
+          title: 'Zeit',
+          type: 'date',
+          tickformat: '%H:%M',
+          tickangle: -30
+        },
+        yaxis: {
+          title: 'Temperatur (°C)',
+          rangemode: 'tozero'
+        },
+        yaxis2: {
+          title: 'Luftfeuchte (%)',
+          overlaying: 'y',
+          side: 'right',
+          rangemode: 'tozero'
+        },
+        margin: { t: 40, b: 60 },
+        legend: { orientation: 'h' },
+        plot_bgcolor: 'transparent',
+        paper_bgcolor: 'transparent'
+      }, { responsive: true });
+
+      document.getElementById('lastUpdate').textContent =
+        `Zuletzt aktualisiert: ${new Date().toLocaleTimeString()}`;
+    }
+
+    function fetchData() {
+      Promise.all([
+        fetch('/api/sensordata').then(r => r.json()),
+        fetch('/api/relay-switches-log').then(r => r.json())
+      ]).then(([sensors, relays]) => {
+        sensorData = sensors;
+        relayLog = relays;
+        if (!selectedSensor || !sensorData[selectedSensor]) {
+          selectedSensor = Object.keys(sensorData)[0];
+        }
+        updateTabs();
+        drawChart();
+      }).catch(err => console.error('❌ Fehler beim Laden:', err));
+    }
+
+    document.getElementById('aggSelect').onchange = e => {
+      aggregationMinutes = parseInt(e.target.value);
+      drawChart();
+    };
+
+    fetchData();
+  </script>
+</body>
+</html>

@@ -12,7 +12,7 @@ const DATA_DIR = path.join('./sensor_data');
 // Konfiguration für offline Zeiten und Intervall für Offline-Überprüfung
 const OFFLINE_TIMEOUT_MS = 4 * 60 * 60 * 1000; // 4 Stunden
 const OFFLINE_CHECK_INTERVAL_MS = 10 * 60 * 1000; // 10 Minuten
-const WRITE_THROTTLE_MS = 5_000; // 30 Sekunden
+const WRITE_THROTTLE_MS = 20_000; // 30 Sekunden
 let sensorCounter = 1;
 
 const offlineNotified = new Set();
