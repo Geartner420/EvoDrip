@@ -1,20 +1,21 @@
+// Hauptmodule importieren
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
 import { ruleEngineLogger as logger } from '../helper/logger.mjs';
 
+// Basisverzeichnisse und Pfade zu JSON-Dateien
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(__dirname, '../sensor_data');
 
-const rulesFile = path.join(dataDir, 'relay_rules.json');
-const relaysFile = path.join(dataDir, 'relays.json');
-const sensorFile = path.join(dataDir, 'last_entrys.json');
-const relayLogFile = path.join(dataDir, 'relay_log.json');
+const rulesFile = path.join(dataDir, 'relay_rules.json');      // Regeln für Relaissteuerung
+const relaysFile = path.join(dataDir, 'relays.json');          // Relaiskonfiguration (Name, IP)
+const sensorFile = path.join(dataDir, 'last_entrys.json');     // Letzte Sensorwerte
+const relayLogFile = path.join(dataDir, 'relay_log.json');     // Log aller Schaltvorgänge
 
-const DEBUG_MODE = ['1', 'true', 'yes'].includes((process.env.DEBUG || '').toLowerCase());
-const lastStates = {};
 
+// Vergleichsoperatoren für sprechende Log-Ausgaben
 const operatorMap = {
   '>': 'größer als',
   '<': 'kleiner als',
@@ -23,6 +24,7 @@ const operatorMap = {
   '==': 'gleich'
 };
 
+// JSON-Datei sicher laden
 function loadJson(filePath) {
   if (!fs.existsSync(filePath)) return [];
   try {
@@ -34,6 +36,7 @@ function loadJson(filePath) {
   }
 }
 
+// Neuen Eintrag ins Schaltlog schreiben
 function saveRelayLogEntry(entry) {
   let log = [];
   try {
@@ -46,8 +49,8 @@ function saveRelayLogEntry(entry) {
     logger.warn(`[rule_engine] Konnte relay_log.json nicht laden: ${err.message}`);
   }
 
-  log.unshift(entry);
-  if (log.length > 5000) log = log.slice(0, 5000);
+  log.unshift(entry);                  // Neuester Eintrag nach oben
+  if (log.length > 5000) log = log.slice(0, 5000);  // Log auf 5000 Einträge begrenzen
 
   try {
     fs.writeFileSync(relayLogFile, JSON.stringify(log, null, 2), 'utf-8');
@@ -56,6 +59,7 @@ function saveRelayLogEntry(entry) {
   }
 }
 
+// HTTP-Anfrage mit Timeout absichern
 async function fetchWithTimeout(url, timeout = 5000) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
@@ -66,6 +70,7 @@ async function fetchWithTimeout(url, timeout = 5000) {
   }
 }
 
+// Aktuellen Zustand eines Shelly Gen3 Geräts abfragen
 async function getRelayState(ip) {
   try {
     const res = await fetchWithTimeout(`http://${ip}/rpc/Switch.GetStatus?id=0`);
@@ -77,6 +82,7 @@ async function getRelayState(ip) {
   }
 }
 
+// Relais mit Wiederholversuchen sicher schalten
 async function safeSwitch(url, retries = 2) {
   for (let i = 0; i <= retries; i++) {
     try {
@@ -91,6 +97,7 @@ async function safeSwitch(url, retries = 2) {
   }
 }
 
+// Bedingung bewerten (mit Hysterese)
 function evaluateCondition(sensorValue, { param, op, value, hysteresis }, currentState) {
   const actual = sensorValue[param];
   const expected = parseFloat(value);
@@ -99,19 +106,21 @@ function evaluateCondition(sensorValue, { param, op, value, hysteresis }, curren
   const h = parseFloat(hysteresis) || 0;
 
   switch (op) {
-    case '>': return currentState === 'off' ? actual > expected : actual > (expected - h);
-    case '<': return currentState === 'off' ? actual < expected : actual < (expected + h);
+    case '>':  return currentState === 'off' ? actual > expected : actual > (expected - h);
+    case '<':  return currentState === 'off' ? actual < expected : actual < (expected + h);
     case '>=': return currentState === 'off' ? actual >= expected : actual > (expected - h);
     case '<=': return currentState === 'off' ? actual <= expected : actual < (expected + h);
     case '==': return actual === expected;
-    default: return false;
+    default:   return false;
   }
 }
 
+// Schalt-URL für Shelly erstellen
 function getShellyUrl(ip, state) {
   return `http://${ip}/relay/0?turn=${state}`;
 }
 
+// Prüfen, ob aktuelle Uhrzeit im definierten Zeitfenster liegt
 function isWithinTimeWindow(startTime, endTime) {
   if (!startTime || !endTime) return true;
 
@@ -132,10 +141,11 @@ function isWithinTimeWindow(startTime, endTime) {
   return inWindow;
 }
 
+// Zentrale Logik der Regel-Engine
 async function runRuleEngine() {
-  const rules = loadJson(rulesFile);
-  const relays = loadJson(relaysFile);
-  const sensors = loadJson(sensorFile);
+  const rules = loadJson(rulesFile);     // Regeldefinitionen laden
+  const relays = loadJson(relaysFile);   // Relais mit IP-Adressen
+  const sensors = loadJson(sensorFile);  // Aktuelle Sensordaten
 
   const relayMap = Object.fromEntries(relays.map(r => [r.name, r.ip]));
   const sensorMap = Object.fromEntries(
@@ -144,7 +154,7 @@ async function runRuleEngine() {
 
   let checked = 0;
   let switched = 0;
-  const pendingStates = {};
+  const pendingStates = {};  // Zwischenspeicher für Schaltvorgänge (pro Tick)
 
   for (const rule of rules) {
     const sensorData = sensorMap[rule.sensor];
@@ -154,7 +164,7 @@ async function runRuleEngine() {
     }
 
     const inTimeWindow = isWithinTimeWindow(rule.activeFrom, rule.activeTo);
-    const currentState = lastStates[rule.relay] || 'off';
+    const currentState = await getRelayState(relayMap[rule.relay]);
 
     const conditionResults = rule.conditions.map(cond => {
       const actual = sensorData[cond.param];
@@ -182,6 +192,7 @@ async function runRuleEngine() {
       continue;
     }
 
+    // Verhindere doppelte Schaltungen in einem Tick
     const existing = pendingStates[rule.relay];
     if (existing?.action === 'on') continue;
     if (rule.action === 'on' || !existing) {
@@ -195,6 +206,7 @@ async function runRuleEngine() {
     }
   }
 
+  // Relais schalten
   for (const [relayName, { rule, action, desc }] of Object.entries(pendingStates)) {
     const ip = relayMap[relayName];
     if (!ip) {
@@ -204,8 +216,7 @@ async function runRuleEngine() {
 
     const actualState = await getRelayState(ip);
     if (actualState === action) {
-      logger.debug(`[rule_engine] ${relayName} ist laut Shelly bereits ${action.toUpperCase()} – kein neuer Befehl`);
-      lastStates[relayName] = actualState;
+      logger.info(`[rule_engine] ${relayName} ist laut Shelly bereits ${action.toUpperCase()} – kein neuer Befehl`);
       continue;
     }
 
@@ -226,7 +237,6 @@ async function runRuleEngine() {
         activeFrom: rule.activeFrom,
         activeTo: rule.activeTo
       });
-      lastStates[relayName] = action;
       switched++;
     } catch (err) {
       logger.error(`[rule_engine] ❌ Fehler beim Schalten von ${relayName}: ${err.message}`);
@@ -238,6 +248,7 @@ async function runRuleEngine() {
   }
 }
 
+// Safe Wrapper mit Tick-Zähler
 let tick = 0;
 function runRuleEngineSafe() {
   logger.debug(`⏲ Tick ${++tick}`);
@@ -246,6 +257,7 @@ function runRuleEngineSafe() {
   );
 }
 
+// Engine-Startfunktion (alle 5 Sekunden)
 export function startRuleEngine() {
   logger.info('🚀 Regel-Engine gestartet (alle 5s)');
   runRuleEngineSafe();
