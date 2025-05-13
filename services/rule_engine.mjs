@@ -4,7 +4,6 @@ import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
 import { ruleEngineLogger as logger } from '../helper/logger.mjs';
 
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(__dirname, '../sensor_data');
 
@@ -13,7 +12,7 @@ const relaysFile = path.join(dataDir, 'relays.json');
 const sensorFile = path.join(dataDir, 'last_entrys.json');
 const relayLogFile = path.join(dataDir, 'relay_log.json');
 
-const DEBUG_MODE = process.env.DEBUG === 'true';
+const DEBUG_MODE = ['1', 'true', 'yes'].includes((process.env.DEBUG || '').toLowerCase());
 const lastStates = {};
 
 const operatorMap = {
@@ -59,11 +58,23 @@ function saveRelayLogEntry(entry) {
 
 async function fetchWithTimeout(url, timeout = 5000) {
   const controller = new AbortController();
-  const id = setTimeout(() => {
-    controller.abort();
-    logger.warn(`[rule_engine] ⚠️ Timeout beim Zugriff: ${url}`);
-  }, timeout);
-  return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(id));
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(id);
+  }
+}
+
+async function getRelayState(ip) {
+  try {
+    const res = await fetchWithTimeout(`http://${ip}/rpc/Switch.GetStatus?id=0`);
+    const data = await res.json();
+    return data.output ? 'on' : 'off';
+  } catch (err) {
+    logger.warn(`[rule_engine] ⚠️ Statusabfrage bei ${ip} fehlgeschlagen: ${err.message}`);
+    return null;
+  }
 }
 
 async function safeSwitch(url, retries = 2) {
@@ -133,8 +144,7 @@ async function runRuleEngine() {
 
   let checked = 0;
   let switched = 0;
-
-  const pendingStates = {}; // relay → { rule, action, desc }
+  const pendingStates = {};
 
   for (const rule of rules) {
     const sensorData = sensorMap[rule.sensor];
@@ -144,11 +154,11 @@ async function runRuleEngine() {
     }
 
     const inTimeWindow = isWithinTimeWindow(rule.activeFrom, rule.activeTo);
-    const lastState = lastStates[rule.relay] || 'off';
+    const currentState = lastStates[rule.relay] || 'off';
 
     const conditionResults = rule.conditions.map(cond => {
       const actual = sensorData[cond.param];
-      const passed = evaluateCondition(sensorData, cond, lastState);
+      const passed = evaluateCondition(sensorData, cond, currentState);
       const hStr = cond.hysteresis ? ` ±${cond.hysteresis}` : '';
       const label = cond.param === 'temperature' ? '🌡' :
                     cond.param === 'humidity' ? '💧' :
@@ -162,9 +172,8 @@ async function runRuleEngine() {
     const conditionsPassed = logic === 'OR'
       ? conditionResults.some(r => r.passed)
       : conditionResults.every(r => r.passed);
-    
+
     const shouldActivate = inTimeWindow && conditionsPassed;
-    
     checked++;
 
     if (!shouldActivate) {
@@ -172,8 +181,9 @@ async function runRuleEngine() {
       logger.debug(`[rule_engine] Regel ${rule.relay} (${rule.action}) übersprungen – ${reason}`);
       continue;
     }
+
     const existing = pendingStates[rule.relay];
-    if (existing?.action === 'on') continue; // bereits ON angefordert
+    if (existing?.action === 'on') continue;
     if (rule.action === 'on' || !existing) {
       pendingStates[rule.relay] = {
         rule,
@@ -191,19 +201,20 @@ async function runRuleEngine() {
       logger.warn(`[rule_engine] ⚠️ Keine IP für Relais "${relayName}".`);
       continue;
     }
-    if (lastStates[relayName] === action) {
-  logger.debug(`[rule_engine] ${relayName} ist bereits ${action.toUpperCase()} – kein neuer Befehl`);
-  continue;
-}
+
+    const actualState = await getRelayState(ip);
+    if (actualState === action) {
+      logger.debug(`[rule_engine] ${relayName} ist laut Shelly bereits ${action.toUpperCase()} – kein neuer Befehl`);
+      lastStates[relayName] = actualState;
+      continue;
+    }
+
     const url = getShellyUrl(ip, action);
     const emoji = action === 'on' ? '🟢' : '🔴';
 
-
-
     logger.debug(`[rule_engine] Regel ${relayName} wird jetzt geschaltet – Zeitfenster gültig`);
     try {
-
-  await safeSwitch(url);
+      await safeSwitch(url);
       logger.info(`${emoji} ${relayName} → ${desc}`);
       saveRelayLogEntry({
         timestamp: new Date().toISOString(),
