@@ -192,3 +192,5 @@ export function getLatestSensorValues() {
   return result;
 }
 export { loadSensorIdMapping, saveSensorIdMapping };
+
+//Test
