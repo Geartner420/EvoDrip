@@ -70943,5 +70943,4190 @@
     "temperature": 25.3,
     "humidity": 66,
     "timestamp": "2025-05-12T08:08:19.625Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T12:02:35.877Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T12:03:05.872Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T12:03:28.818Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 47,
+    "timestamp": "2025-05-12T12:03:54.311Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 47,
+    "timestamp": "2025-05-12T12:04:18.878Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 47,
+    "timestamp": "2025-05-12T12:04:40.388Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 48,
+    "timestamp": "2025-05-12T12:05:04.377Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:05:27.385Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:05:58.820Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:06:20.335Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:06:42.868Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:07:04.368Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:07:25.870Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:07:47.384Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:08:11.358Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:08:41.355Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:09:10.401Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:09:32.862Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:09:54.356Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:10:21.352Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:10:47.377Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:11:17.378Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:11:54.351Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:12:15.866Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:12:37.351Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:12:58.869Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:13:24.358Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:13:50.370Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:14:14.345Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:14:35.849Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:15:04.298Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:15:25.794Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:15:44.351Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:16:12.839Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:16:37.292Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 52,
+    "timestamp": "2025-05-12T12:17:02.783Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 55,
+    "timestamp": "2025-05-12T12:17:24.283Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 59,
+    "timestamp": "2025-05-12T12:17:51.336Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 60,
+    "timestamp": "2025-05-12T12:18:12.844Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 63,
+    "timestamp": "2025-05-12T12:18:42.838Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 64,
+    "timestamp": "2025-05-12T12:19:07.408Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 65,
+    "timestamp": "2025-05-12T12:19:40.367Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 61,
+    "timestamp": "2025-05-12T12:20:04.335Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 58,
+    "timestamp": "2025-05-12T12:20:25.848Z"
+  },
+  {
+    "temperature": 25.7,
+    "humidity": 55,
+    "timestamp": "2025-05-12T12:20:55.835Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 54,
+    "timestamp": "2025-05-12T12:21:17.357Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 52,
+    "timestamp": "2025-05-12T12:21:40.364Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 51,
+    "timestamp": "2025-05-12T12:22:25.840Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 51,
+    "timestamp": "2025-05-12T12:22:47.342Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 51,
+    "timestamp": "2025-05-12T12:23:11.327Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:23:38.849Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:24:00.360Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:24:24.330Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:24:45.834Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:25:15.833Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 51,
+    "timestamp": "2025-05-12T12:25:45.854Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 51,
+    "timestamp": "2025-05-12T12:26:07.333Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 51,
+    "timestamp": "2025-05-12T12:26:30.362Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 51,
+    "timestamp": "2025-05-12T12:27:01.316Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 51,
+    "timestamp": "2025-05-12T12:27:22.818Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 51,
+    "timestamp": "2025-05-12T12:27:50.347Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:28:28.841Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:28:50.340Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:29:14.317Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:29:35.829Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:29:57.332Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:30:18.834Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:30:48.832Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:31:21.308Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:31:42.811Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:32:18.824Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:32:40.350Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:33:04.318Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:33:25.817Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:33:48.829Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:34:10.329Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:34:34.310Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:34:55.813Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:35:17.321Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:35:40.346Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:36:08.829Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:36:32.802Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:37:00.318Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:37:24.300Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:37:45.811Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:38:21.229Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:38:54.307Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:39:17.258Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:39:40.258Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:40:04.232Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:40:24.239Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:40:48.809Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:41:21.288Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:41:42.798Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:42:04.300Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:42:34.299Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:42:55.808Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:43:18.814Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:43:40.313Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:44:04.290Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:44:25.800Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:44:47.310Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:45:08.804Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:45:34.224Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:46:05.725Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:46:27.228Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:47:00.296Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:47:30.300Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:47:54.281Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:48:15.791Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:48:45.789Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:49:07.287Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:49:28.791Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:49:52.775Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:50:22.776Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:50:44.285Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:51:05.779Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:51:32.712Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:51:58.794Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:52:21.264Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:52:48.782Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:53:14.275Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:53:35.779Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:53:57.287Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:54:21.261Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:54:42.768Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:55:07.216Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:55:34.272Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:55:58.843Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:56:21.381Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:56:42.894Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:57:04.394Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 49,
+    "timestamp": "2025-05-12T12:57:25.887Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:57:52.820Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:58:25.896Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:58:48.827Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:59:14.318Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T12:59:38.903Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:00:08.902Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:00:30.397Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:00:54.377Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:01:14.378Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:01:40.335Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:02:08.902Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:02:30.403Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:03:04.317Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:03:38.815Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:03:58.885Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:04:20.396Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:04:44.376Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:05:05.875Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:05:27.384Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:06:05.870Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:06:27.378Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:06:51.361Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:07:14.492Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:07:35.999Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:07:57.501Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:08:19.004Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:08:45.937Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:09:10.518Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:09:34.488Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:10:10.509Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:10:41.475Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:11:21.412Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:11:54.489Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:12:31.474Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T13:13:01.472Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:13:22.971Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:13:45.984Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:14:07.492Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:14:45.992Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:15:14.473Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:15:44.478Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:16:05.975Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:16:29.001Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:16:55.964Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:17:21.467Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 48,
+    "timestamp": "2025-05-12T13:17:50.501Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 48,
+    "timestamp": "2025-05-12T13:18:12.962Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 48,
+    "timestamp": "2025-05-12T13:18:48.988Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 48,
+    "timestamp": "2025-05-12T13:19:10.483Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 48,
+    "timestamp": "2025-05-12T13:19:40.481Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 48,
+    "timestamp": "2025-05-12T13:20:04.471Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 48,
+    "timestamp": "2025-05-12T13:20:28.916Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 48,
+    "timestamp": "2025-05-12T13:20:50.414Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:21:20.424Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:21:55.982Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T13:22:25.972Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 48,
+    "timestamp": "2025-05-12T13:22:54.460Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:23:15.963Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:23:41.447Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:24:02.949Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:24:24.458Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:24:45.966Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:25:15.955Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:25:37.462Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:25:58.965Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:26:28.962Z"
+  },
+  {
+    "temperature": 25.7,
+    "humidity": 45,
+    "timestamp": "2025-05-12T13:26:52.943Z"
+  },
+  {
+    "temperature": 25.7,
+    "humidity": 44,
+    "timestamp": "2025-05-12T13:27:14.464Z"
+  },
+  {
+    "temperature": 25.8,
+    "humidity": 44,
+    "timestamp": "2025-05-12T13:27:44.452Z"
+  },
+  {
+    "temperature": 25.8,
+    "humidity": 43,
+    "timestamp": "2025-05-12T13:28:07.469Z"
+  },
+  {
+    "temperature": 25.8,
+    "humidity": 44,
+    "timestamp": "2025-05-12T13:28:28.959Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 44,
+    "timestamp": "2025-05-12T13:28:52.947Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 45,
+    "timestamp": "2025-05-12T13:29:14.443Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:29:44.446Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:30:05.946Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:30:27.447Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:30:51.434Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:31:18.946Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:31:48.953Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:32:10.462Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:32:40.458Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:33:12.935Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:33:34.433Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:33:55.941Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:34:25.949Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:35:02.942Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:35:34.440Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:35:55.947Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:36:17.441Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:36:38.940Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:37:02.926Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:37:30.459Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:37:54.434Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:38:15.940Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:38:45.939Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:39:24.425Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:39:58.931Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:40:20.447Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:40:44.434Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:41:05.930Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:41:42.917Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:42:04.412Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:42:27.431Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:42:51.409Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:43:12.911Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:43:34.419Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:43:55.920Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:44:30.422Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:45:04.416Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:45:25.922Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:45:47.421Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:46:41.402Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:47:02.906Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:47:30.427Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:47:54.403Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:48:15.909Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:48:37.419Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:49:00.425Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:49:31.402Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:49:58.915Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:50:31.393Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:50:58.916Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:51:20.425Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:51:44.396Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:52:07.414Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:52:44.402Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:53:05.917Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:53:27.408Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:53:50.421Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:54:21.385Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 47,
+    "timestamp": "2025-05-12T13:54:51.387Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:55:12.886Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:55:35.905Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:56:21.380Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:56:42.885Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:57:04.394Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:57:25.888Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:58:10.407Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:58:32.880Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:58:55.890Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:59:17.400Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T13:59:41.375Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:00:02.874Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:00:28.897Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:00:54.384Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T14:01:54.378Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 51,
+    "timestamp": "2025-05-12T14:02:15.883Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T14:02:37.387Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T14:03:01.366Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T14:03:28.888Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T14:04:01.367Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 49,
+    "timestamp": "2025-05-12T14:04:31.366Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 48,
+    "timestamp": "2025-05-12T14:04:52.870Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 47,
+    "timestamp": "2025-05-12T14:05:20.393Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:05:50.397Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:06:14.374Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:06:35.876Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:06:57.369Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:07:51.357Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:08:18.883Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:08:42.859Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:09:27.382Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:10:04.358Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:10:24.359Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:10:45.858Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:11:07.360Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 46,
+    "timestamp": "2025-05-12T14:11:32.856Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:12:02.859Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:12:24.356Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:12:54.360Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:13:15.856Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:13:45.859Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:14:07.367Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:14:28.874Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:14:50.378Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:15:28.871Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:15:52.847Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:16:14.356Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:16:35.855Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:16:57.356Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:17:18.859Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:17:57.355Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:18:18.858Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:18:42.848Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:19:12.837Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:19:42.832Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:20:04.343Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:20:47.344Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:21:08.843Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:21:34.338Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:22:11.326Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:22:32.835Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:22:55.844Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:23:24.339Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:23:45.832Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:24:07.345Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:24:30.355Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:24:54.332Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:25:30.355Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:25:54.330Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:26:15.836Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:26:44.328Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:27:07.337Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:27:31.323Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:27:58.840Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:28:31.314Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:28:58.841Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:29:22.816Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:29:58.847Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:30:21.310Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:30:48.831Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:31:10.323Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:31:35.827Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:32:04.315Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:32:27.331Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:32:48.826Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:33:12.812Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:33:41.303Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:34:04.313Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:34:25.815Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:34:47.319Z"
+  },
+  {
+    "temperature": 26.3,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:35:11.299Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:35:32.799Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:35:54.310Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:36:15.814Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:36:38.828Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:37:08.828Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:37:38.817Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:38:08.823Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:38:45.818Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:39:15.815Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 45,
+    "timestamp": "2025-05-12T14:39:37.307Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:40:01.295Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:40:22.795Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:40:48.819Z"
+  },
+  {
+    "temperature": 26.2,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:41:12.795Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:41:40.308Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:42:04.291Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:42:25.801Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:42:48.816Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:43:12.793Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:43:38.803Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:44:04.293Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 44,
+    "timestamp": "2025-05-12T14:44:25.802Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 43,
+    "timestamp": "2025-05-12T14:44:47.302Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 43,
+    "timestamp": "2025-05-12T14:45:08.814Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 43,
+    "timestamp": "2025-05-12T14:45:32.780Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 43,
+    "timestamp": "2025-05-12T14:46:00.298Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 43,
+    "timestamp": "2025-05-12T14:46:22.783Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 43,
+    "timestamp": "2025-05-12T14:46:54.286Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 43,
+    "timestamp": "2025-05-12T14:47:24.281Z"
+  },
+  {
+    "temperature": 26.1,
+    "humidity": 43,
+    "timestamp": "2025-05-12T14:48:07.281Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 43,
+    "timestamp": "2025-05-12T14:48:37.296Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 42,
+    "timestamp": "2025-05-12T14:49:01.280Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:49:22.771Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:49:50.293Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:50:20.297Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:50:44.281Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 40,
+    "timestamp": "2025-05-12T14:51:28.798Z"
+  },
+  {
+    "temperature": 26,
+    "humidity": 39,
+    "timestamp": "2025-05-12T14:51:50.290Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 39,
+    "timestamp": "2025-05-12T14:52:27.285Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 39,
+    "timestamp": "2025-05-12T14:52:51.263Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 40,
+    "timestamp": "2025-05-12T14:53:20.303Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:53:55.775Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:54:21.264Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:54:47.269Z"
+  },
+  {
+    "temperature": 25.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:55:10.283Z"
+  },
+  {
+    "temperature": 25.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:55:34.270Z"
+  },
+  {
+    "temperature": 25.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:55:57.287Z"
+  },
+  {
+    "temperature": 25.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:56:34.270Z"
+  },
+  {
+    "temperature": 25.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:56:55.773Z"
+  },
+  {
+    "temperature": 25.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:57:17.271Z"
+  },
+  {
+    "temperature": 25.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:57:47.277Z"
+  },
+  {
+    "temperature": 25.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:58:17.283Z"
+  },
+  {
+    "temperature": 25.7,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:58:40.300Z"
+  },
+  {
+    "temperature": 25.7,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:59:11.249Z"
+  },
+  {
+    "temperature": 25.7,
+    "humidity": 41,
+    "timestamp": "2025-05-12T14:59:41.251Z"
+  },
+  {
+    "temperature": 25.7,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:00:02.754Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:00:24.260Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:00:45.754Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:01:15.763Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:01:45.766Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:02:15.766Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:02:37.264Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:02:58.765Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:03:20.280Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:03:44.255Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:04:22.739Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:04:44.249Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:05:05.755Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:05:27.253Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:05:51.236Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:06:14.249Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 43,
+    "timestamp": "2025-05-12T15:06:51.233Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 43,
+    "timestamp": "2025-05-12T15:07:12.740Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:07:34.241Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:07:58.695Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:08:28.689Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:09:04.246Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 43,
+    "timestamp": "2025-05-12T15:09:25.747Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:09:47.250Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:10:08.749Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:10:32.730Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:10:54.238Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:11:21.163Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:11:45.737Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:12:17.166Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:12:37.229Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:13:00.192Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:13:25.666Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:13:52.726Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:14:17.175Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:14:37.250Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:14:58.753Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:15:28.750Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:15:50.258Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:16:28.750Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:16:54.163Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:17:15.666Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:17:38.685Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:18:07.161Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:18:34.223Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:18:58.669Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:19:21.210Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:19:42.710Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:20:07.165Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:20:31.144Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:20:52.650Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:21:14.145Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:21:42.645Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:22:02.711Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:22:32.708Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:23:05.657Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:23:27.151Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:23:54.207Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:24:15.713Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:24:40.157Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:25:10.166Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:25:34.144Z"
+  },
+  {
+    "temperature": 25,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:26:04.142Z"
+  },
+  {
+    "temperature": 25,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:26:25.645Z"
+  },
+  {
+    "temperature": 25,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:26:55.638Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:27:20.215Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:28:14.208Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:28:44.192Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:29:14.208Z"
+  },
+  {
+    "temperature": 25,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:29:38.662Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:29:58.722Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:30:21.186Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:30:51.185Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:31:18.705Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:31:40.214Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:32:10.219Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:33:00.203Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:33:25.687Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:33:55.696Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:34:17.191Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:34:47.198Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:35:08.697Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:35:41.173Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:36:08.695Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 40,
+    "timestamp": "2025-05-12T15:36:32.678Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 40,
+    "timestamp": "2025-05-12T15:36:54.174Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 40,
+    "timestamp": "2025-05-12T15:37:24.187Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:37:52.678Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:38:20.197Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:38:45.674Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:39:07.187Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 44,
+    "timestamp": "2025-05-12T15:39:28.674Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 46,
+    "timestamp": "2025-05-12T15:39:52.666Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 48,
+    "timestamp": "2025-05-12T15:40:15.684Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 50,
+    "timestamp": "2025-05-12T15:40:35.685Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 54,
+    "timestamp": "2025-05-12T15:41:10.176Z"
+  },
+  {
+    "temperature": 25,
+    "humidity": 56,
+    "timestamp": "2025-05-12T15:41:37.111Z"
+  },
+  {
+    "temperature": 25,
+    "humidity": 56,
+    "timestamp": "2025-05-12T15:41:58.621Z"
+  },
+  {
+    "temperature": 25,
+    "humidity": 56,
+    "timestamp": "2025-05-12T15:42:20.121Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 57,
+    "timestamp": "2025-05-12T15:42:44.107Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 59,
+    "timestamp": "2025-05-12T15:43:14.098Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 60,
+    "timestamp": "2025-05-12T15:43:34.172Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 61,
+    "timestamp": "2025-05-12T15:44:02.659Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 61,
+    "timestamp": "2025-05-12T15:44:25.676Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 61,
+    "timestamp": "2025-05-12T15:44:50.121Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 61,
+    "timestamp": "2025-05-12T15:45:11.155Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 60,
+    "timestamp": "2025-05-12T15:45:41.154Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 59,
+    "timestamp": "2025-05-12T15:46:02.659Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 59,
+    "timestamp": "2025-05-12T15:46:24.167Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 58,
+    "timestamp": "2025-05-12T15:46:50.135Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 57,
+    "timestamp": "2025-05-12T15:47:15.664Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 55,
+    "timestamp": "2025-05-12T15:48:15.668Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 54,
+    "timestamp": "2025-05-12T15:48:37.172Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 52,
+    "timestamp": "2025-05-12T15:48:58.680Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 52,
+    "timestamp": "2025-05-12T15:49:20.175Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 55,
+    "timestamp": "2025-05-12T15:49:52.655Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 58,
+    "timestamp": "2025-05-12T15:50:22.652Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 61,
+    "timestamp": "2025-05-12T15:50:52.647Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 63,
+    "timestamp": "2025-05-12T15:51:14.154Z"
+  },
+  {
+    "temperature": 25.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T15:51:54.207Z"
+  },
+  {
+    "temperature": 25.7,
+    "humidity": 62,
+    "timestamp": "2025-05-12T15:52:21.140Z"
+  },
+  {
+    "temperature": 25.6,
+    "humidity": 56,
+    "timestamp": "2025-05-12T15:52:48.668Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 50,
+    "timestamp": "2025-05-12T15:53:12.643Z"
+  },
+  {
+    "temperature": 25.5,
+    "humidity": 47,
+    "timestamp": "2025-05-12T15:53:35.667Z"
+  },
+  {
+    "temperature": 25.4,
+    "humidity": 46,
+    "timestamp": "2025-05-12T15:53:57.156Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 44,
+    "timestamp": "2025-05-12T15:54:21.137Z"
+  },
+  {
+    "temperature": 25.3,
+    "humidity": 44,
+    "timestamp": "2025-05-12T15:54:45.584Z"
+  },
+  {
+    "temperature": 25.2,
+    "humidity": 43,
+    "timestamp": "2025-05-12T15:55:12.645Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:55:42.642Z"
+  },
+  {
+    "temperature": 25.1,
+    "humidity": 42,
+    "timestamp": "2025-05-12T15:56:04.149Z"
+  },
+  {
+    "temperature": 25,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:56:28.593Z"
+  },
+  {
+    "temperature": 24.9,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:57:08.651Z"
+  },
+  {
+    "temperature": 24.8,
+    "humidity": 41,
+    "timestamp": "2025-05-12T15:57:32.633Z"
+  },
+  {
+    "temperature": 24.7,
+    "humidity": 46,
+    "timestamp": "2025-05-12T15:58:54.131Z"
+  },
+  {
+    "temperature": 24.6,
+    "humidity": 49,
+    "timestamp": "2025-05-12T15:59:17.154Z"
+  },
+  {
+    "temperature": 24.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T15:59:38.646Z"
+  },
+  {
+    "temperature": 24.6,
+    "humidity": 54,
+    "timestamp": "2025-05-12T16:00:00.146Z"
+  },
+  {
+    "temperature": 24.7,
+    "humidity": 57,
+    "timestamp": "2025-05-12T16:00:24.141Z"
+  },
+  {
+    "temperature": 24.6,
+    "humidity": 57,
+    "timestamp": "2025-05-12T16:00:54.141Z"
+  },
+  {
+    "temperature": 24.6,
+    "humidity": 52,
+    "timestamp": "2025-05-12T16:01:24.140Z"
+  },
+  {
+    "temperature": 24.5,
+    "humidity": 49,
+    "timestamp": "2025-05-12T16:01:50.139Z"
+  },
+  {
+    "temperature": 24.5,
+    "humidity": 47,
+    "timestamp": "2025-05-12T16:02:22.623Z"
+  },
+  {
+    "temperature": 24.3,
+    "humidity": 47,
+    "timestamp": "2025-05-12T16:02:52.624Z"
+  },
+  {
+    "temperature": 24.4,
+    "humidity": 49,
+    "timestamp": "2025-05-12T16:03:17.199Z"
+  },
+  {
+    "temperature": 24.4,
+    "humidity": 50,
+    "timestamp": "2025-05-12T16:03:38.698Z"
+  },
+  {
+    "temperature": 24.3,
+    "humidity": 52,
+    "timestamp": "2025-05-12T16:04:02.677Z"
+  },
+  {
+    "temperature": 24.3,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:04:41.178Z"
+  },
+  {
+    "temperature": 24.3,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:05:02.679Z"
+  },
+  {
+    "temperature": 24.2,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:05:30.208Z"
+  },
+  {
+    "temperature": 24.2,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:05:54.187Z"
+  },
+  {
+    "temperature": 24.2,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:06:15.690Z"
+  },
+  {
+    "temperature": 24.2,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:06:54.172Z"
+  },
+  {
+    "temperature": 24.1,
+    "humidity": 54,
+    "timestamp": "2025-05-12T16:07:30.200Z"
+  },
+  {
+    "temperature": 24.1,
+    "humidity": 54,
+    "timestamp": "2025-05-12T16:08:15.690Z"
+  },
+  {
+    "temperature": 24.1,
+    "humidity": 54,
+    "timestamp": "2025-05-12T16:08:45.690Z"
+  },
+  {
+    "temperature": 24,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:09:28.695Z"
+  },
+  {
+    "temperature": 23.9,
+    "humidity": 56,
+    "timestamp": "2025-05-12T16:09:52.671Z"
+  },
+  {
+    "temperature": 23.9,
+    "humidity": 56,
+    "timestamp": "2025-05-12T16:10:14.173Z"
+  },
+  {
+    "temperature": 23.8,
+    "humidity": 56,
+    "timestamp": "2025-05-12T16:10:51.164Z"
+  },
+  {
+    "temperature": 23.8,
+    "humidity": 56,
+    "timestamp": "2025-05-12T16:11:18.686Z"
+  },
+  {
+    "temperature": 23.8,
+    "humidity": 56,
+    "timestamp": "2025-05-12T16:11:40.192Z"
+  },
+  {
+    "temperature": 23.8,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:12:04.164Z"
+  },
+  {
+    "temperature": 23.8,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:12:40.184Z"
+  },
+  {
+    "temperature": 23.8,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:13:04.166Z"
+  },
+  {
+    "temperature": 23.6,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:13:25.670Z"
+  },
+  {
+    "temperature": 23.6,
+    "humidity": 56,
+    "timestamp": "2025-05-12T16:14:04.171Z"
+  },
+  {
+    "temperature": 23.6,
+    "humidity": 56,
+    "timestamp": "2025-05-12T16:14:25.673Z"
+  },
+  {
+    "temperature": 23.5,
+    "humidity": 56,
+    "timestamp": "2025-05-12T16:14:47.174Z"
+  },
+  {
+    "temperature": 23.5,
+    "humidity": 57,
+    "timestamp": "2025-05-12T16:15:11.154Z"
+  },
+  {
+    "temperature": 23.5,
+    "humidity": 57,
+    "timestamp": "2025-05-12T16:15:32.658Z"
+  },
+  {
+    "temperature": 23.5,
+    "humidity": 57,
+    "timestamp": "2025-05-12T16:16:00.179Z"
+  },
+  {
+    "temperature": 23.5,
+    "humidity": 57,
+    "timestamp": "2025-05-12T16:16:21.215Z"
+  },
+  {
+    "temperature": 23.4,
+    "humidity": 58,
+    "timestamp": "2025-05-12T16:16:51.213Z"
+  },
+  {
+    "temperature": 23.3,
+    "humidity": 58,
+    "timestamp": "2025-05-12T16:17:18.672Z"
+  },
+  {
+    "temperature": 23.3,
+    "humidity": 58,
+    "timestamp": "2025-05-12T16:17:44.164Z"
+  },
+  {
+    "temperature": 23.3,
+    "humidity": 58,
+    "timestamp": "2025-05-12T16:18:05.659Z"
+  },
+  {
+    "temperature": 23.3,
+    "humidity": 58,
+    "timestamp": "2025-05-12T16:18:27.171Z"
+  },
+  {
+    "temperature": 23.3,
+    "humidity": 58,
+    "timestamp": "2025-05-12T16:18:48.677Z"
+  },
+  {
+    "temperature": 23.3,
+    "humidity": 58,
+    "timestamp": "2025-05-12T16:19:18.667Z"
+  },
+  {
+    "temperature": 23.3,
+    "humidity": 59,
+    "timestamp": "2025-05-12T16:20:07.158Z"
+  },
+  {
+    "temperature": 23.2,
+    "humidity": 59,
+    "timestamp": "2025-05-12T16:20:31.147Z"
+  },
+  {
+    "temperature": 23.2,
+    "humidity": 59,
+    "timestamp": "2025-05-12T16:20:55.717Z"
+  },
+  {
+    "temperature": 23.2,
+    "humidity": 59,
+    "timestamp": "2025-05-12T16:21:18.658Z"
+  },
+  {
+    "temperature": 23.2,
+    "humidity": 60,
+    "timestamp": "2025-05-12T16:22:01.141Z"
+  },
+  {
+    "temperature": 23.2,
+    "humidity": 60,
+    "timestamp": "2025-05-12T16:22:28.667Z"
+  },
+  {
+    "temperature": 23.2,
+    "humidity": 60,
+    "timestamp": "2025-05-12T16:22:50.173Z"
+  },
+  {
+    "temperature": 23.2,
+    "humidity": 60,
+    "timestamp": "2025-05-12T16:23:14.153Z"
+  },
+  {
+    "temperature": 23.2,
+    "humidity": 60,
+    "timestamp": "2025-05-12T16:23:35.653Z"
+  },
+  {
+    "temperature": 23.2,
+    "humidity": 60,
+    "timestamp": "2025-05-12T16:24:00.219Z"
+  },
+  {
+    "temperature": 23.1,
+    "humidity": 60,
+    "timestamp": "2025-05-12T16:24:21.134Z"
+  },
+  {
+    "temperature": 23.2,
+    "humidity": 61,
+    "timestamp": "2025-05-12T16:24:50.182Z"
+  },
+  {
+    "temperature": 23.1,
+    "humidity": 61,
+    "timestamp": "2025-05-12T16:25:18.655Z"
+  },
+  {
+    "temperature": 23.1,
+    "humidity": 61,
+    "timestamp": "2025-05-12T16:25:40.159Z"
+  },
+  {
+    "temperature": 23.1,
+    "humidity": 61,
+    "timestamp": "2025-05-12T16:26:05.659Z"
+  },
+  {
+    "temperature": 23.1,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:26:34.139Z"
+  },
+  {
+    "temperature": 23.1,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:26:55.646Z"
+  },
+  {
+    "temperature": 23,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:27:18.662Z"
+  },
+  {
+    "temperature": 23,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:27:45.710Z"
+  },
+  {
+    "temperature": 23,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:28:07.220Z"
+  },
+  {
+    "temperature": 23,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:28:31.203Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:28:55.647Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:29:20.222Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:29:47.144Z"
+  },
+  {
+    "temperature": 23,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:30:08.645Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:30:32.636Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:30:54.130Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:31:17.152Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:31:45.631Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:32:07.145Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:32:27.193Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:32:48.719Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 62,
+    "timestamp": "2025-05-12T16:33:15.635Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 63,
+    "timestamp": "2025-05-12T16:33:37.134Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 63,
+    "timestamp": "2025-05-12T16:33:58.630Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 63,
+    "timestamp": "2025-05-12T16:34:18.708Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 63,
+    "timestamp": "2025-05-12T16:34:58.638Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 63,
+    "timestamp": "2025-05-12T16:35:24.186Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 63,
+    "timestamp": "2025-05-12T16:35:50.133Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 63,
+    "timestamp": "2025-05-12T16:36:11.175Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 64,
+    "timestamp": "2025-05-12T16:36:41.172Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 64,
+    "timestamp": "2025-05-12T16:37:02.684Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 64,
+    "timestamp": "2025-05-12T16:37:30.190Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 64,
+    "timestamp": "2025-05-12T16:37:51.117Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 64,
+    "timestamp": "2025-05-12T16:38:18.633Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 64,
+    "timestamp": "2025-05-12T16:38:48.619Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 64,
+    "timestamp": "2025-05-12T16:39:12.612Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 64,
+    "timestamp": "2025-05-12T16:39:34.110Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 64,
+    "timestamp": "2025-05-12T16:39:54.172Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:40:22.603Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:40:44.108Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:41:04.171Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:41:31.095Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:41:52.599Z"
+  },
+  {
+    "temperature": 22.9,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:42:14.105Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:42:44.099Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:43:05.611Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:43:27.112Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:43:48.618Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:44:10.110Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:44:35.607Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:45:12.588Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:45:34.096Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:46:07.164Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:46:34.092Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:46:54.099Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:47:31.144Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:47:52.652Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:48:17.097Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:48:44.152Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:49:05.648Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:49:35.648Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:50:00.111Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:50:30.107Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:50:54.092Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:51:24.080Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:51:45.591Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:52:05.662Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:52:31.070Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:52:52.570Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:53:12.635Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:53:32.641Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:53:58.586Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:54:20.098Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:54:47.154Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:55:08.646Z"
+  },
+  {
+    "temperature": 22.8,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:55:47.149Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:56:14.072Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 66,
+    "timestamp": "2025-05-12T16:56:35.580Z"
+  },
+  {
+    "temperature": 22.7,
+    "humidity": 65,
+    "timestamp": "2025-05-12T16:56:57.084Z"
+  },
+  {
+    "temperature": 22.6,
+    "humidity": 61,
+    "timestamp": "2025-05-12T16:57:27.084Z"
+  },
+  {
+    "temperature": 22.6,
+    "humidity": 59,
+    "timestamp": "2025-05-12T16:57:48.591Z"
+  },
+  {
+    "temperature": 22.6,
+    "humidity": 56,
+    "timestamp": "2025-05-12T16:58:10.080Z"
+  },
+  {
+    "temperature": 22.5,
+    "humidity": 55,
+    "timestamp": "2025-05-12T16:58:45.590Z"
+  },
+  {
+    "temperature": 22.5,
+    "humidity": 54,
+    "timestamp": "2025-05-12T16:59:15.574Z"
+  },
+  {
+    "temperature": 22.5,
+    "humidity": 53,
+    "timestamp": "2025-05-12T16:59:50.088Z"
+  },
+  {
+    "temperature": 22.4,
+    "humidity": 52,
+    "timestamp": "2025-05-12T17:00:14.074Z"
+  },
+  {
+    "temperature": 22.4,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:00:50.091Z"
+  },
+  {
+    "temperature": 22.4,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:01:14.067Z"
+  },
+  {
+    "temperature": 22.4,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:01:44.073Z"
+  },
+  {
+    "temperature": 22.3,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:02:14.071Z"
+  },
+  {
+    "temperature": 22.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:02:35.574Z"
+  },
+  {
+    "temperature": 22.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:02:57.079Z"
+  },
+  {
+    "temperature": 22.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:03:21.054Z"
+  },
+  {
+    "temperature": 22.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:03:42.560Z"
+  },
+  {
+    "temperature": 22.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:04:12.556Z"
+  },
+  {
+    "temperature": 22.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:04:35.570Z"
+  },
+  {
+    "temperature": 22.3,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:05:10.077Z"
+  },
+  {
+    "temperature": 22.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:05:34.060Z"
+  },
+  {
+    "temperature": 22.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:06:10.073Z"
+  },
+  {
+    "temperature": 22.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:06:34.058Z"
+  },
+  {
+    "temperature": 22.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:07:00.072Z"
+  },
+  {
+    "temperature": 22.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:07:25.555Z"
+  },
+  {
+    "temperature": 22.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:07:47.062Z"
+  },
+  {
+    "temperature": 22.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:08:08.571Z"
+  },
+  {
+    "temperature": 22.2,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:08:30.080Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:09:08.560Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:09:38.566Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:10:00.076Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:10:22.541Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:10:55.544Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:11:18.563Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:11:42.538Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:12:02.544Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:12:30.068Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:12:55.558Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:13:20.003Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:14:12.467Z"
+  },
+  {
+    "temperature": 22,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:14:32.533Z"
+  },
+  {
+    "temperature": 22,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:15:02.534Z"
+  },
+  {
+    "temperature": 22,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:15:24.032Z"
+  },
+  {
+    "temperature": 22,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:16:00.057Z"
+  },
+  {
+    "temperature": 22,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:16:31.019Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:17:00.054Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:17:37.039Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:18:00.059Z"
+  },
+  {
+    "temperature": 22,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:18:28.550Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:18:52.523Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:19:14.017Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:19:35.527Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:20:28.544Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:20:51.010Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:21:21.009Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:21:42.516Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 53,
+    "timestamp": "2025-05-12T17:22:15.451Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 55,
+    "timestamp": "2025-05-12T17:22:45.447Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 56,
+    "timestamp": "2025-05-12T17:23:30.942Z"
+  },
+  {
+    "temperature": 22,
+    "humidity": 55,
+    "timestamp": "2025-05-12T17:24:04.016Z"
+  },
+  {
+    "temperature": 22,
+    "humidity": 54,
+    "timestamp": "2025-05-12T17:24:40.028Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 52,
+    "timestamp": "2025-05-12T17:25:06.969Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:25:28.465Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:25:52.439Z"
+  },
+  {
+    "temperature": 22.1,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:26:13.937Z"
+  },
+  {
+    "temperature": 22,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:26:40.038Z"
+  },
+  {
+    "temperature": 22,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:27:08.526Z"
+  },
+  {
+    "temperature": 22,
+    "humidity": 48,
+    "timestamp": "2025-05-12T17:27:30.013Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 48,
+    "timestamp": "2025-05-12T17:27:54.000Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 48,
+    "timestamp": "2025-05-12T17:28:23.999Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 48,
+    "timestamp": "2025-05-12T17:28:54.003Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 48,
+    "timestamp": "2025-05-12T17:29:15.509Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 48,
+    "timestamp": "2025-05-12T17:29:45.503Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 48,
+    "timestamp": "2025-05-12T17:30:07.010Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 48,
+    "timestamp": "2025-05-12T17:30:35.504Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 48,
+    "timestamp": "2025-05-12T17:31:00.990Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:31:30.988Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:31:52.493Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:32:20.012Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:32:43.985Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:33:13.995Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:34:05.503Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:34:35.488Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:35:09.998Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:35:35.505Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:36:05.507Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:36:33.984Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:36:55.493Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:37:25.496Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:37:55.495Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:38:18.517Z"
+  },
+  {
+    "temperature": 21.6,
+    "humidity": 49,
+    "timestamp": "2025-05-12T17:38:40.012Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:39:25.486Z"
+  },
+  {
+    "temperature": 21.6,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:39:46.992Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:40:10.973Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:40:36.994Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:40:58.506Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:41:19.995Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:41:52.469Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:42:13.986Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 50,
+    "timestamp": "2025-05-12T17:42:43.973Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:43:26.981Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:43:50.964Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:44:12.470Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:44:33.965Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:45:20.960Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:46:03.973Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:46:25.469Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:46:48.494Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:47:09.987Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:47:33.965Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:48:03.969Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:48:38.480Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:49:08.485Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:49:32.459Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:49:59.985Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:50:23.965Z"
+  },
+  {
+    "temperature": 21.7,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:50:53.960Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:51:15.459Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:51:38.482Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:52:06.960Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:52:28.470Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:52:58.467Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:53:19.973Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:53:43.954Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:54:06.966Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:54:39.970Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:55:05.458Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:55:28.471Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:55:49.970Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:56:13.949Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:56:48.457Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:57:09.957Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 52,
+    "timestamp": "2025-05-12T17:57:39.956Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 52,
+    "timestamp": "2025-05-12T17:58:09.958Z"
+  },
+  {
+    "temperature": 21.8,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:58:33.942Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T17:59:26.956Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:00:09.956Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:00:55.440Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:01:16.946Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:01:40.926Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:02:02.426Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:02:32.429Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:02:55.443Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:03:29.948Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:03:59.946Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:04:28.437Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:04:52.428Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:05:23.935Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 52,
+    "timestamp": "2025-05-12T18:05:45.437Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:06:06.935Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:06:28.437Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:07:00.914Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 52,
+    "timestamp": "2025-05-12T18:07:20.914Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 52,
+    "timestamp": "2025-05-12T18:07:48.435Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 52,
+    "timestamp": "2025-05-12T18:08:19.951Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:08:49.944Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:09:13.914Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:09:35.424Z"
+  },
+  {
+    "temperature": 21.9,
+    "humidity": 51,
+    "timestamp": "2025-05-12T18:09:56.921Z"
   }
 ]

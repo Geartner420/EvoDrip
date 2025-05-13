@@ -14,28 +14,28 @@ import { watchEnvAndRestart } from './services/watchEnv.mjs';
 import { buildWateringOptions } from './helper/wateringOptions.mjs';
 import config from './helper/config.mjs';
 import logger from './helper/logger.mjs';
-import { cta } from './services/connectAll.mjs';
-import { getLatestSensorValues } from './services/connectAll.mjs';
-import sensorDataRoutes from './routes/sensorDataRoutes.mjs';
+import { cta, getLatestSensorValues } from './services/connectAll.mjs';
 import { startSensorProcessing } from './services/vpdService.mjs';
+import { startRuleEngine } from './services/rule_engine.mjs';
+import { controlRelays } from './services/umluftContol.mjs';
+import { fileURLToPath } from 'url';
+
+// Direkt-Importierte Routen
+import sensorDataRoutes from './routes/sensorDataRoutes.mjs';
 import historyRoute from './routes/historyRoute.mjs';
 import historyViewRoute from './routes/historyView.mjs';
 import rulesRoutes from './routes/api/rules.mjs';
 import relaysRoutes from './routes/api/relays.mjs';
 import sensorsRoutes from './routes/api/sensors.mjs';
-import { startRuleEngine } from './services/rule_engine.mjs';
 import sensorStatusRoute from './routes/api/sensorStatus.mjs';
-import { controlRelays } from './services/umluftContol.mjs'; // Relaissteuerung importieren
 import relayRulesRoutes from './routes/api/relaysRules.mjs';
-import { fileURLToPath } from 'url';
 import chartSwitches from './routes/api/chartSwitches.mjs';
-import regelLogRouter from './routes/regelLogRoutes.mjs';  // passe Pfad ggf. an
-
-
+import regelLogRouter from './routes/regelLogRoutes.mjs';
+import envUpdateRoute from './routes/updateRoute.mjs';
+import uiRoutes from './routes/uiRoutes.mjs'; // stellt '/' bereit
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename); path.dirname(fileURLToPath(import.meta.url));
-
+const __dirname = path.dirname(__filename);
 
 const {
   UI_USERNAME,
@@ -47,14 +47,21 @@ const {
 async function startServer() {
   const app = express();
 
-  // Middleware
+  // View Engine + Middleware
   app.set('view engine', 'ejs');
   app.set('views', './views');
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
+
+  // Statische Dateien
   app.use('/styles', express.static(path.join(__dirname, 'public/styles')));
   app.use('/scripts', express.static(path.join(__dirname, 'public/scripts')));
+  app.use(express.static(path.join(__dirname, 'public')));
+
+  // Authentifizierung
   app.use(basicAuth({ users: { [UI_USERNAME]: UI_PASSWORD }, challenge: true }));
+
+  // Einzelne API-Endpunkte
   app.use('/sensor-data', sensorDataRoutes);
   app.use(historyRoute);
   app.use(historyViewRoute);
@@ -63,14 +70,25 @@ async function startServer() {
   app.use('/api/sensors', sensorsRoutes);
   app.use('/api/sensor-status', sensorStatusRoute);
   app.use('/api/relaysRules', relayRulesRoutes);
-  app.use(express.static(path.join(__dirname, 'public')));
   app.use('/api', chartSwitches);
   app.use('/rulelog', regelLogRouter);
+  app.use('/updateEnv', envUpdateRoute); // POST für /update
 
+  // Relaissteuerung UI
+  app.get('/shelly-control', (req, res) => {
+    res.render('index'); // Steuerelement-UI
+  });
 
+  app.get('/relay-cycle', (req, res) => {
+    res.render('shellyControl');
+  });
+
+  app.get('/combined-dashboard', (req, res) => {
+    res.render('combinedDashboard');
+  });
+
+  // Sensor-Namenszuweisung
   const filePath = './sensor_data/sensorNames.json';
-  
-  // GET: Alle Namen zurückgeben
   app.get('/api/sensor-names', (req, res) => {
     fs.readFile(filePath, (err, data) => {
       if (err) return res.status(500).json({});
@@ -78,32 +96,6 @@ async function startServer() {
     });
   });
 
-  app.get('/combined-dashboard', (req, res) => {
-    res.render('combinedDashboard'); // ohne .ejs-Endung
-  });
-  
-    // Rendern der neuen UI-Datei shellyControl.ejs
-    app.get('/shelly-control', (req, res) => {
-      res.render('index'); // Das Formular für Relaissteuerung
-    });
-
-  // Rendern der neuen UI-Datei shellyControl.ejs
-  app.get('/relay-cycle', (req, res) => {
-    res.render('shellyControl'); // Das Formular für Relaissteuerung
-  });
-
-
-  // Route zum Starten des Relaiszyklus
-  app.post('/start-relay-cycle', async (req, res) => {
-    try {
-        await controlRelays();  // Relaissteuerung aus umluftContol.mjs aufrufen
-        res.status(200).send('Relaissteuerung gestartet.');
-    } catch (error) {
-        res.status(500).send('Fehler beim Starten der Relaissteuerung: ' + error.message);
-    }
-  });
-
-  // POST: Einen Namen speichern
   app.post('/api/sensor-names', (req, res) => {
     const { id, name } = req.body;
     if (!id || typeof name !== 'string') {
@@ -121,14 +113,31 @@ async function startServer() {
     });
   });
 
+
   // Feuchtigkeitsdaten initial laden
   let lastTriggerTime = loadState();
   loadMoistureData();
 
-  // Routen automatisch laden
-  await loadRoutes(app, './routes');
+  // Dynamische Routenerkennung
+  await loadRoutes(app, path.join(__dirname, 'routes'));
 
-  // Gießüberwachung starten
+  // Haupt-UI unter /
+  app.use('/ui', uiRoutes);
+    app.get('/', (req, res) => res.redirect('/ui'));
+    
+
+    // Relais-Zyklus starten
+  app.post('/start-relay-cycle', async (req, res) => {
+    try {
+      await controlRelays();
+      res.status(200).send('Relaissteuerung gestartet.');
+    } catch (error) {
+      res.status(500).send('Fehler beim Starten der Relaissteuerung: ' + error.message);
+    }
+  });
+
+
+  // Automatisierung starten
   global.busy = false;
   const getLastTriggerTime = () => lastTriggerTime;
   const setLastTriggerTime = (ts) => { lastTriggerTime = ts; };
@@ -136,18 +145,18 @@ async function startServer() {
   const wateringOptions = buildWateringOptions(getLastTriggerTime, setLastTriggerTime, logger);
   checkAndWater(wateringOptions);
   setInterval(() => checkAndWater(wateringOptions), CHECK_INTERVAL_MINUTES * 60000);
-
-  // Feuchtigkeitsdaten regelmäßig speichern
   setInterval(saveMoistureData, MOISTURE_SAVE_INTERVAL_MS);
 
   // Server starten
   const PORT = process.env.PORT || 3500;
-  app.listen(PORT, '0.0.0.0', () => logger.info(`🛜 Interface läuft auf http://localhost:${PORT}`));
+  app.listen(PORT, '0.0.0.0', () =>
+    logger.info(`🛜 Interface läuft auf http://localhost:${PORT}`)
+  );
 
   logger.info(`💾 Feuchtigkeitsdaten werden alle ${MOISTURE_SAVE_INTERVAL_MS / 1000} Sekunden gespeichert`);
 }
 
-// Server starten
+// Boot
 startServer();
 cta();
 controlRelays();
@@ -155,6 +164,3 @@ getLatestSensorValues();
 startSensorProcessing();
 startRuleEngine();
 watchEnvAndRestart();
-
-
-

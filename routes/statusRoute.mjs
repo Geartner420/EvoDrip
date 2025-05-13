@@ -4,7 +4,7 @@ import { readEnv } from '../services/envService.mjs';
 
 const router = express.Router();
 
-router.get('/status', (req, res) => {
+router.get('/system-status', (req, res) => {
   try {
     const history = getMoistureHistory();
     const env = readEnv();

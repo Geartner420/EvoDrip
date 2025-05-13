@@ -1,24 +1,31 @@
-// helper/loadRoutes.mjs
-
 import fs from 'fs';
 import path from 'path';
+import { pathToFileURL, fileURLToPath } from 'url';
 
-export async function loadRoutes(app, folderPath) {
-  const routesPath = path.resolve(folderPath);
-  const files = fs.readdirSync(routesPath);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export async function loadRoutes(app, routesDirRel = '../routes') {
+  const routesDir = path.resolve(__dirname, routesDirRel);
+
+  const files = fs.readdirSync(routesDir, { withFileTypes: true });
 
   for (const file of files) {
-    if (file.endsWith('.mjs')) {
+    if (file.isDirectory()) {
+      // Rekursiv durch Unterordner gehen
+      await loadRoutes(app, path.join(routesDirRel, file.name));
+    } else if (file.name.endsWith('.mjs')) {
+      const fullPath = path.join(routesDir, file.name);
       try {
-        const module = await import(path.join(routesPath, file));
-        if (module && typeof module.default === 'function') {
-          app.use(module.default);
-          console.log(`✅ Route geladen: ${file}`);
+        const routeModule = await import(pathToFileURL(fullPath).href);
+        const route = routeModule.default;
+        if (typeof route === 'function') {
+          app.use(route);
+          console.log(`✅ Route geladen: ${file.name}`);
         } else {
-          console.warn(`⚠️  Datei ignoriert (kein gültiger Router): ${file}`);
+          console.warn(`⚠️  Keine gültige Express-Route in ${file.name}`);
         }
-      } catch (error) {
-        console.error(`❌ Fehler beim Laden der Route ${file}:`, error.message);
+      } catch (err) {
+        console.error(`❌ Fehler beim Laden der Route ${file.name}:`, err.message);
       }
     }
   }

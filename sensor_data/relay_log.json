@@ -1,5 +1,1016 @@
 [
   {
+    "timestamp": "2025-05-12T17:41:00.500Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "54",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T17:25:39.354Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "51",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T17:22:19.120Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">",
+        "value": "59",
+        "hysteresis": "2"
+      },
+      {
+        "param": "temperature",
+        "op": ">",
+        "value": "22",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T17:21:09.000Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "54",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T17:20:19.070Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "51",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T17:20:18.980Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "off",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "54",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T17:19:36.425Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "51",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T16:58:24.977Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">",
+        "value": "59",
+        "hysteresis": "2"
+      },
+      {
+        "param": "temperature",
+        "op": ">",
+        "value": "22",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T16:58:24.937Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "54",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T16:55:44.894Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "54",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T16:55:44.859Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "69",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T16:02:55.381Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "54",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T16:01:15.229Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "51",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T16:00:00.246Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "54",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T16:00:00.206Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">",
+        "value": "59",
+        "hysteresis": "2"
+      },
+      {
+        "param": "temperature",
+        "op": ">",
+        "value": "22",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "18:00",
+    "activeTo": "06:00"
+  },
+  {
+    "timestamp": "2025-05-12T15:57:04.984Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "58",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T15:52:54.602Z",
+    "relay": "Befeuchter",
+    "ip": "192.168.178.39",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "vpd",
+        "op": ">",
+        "value": "1.2",
+        "hysteresis": "0.05"
+      },
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "58",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T15:52:24.585Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "52",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T15:51:24.501Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T15:51:14.496Z",
+    "relay": "Befeuchter",
+    "ip": "192.168.178.39",
+    "state": "off",
+    "sourceSensor": "sensor_3.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "68",
+        "hysteresis": "1"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T15:50:54.447Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T15:48:34.246Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "52",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T15:40:03.558Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T15:37:53.416Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "58",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T14:03:15.904Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "temperature",
+        "op": ">=",
+        "value": "25.5",
+        "hysteresis": "2"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T14:03:05.898Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "58",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T14:01:25.759Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "temperature",
+        "op": ">=",
+        "value": "25.5",
+        "hysteresis": "2"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T14:01:15.746Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "58",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T14:00:55.697Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "temperature",
+        "op": ">=",
+        "value": "25.5",
+        "hysteresis": "2"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T14:00:45.675Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "58",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T14:00:25.685Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "temperature",
+        "op": ">=",
+        "value": "25.5",
+        "hysteresis": "2"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T14:00:15.653Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "58",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:20:32.964Z",
+    "relay": "Befeuchter",
+    "ip": "192.168.178.39",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "vpd",
+        "op": ">",
+        "value": "1.2",
+        "hysteresis": "0.05"
+      },
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "58",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:20:22.947Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "52",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:18:52.788Z",
+    "relay": "Befeuchter",
+    "ip": "192.168.178.39",
+    "state": "off",
+    "sourceSensor": "sensor_3.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "68",
+        "hysteresis": "1"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:18:42.777Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "temperature",
+        "op": ">=",
+        "value": "25.5",
+        "hysteresis": "2"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:17:32.623Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:15:42.694Z",
+    "relay": "Befeuchter",
+    "ip": "192.168.178.39",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "vpd",
+        "op": ">",
+        "value": "1.2",
+        "hysteresis": "0.05"
+      },
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "58",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:15:42.597Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "52",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:15:42.562Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "off",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "58",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:02:36.871Z",
+    "relay": "Befeuchter",
+    "ip": "192.168.178.39",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "vpd",
+        "op": ">",
+        "value": "1.2",
+        "hysteresis": "0.05"
+      },
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "58",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:02:26.819Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "off",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "52",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:02:16.889Z",
+    "relay": "Befeuchter",
+    "ip": "192.168.178.39",
+    "state": "off",
+    "sourceSensor": "sensor_3.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "68",
+        "hysteresis": "1"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:02:16.856Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T12:02:16.826Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:58:28.267Z",
+    "relay": "Befeuchter",
+    "ip": "192.168.178.39",
+    "state": "off",
+    "sourceSensor": "sensor_3.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "68",
+        "hysteresis": "1"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:58:28.169Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:58:28.138Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:55:11.995Z",
+    "relay": "Befeuchter",
+    "ip": "192.168.178.39",
+    "state": "off",
+    "sourceSensor": "sensor_3.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "68",
+        "hysteresis": "1"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:55:11.959Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:55:11.926Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:49:43.953Z",
+    "relay": "Befeuchter",
+    "ip": "192.168.178.39",
+    "state": "off",
+    "sourceSensor": "sensor_3.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "68",
+        "hysteresis": "1"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:49:43.866Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:49:43.834Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:42:45.466Z",
+    "relay": "Befeuchter",
+    "ip": "192.168.178.39",
+    "state": "off",
+    "sourceSensor": "sensor_3.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "68",
+        "hysteresis": "1"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:42:45.429Z",
+    "relay": "Dunstabzug",
+    "ip": "192.168.178.22",
+    "state": "on",
+    "sourceSensor": "sensor_2.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
+    "timestamp": "2025-05-12T11:42:45.380Z",
+    "relay": "Abluft",
+    "ip": "192.168.178.26",
+    "state": "on",
+    "sourceSensor": "sensor_1.json",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "62",
+        "hysteresis": "3"
+      }
+    ],
+    "activeFrom": "06:00",
+    "activeTo": "18:00"
+  },
+  {
     "timestamp": "2025-05-12T08:08:55.436Z",
     "relay": "Dunstabzug",
     "ip": "192.168.178.22",

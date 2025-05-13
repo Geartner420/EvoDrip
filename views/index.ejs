@@ -8,7 +8,6 @@
 </head>
 <body>
   <h1>🌱Klima-Automatisierung</h1>
-  <button onclick="location.href='/'" class="back-button">Zurück zur Übersicht</button>
   <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
   <div class="card-container" id="sensor-cards-container"></div>
   <div id="root"></div>
@@ -107,7 +106,7 @@
   function saveEdit() {
     const updatedRule = convertCommaToDot(editRule);
 
-    fetch('/api/rules/update', {
+    fetch('/api/rules/updateRule', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ oldRule: originalRule, newRule: updatedRule })
@@ -505,17 +504,16 @@
     }
   </script>
       <div class="button-bar">
-        <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
-        <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
-        <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
-        <button type="button" onclick="location.href='/status'">🩺 System-Status</button>
-        <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
-        <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
-        <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
-        <button type="button" onclick="location.href='/shelly-control'">🌱 Klima-Automatisierung</button>
-        <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
-        <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
-        <button type="button" onclick="location.href='/'">Zur Übersicht</button>
+      <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
+      <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
+      <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
+      <button type="button" onclick="location.href='/system-status'">🩺 System-Status</button>
+      <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
+      <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
+      <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
+      <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
+      <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
+      <button type="button" onclick="location.href='/ui'">Zur Übersicht</button>
       </div>
 </body>
 </html>

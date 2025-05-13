@@ -88,7 +88,7 @@ function normalizeRule(rule) {
 
 
 // POST Regel aktualisieren
-router.post('/update', (req, res) => {
+router.post('/updateRule', (req, res) => {
   try {
     const { oldRule, newRule } = req.body;
 
