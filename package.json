@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
+    "@abandonware/noble": "^1.9.2-26",
     "abbrev": "^1.1.1",
     "accepts": "^2.0.0",
     "ansi-regex": "^2.1.1",
@@ -136,7 +137,6 @@
     "negotiator": "^1.0.0",
     "nice-try": "^1.0.5",
     "noble": "^1.9.1",
-    "noble-mac": "^0.0.4",
     "node-addon-api": "^1.7.2",
     "node-domexception": "^1.0.0",
     "node-fetch": "^3.3.2",
