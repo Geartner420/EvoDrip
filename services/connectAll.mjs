@@ -245,6 +245,7 @@ export function cta() {
   });
 }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 // ================== Zugriff für andere Module ===================
 export function getLatestSensorValues() {
@@ -272,5 +273,7 @@ export function getLatestSensorValues() {
 export { loadSensorIdMapping, saveSensorIdMapping };
 
 //Test
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
