@@ -67,16 +67,16 @@
     "activeTo": "18:00",
     "conditions": [
       {
-        "param": "vpd",
-        "op": ">",
-        "value": "1.2",
-        "hysteresis": "0.05"
-      },
-      {
         "param": "humidity",
         "op": "<=",
-        "value": "58",
+        "value": "50",
         "hysteresis": "3"
+      },
+      {
+        "param": "vpd",
+        "op": ">",
+        "value": "1.1",
+        "hysteresis": "0.05"
       }
     ]
   },
@@ -91,21 +91,6 @@
         "param": "humidity",
         "op": ">=",
         "value": "69",
-        "hysteresis": "3"
-      }
-    ]
-  },
-  {
-    "sensor": "sensor_2.json",
-    "relay": "Abluft",
-    "action": "off",
-    "activeFrom": "18:00",
-    "activeTo": "06:00",
-    "conditions": [
-      {
-        "param": "humidity",
-        "op": "<=",
-        "value": "54",
         "hysteresis": "3"
       }
     ]
@@ -150,13 +135,13 @@
       {
         "param": "humidity",
         "op": ">",
-        "value": "59",
+        "value": "40",
         "hysteresis": "2"
       },
       {
         "param": "temperature",
         "op": ">",
-        "value": "22",
+        "value": "16",
         "hysteresis": "3"
       }
     ],
@@ -203,6 +188,36 @@
         "param": "humidity",
         "op": ">=",
         "value": "68",
+        "hysteresis": "1"
+      }
+    ]
+  },
+  {
+    "sensor": "sensor_1.json",
+    "relay": "Befeuchter",
+    "action": "off",
+    "activeFrom": "18:00",
+    "activeTo": "06:00",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "20",
+        "hysteresis": ""
+      }
+    ]
+  },
+  {
+    "sensor": "sensor_1.json",
+    "relay": "Abluft",
+    "action": "off",
+    "activeFrom": "18:00",
+    "activeTo": "06:00",
+    "conditions": [
+      {
+        "param": "temperature",
+        "op": "<=",
+        "value": "14",
         "hysteresis": "1"
       }
     ]

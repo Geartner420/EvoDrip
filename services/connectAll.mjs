@@ -1,56 +1,68 @@
-// connectAll.mjs
+import noble from 'noble-mac';
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
-import { fileURLToPath } from 'url';
 import { sendTelegramMessage } from './telegramService.mjs';
 import logger from '../helper/logger.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ID_FILE = path.join(__dirname, '../sensor_data/sensor_ids.json');
-const DATA_DIR = path.join(__dirname, '../sensor_data');
 
+// Verzeichnisse für Sensor-Daten und IDs
+const ID_FILE = path.join('./sensor_data/sensor_ids.json');
+const DATA_DIR = path.join('./sensor_data');
+
+// Konfiguration für offline Zeiten und Intervall für Offline-Überprüfung
 const OFFLINE_TIMEOUT_MS = 4 * 60 * 60 * 1000; // 4 Stunden
 const OFFLINE_CHECK_INTERVAL_MS = 10 * 60 * 1000; // 10 Minuten
-const WRITE_THROTTLE_MS = 20_000;
+const WRITE_THROTTLE_MS = 20_000; // 30 Sekunden
+let sensorCounter = 1;
 
-let noble;
 const offlineNotified = new Set();
 const deviceToSensorId = new Map();
 const lastUpdateTime = new Map();
 const latestValues = new Map();
-let sensorCounter = 1;
 
-// ================== Sensor-ID Zuordnung ===================
-function loadSensorIdMapping() {
+// Lade persistente Zuordnung
+export function loadSensorIdMapping() {
   if (fs.existsSync(ID_FILE)) {
+    const raw = fs.readFileSync(ID_FILE);
     try {
-      const raw = fs.readFileSync(ID_FILE);
       const arr = JSON.parse(raw);
-      if (!Array.isArray(arr)) throw new Error('Nicht-Array');
 
-      for (const { uuid, id } of arr) {
-        deviceToSensorId.set(uuid, id);
-        sensorCounter = Math.max(sensorCounter, id + 1);
+      // Sicherstellen, dass es ein Array von Objekten ist
+      if (!Array.isArray(arr)) {
+        console.warn('Warnung: sensor_ids.json ist kein Array. Setze als leeres Array.');
+        deviceToSensorId.clear();
+      } else {
+        for (const { uuid, id } of arr) {
+          deviceToSensorId.set(uuid, id);
+          sensorCounter = Math.max(sensorCounter, id + 1);
+        }
+        console.log(`📁 Sensor-Zuordnung geladen (${deviceToSensorId.size} bekannt)`);
       }
-      logger.info(`📁 Sensor-Zuordnung geladen (${deviceToSensorId.size} bekannt)`);
     } catch (err) {
       logger.error('❌ Fehler beim Laden der sensor_ids.json:', err.message);
-      deviceToSensorId.clear();
+      deviceToSensorId.clear(); // Bei Fehlern wird die Zuordnung geleert
     }
   } else {
-    logger.warn('sensor_ids.json existiert nicht – neue Datei wird erstellt.');
-    saveSensorIdMapping();
+    logger.warn('sensor_ids.json existiert nicht. Erstelle eine neue Zuordnung.');
+    saveSensorIdMapping(); // Lege eine neue Datei mit einem leeren Array an
   }
 }
 
-function saveSensorIdMapping() {
+// Speichere die Zuordnung von Sensor-IDs
+export function saveSensorIdMapping() {
+  // Umwandeln der Map in ein Array von Objekten
   const arr = Array.from(deviceToSensorId.entries()).map(([uuid, id]) => ({ uuid, id }));
+
+  if (!Array.isArray(arr)) {
+    logger.error('❌ Fehler: sensor_ids.json Zuordnung ist ungültig.');
+    return;
+  }
+
   fs.writeFileSync(ID_FILE, JSON.stringify(arr, null, 2), 'utf-8');
-  logger.debug('💾 sensor_ids.json gespeichert');
+  logger.debug('💾 sensor_ids.json erfolgreich gespeichert.');
 }
 
-// ================== Sensordaten speichern ===================
+// Die Funktion zur Verarbeitung und Speicherung von Sensordaten
 function writeSensorData(sensorId, data) {
   const now = Date.now();
   const lastWrite = lastUpdateTime.get(sensorId) || 0;
@@ -58,35 +70,51 @@ function writeSensorData(sensorId, data) {
 
   lastUpdateTime.set(sensorId, now);
 
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 
-  const file = path.join(DATA_DIR, `sensor_${sensorId}.json`);
+  const filename = `sensor_${sensorId}.json`;
+  const filepath = path.join(DATA_DIR, filename);
+
   let existingData = [];
 
-  try {
-    if (fs.existsSync(file)) {
-      const raw = fs.readFileSync(file);
+  if (fs.existsSync(filepath)) {
+    const raw = fs.readFileSync(filepath);
+    try {
       existingData = JSON.parse(raw);
-      if (!Array.isArray(existingData)) existingData = [];
+
+      if (!Array.isArray(existingData)) {
+        logger.warn(`Warnung: Daten von Sensor ${sensorId} sind kein Array. Setze als leeres Array.`);
+        existingData = [];
+      }
+    } catch (err) {
+      console.error(`❌ Fehler beim Parsen der Datei ${filename}:`, err.message);
+      existingData = [];
     }
-  } catch (err) {
-    logger.error(`❌ Fehler beim Lesen ${file}:`, err.message);
   }
 
   existingData.push(data);
-  if (existingData.length > 200000) existingData = existingData.slice(-200000);
 
-  fs.writeFile(file, JSON.stringify(existingData, null, 2), err => {
-    if (err) logger.error(`❌ Fehler beim Schreiben von ${file}:`, err.message);
-    else logger.debug(`💾 Gespeichert in ${file}`);
+  if (existingData.length > 200000) {
+    existingData = existingData.slice(-200000);
+  }
+
+  fs.writeFile(filepath, JSON.stringify(existingData, null, 2), (err) => {
+    if (err) {
+     logger.error(`❌ Fehler beim Schreiben von ${filename}:`, err.message);
+    } else {
+      logger.debug(`💾 Gespeichert in ${filename}`);
+    }
   });
 }
 
+// Die Funktion zum Dekodieren der Sensor-Daten
 function decodeAdvertisement(manufacturerData) {
   if (!manufacturerData || manufacturerData.length < 7) return null;
+
   const tempRaw = manufacturerData.readUInt16LE(1);
   const temperature = tempRaw / 10;
   const humidity = manufacturerData[3];
+
   return {
     temperature: parseFloat(temperature.toFixed(1)),
     humidity: Math.round(humidity),
@@ -98,49 +126,95 @@ function checkForOfflineSensors() {
   const now = Date.now();
 
   for (const [sensorId, lastSeen] of lastUpdateTime.entries()) {
-    const inactive = now - lastSeen;
+    const inactiveFor = now - lastSeen;
 
-    if (inactive > OFFLINE_TIMEOUT_MS && !offlineNotified.has(sensorId)) {
-      const hours = Math.floor(inactive / (60 * 60 * 1000));
-      const minutes = Math.floor((inactive % (60 * 60 * 1000)) / (60 * 1000));
-      const msg = `⚠️ *Sensor ${sensorId}* wurde seit *${hours}h ${minutes}min* nicht mehr empfangen.`;
-      logger.warn(msg);
-      sendTelegramMessage(msg);
+    if (inactiveFor > OFFLINE_TIMEOUT_MS && !offlineNotified.has(sensorId)) {
+      const hours = Math.floor(inactiveFor / (60 * 60 * 1000));
+      const minutes = Math.floor((inactiveFor % (60 * 60 * 1000)) / (60 * 1000));
+
+      const message = `⚠️ *Sensor ${sensorId}* wurde seit *${hours}h ${minutes}min* nicht mehr empfangen.`;
+      logger.warn(message);
+      sendTelegramMessage(message);
+
       offlineNotified.add(sensorId);
     }
 
-    if (inactive <= OFFLINE_TIMEOUT_MS && offlineNotified.has(sensorId)) {
-      const msg = `✅ *Sensor ${sensorId}* ist wieder aktiv.`;
-      logger.info(msg);
-      sendTelegramMessage(msg);
+    if (inactiveFor <= OFFLINE_TIMEOUT_MS && offlineNotified.has(sensorId)) {
+      const message = `✅ *Sensor ${sensorId}* ist wieder aktiv.`;
+      logger.info (message);
+      sendTelegramMessage(message);
       offlineNotified.delete(sensorId);
     }
   }
 }
 
+// Überprüfe alle 10 Minuten auf Offline-Sensoren
 setInterval(checkForOfflineSensors, OFFLINE_CHECK_INTERVAL_MS);
 
-// ================== Main BLE Init ===================
-export async function cta() {
-  loadSensorIdMapping();
+// Funktion, die die Daten aus den JSON-Dateien liest
+function getSensorDataFromFile(sensorId) {
+  const filepath = path.join(DATA_DIR, `sensor_${sensorId}.json`);
 
+  if (!fs.existsSync(filepath)) {
+    logger.warn(`⚠️ Keine Daten gefunden für Sensor ${sensorId}`);
+    return null;
+  }
+
+  let data = [];
   try {
-    if (os.platform() === 'darwin') {
-      noble = (await import('noble-mac')).default;
-    } else {
-      noble = (await import('@abandonware/noble')).default;
+    const raw = fs.readFileSync(filepath);
+    data = JSON.parse(raw);
+
+    if (!Array.isArray(data)) {
+      logger.warn(`Warnung: Daten von Sensor ${sensorId} sind kein Array. Setze als leeres Array.`);
+      data = [];
     }
   } catch (err) {
-    logger.error('❌ noble-Modul konnte nicht geladen werden:', err.message);
-    return;
+    logger.error(`❌ Fehler beim Laden der Datei für Sensor ${sensorId}:`, err.message);
+    data = [];
   }
+
+  return data[data.length - 1]; // Gibt die letzten gespeicherten Daten zurück
+}
+
+// Neue Version von getLatestSensorValues, die keine Sensor-IDs braucht
+export function getLatestSensorValues() {
+  const result = {};
+  const files = fs.readdirSync(DATA_DIR);
+
+  for (const file of files) {
+    const match = file.match(/^sensor_(\d+)\.json$/); // Sensor-ID aus Dateinamen extrahieren
+    if (!match) continue;
+
+    const sensorId = match[1]; // Die Sensor-ID
+    const filepath = path.join(DATA_DIR, file); // Vollständiger Pfad zur Datei
+    const raw = fs.readFileSync(filepath, 'utf-8'); // Lese die Datei
+
+    try {
+      const data = JSON.parse(raw); // Parsen der JSON-Daten
+
+      if (Array.isArray(data) && data.length > 0) {
+        result[sensorId] = data[data.length - 1]; // Füge nur die neuesten Daten hinzu
+      }
+    } catch (err) {
+      logger.error(`Fehler beim Parsen der Datei ${file}:`, err.message);
+    }
+  }
+
+  logger.debug(`Aktuelle Sensordaten aus JSON-Dateien:`, result);
+  return result; // Gibt die gesammelten Daten zurück
+}
+
+export function cta() {
+  loadSensorIdMapping();  // Stellt sicher, dass die Sensor-IDs geladen werden
 
   noble.on('stateChange', (state) => {
     if (state === 'poweredOn') {
       logger.info('🟢 BLE aktiv – TP357S-Scan läuft...');
-      noble.startScanning([], true);
+      noble.startScanning([], true);  // Starten des Scannens ohne den Status zu stoppen
     } else {
-      logger.warn(`🔴 BLE inaktiv: ${state}`);
+      logger.warn('🔴 BLE nicht bereit:', state);
+      // Hier können wir den Status ignorieren und das Scannen weiterhin fortsetzen
     }
   });
 
@@ -148,6 +222,7 @@ export async function cta() {
     const name = peripheral.advertisement.localName || '';
     const uuid = peripheral.uuid;
     const manufacturerData = peripheral.advertisement.manufacturerData;
+
     if (!name.includes('TP357S')) return;
 
     if (!deviceToSensorId.has(uuid)) {
@@ -163,10 +238,13 @@ export async function cta() {
 
     latestValues.set(sensorId, decoded);
 
-    logger.debug(`📡 [Sensor ${sensorId}] ${decoded.timestamp} 🌡️ ${decoded.temperature} °C | 💧 ${decoded.humidity} %`);
+    const timestamp = new Date().toISOString();
+    logger.debug(`📡 [Sensor ${sensorId}] ${timestamp} 🌡️ ${decoded.temperature} °C | 💧 ${decoded.humidity} % |[}]`);
+
     writeSensorData(sensorId, decoded);
   });
 }
+<<<<<<< Updated upstream
 
 // ================== Zugriff für andere Module ===================
 export function getLatestSensorValues() {
@@ -194,3 +272,5 @@ export function getLatestSensorValues() {
 export { loadSensorIdMapping, saveSensorIdMapping };
 
 //Test
+=======
+>>>>>>> Stashed changes
