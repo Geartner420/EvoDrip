@@ -242,8 +242,7 @@ async function runRuleEngine() {
       logger.error(`[rule_engine] ❌ Fehler beim Schalten von ${relayName}: ${err.message}`);
     }
   }
-
-  if (DEBUG_MODE) {
+  if (logger.isDebugEnabled()) {
     logger.debug(`[rule_engine] ✅ ${checked} Regeln geprüft, ${switched} geschaltet`);
   }
 }

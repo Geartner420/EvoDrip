@@ -28,7 +28,7 @@ const logger = winston.createLogger({
 
 // Zusätzlicher Logger speziell für die Regel-Engine (rule_engine.log)
 const ruleEngineLogger = winston.createLogger({
-  level: 'debug',
+  level: process.env.DEBUG === 'true' ? 'debug' : 'info',
   format: winston.format.combine(
     winston.format.timestamp({ format: 'DD.MM.YYYY HH:mm:ss' }),
     logFormat

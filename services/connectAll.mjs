@@ -76,10 +76,11 @@ function writeSensorData(sensorId, data) {
   existingData.push(data);
   if (existingData.length > 200000) existingData = existingData.slice(-200000);
 
-  fs.writeFile(file, JSON.stringify(existingData, null, 2), err => {
-    if (err) logger.error(`❌ Fehler beim Schreiben von ${file}:`, err.message);
-    else logger.debug(`💾 Gespeichert in ${file}`);
-  });
+  const tmpFile = file + '.tmp';
+  fs.writeFileSync(tmpFile, JSON.stringify(existingData, null, 2));
+  fs.renameSync(tmpFile, file);
+  logger.debug(`💾 Gespeichert in ${file}`);
+  
 }
 
 function decodeAdvertisement(manufacturerData) {
