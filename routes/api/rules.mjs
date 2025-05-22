@@ -150,4 +150,22 @@ router.post('/updateRule', (req, res) => {
   }
 });
 
+// POST neue Reihenfolge speichern
+router.post('/reorder', (req, res) => {
+  try {
+    const reorderedRules = req.body;
+
+    if (!Array.isArray(reorderedRules)) {
+      return res.status(400).json({ error: 'Ungültiges Format: Erwartet ein Array von Regeln.' });
+    }
+
+    saveRules(reorderedRules);
+    logger.info(`🔀 Reihenfolge der Regeln gespeichert (${reorderedRules.length} Regeln)`);
+    res.json({ success: true });
+  } catch (err) {
+    logger.error(`❌ Fehler beim Speichern der Regel-Reihenfolge: ${err.message}`);
+    res.status(500).json({ error: 'Fehler beim Speichern der Reihenfolge' });
+  }
+});
+
 export default router;
