@@ -1,0 +1,193 @@
+/* Basisfarben & Variablen */
+:root {
+  --card-bg: #ffffff;
+  --card-border: #e0e0e0;
+  --text-color: #222;
+  --accent-green: #2ecc71;
+  --accent-red: #e74c3c;
+  --accent-yellow: #ffffff;
+  --accent-blue: #3498db;
+  --disabled-text: #999;
+}
+
+html.dark {
+  --card-bg: #1e1e1e;
+  --card-border: #444;
+  --text-color: #eee;
+}
+
+/* Kartencontainer */
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  padding: 8px;
+}
+
+/* Einzelne Regelkarte */
+.rule-card  {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border-left: 6px solid var(--accent-green);
+  padding: 16px;
+  width: 300px;
+  min-height: 280px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rule-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* Titelbereich */
+.card-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.subinfo {
+  font-size: 0.9em;
+  color: var(--disabled-text);
+}
+
+/* Inhalt */
+.card-content {
+  flex-grow: 1;
+  margin: 8px 0;
+  font-size: 0.95em;
+}
+
+.card-content ul {
+  padding-left: 16px;
+  margin: 0;
+}
+
+.active-time {
+  margin-top: 6px;
+  font-size: 0.85em;
+  color: var(--accent-yellow);
+}
+
+/* Footer-Bereich */
+.card-footer-rules {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Power-Button */
+.power-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+html.dark .power-btn {
+  background-color: #2a2a2a;
+}
+
+.power-btn svg {
+  stroke-width: 2;
+}
+
+.power-btn.on {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+}
+
+.power-btn.off {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.power-btn:hover {
+  background-color: #f9f9f9;
+}
+html.dark .power-btn:hover {
+  background-color: #333;
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  font-size: 0.9em;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+button.delete-btn {
+  background-color: var(--accent-red);
+  color: white;
+}
+
+button.delete-btn:hover {
+  background-color: #c0392b;
+}
+
+button.edit-btn {
+  background-color: var(--accent-blue);
+  color: white;
+}
+
+button.edit-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Erfolgs-/Fehlermeldung */
+.success-msg, .error-msg {
+  font-size: 0.85em;
+  margin-top: 6px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.success-msg {
+  color: var(--accent-green);
+  background-color: #eafaf1;
+}
+
+.error-msg {
+  color: var(--accent-red);
+  background-color: #fdecea;
+}
+
+/* Deaktiviert-Hinweis */
+.disabled-flag {
+  font-size: 0.9em;
+  color: var(--disabled-text);
+  margin-top: 4px;
+}
+
+/* Bedingungsreihe */
+.condition-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 4px;
+}

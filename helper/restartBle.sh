@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 # Verzögerung, bevor der Dienst gestoppt wird
 sleep 10

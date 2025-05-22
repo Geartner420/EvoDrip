@@ -8,7 +8,6 @@
   <script src="/scripts/darkmode.js" defer></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
-
     #intervalTabs {
       display: flex;
       justify-content: center;
@@ -23,6 +22,36 @@
       border-radius: 5px;
     }
 
+    .tab-wrapper {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 6px;
+      position: relative;
+    }
+
+    .name-input {
+      padding: 4px 8px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color, #ccc);
+      background: var(--bg-color, #fff);
+      color: var(--text-color, #000);
+    }
+
+    .save-btn {
+      margin-left: 6px;
+      padding: 4px 8px;
+      font-size: 14px;
+      cursor: pointer;
+      background: #28a745;
+      border: none;
+      color: white;
+      border-radius: 4px;
+    }
+
+    .tab.dragging {
+      opacity: 0.5;
+    }
   </style>
 </head>
 <body>
@@ -30,28 +59,28 @@
 
   <div class="container">
     <div class="tabs" style="display: flex; justify-content: center;">
-      <h2 style="margin: auto;">📈 TP357S Klima-Diagramme</h2> 
-    </div> 
+      <h2 style="margin: auto;">📈 TP357S Klima-Diagramme</h2>
+    </div>
 
-    <!-- Sensorauswahl -->
+    <!-- Sensor-Tabs mit Umbenennung + Drag & Drop -->
     <div id="sensorTabs" class="tabs"></div>
 
-    <!-- Diagrammtyp Tabs -->
+    <!-- Diagrammtyp-Tabs -->
     <div id="metricTabs" class="tabs"></div>
 
-    <!-- Aggregationsintervall -->
+    <!-- Intervallauswahl -->
     <div class="tabs" id="intervalTabs">
       <label for="intervalSelect">🔁 Aggregationsintervall:</label>
       <select id="intervalSelect">
         <option value="1">1 Minute</option>
         <option value="5">5 Minuten</option>
-        <option value="10" >10 Minuten</option>
-        <option value="30"selected>30 Minuten</option>
+        <option value="10">10 Minuten</option>
+        <option value="30" selected>30 Minuten</option>
         <option value="60">1 Stunde</option>
       </select>
     </div>
 
-    <!-- Diagrammfläche -->
+    <!-- Hauptdiagramm -->
     <div class="chart-container" style="width: 100%; max-width: none;">
       <div id="mainChart" style="height: 500px;"></div>
     </div>
@@ -97,11 +126,21 @@
         .catch(err => console.error('Fehler beim Laden der Historie:', err));
     }
 
-    function renderSensorTabs(ids) {
+    function renderSensorTabs(sensorIds) {
       const tabsDiv = document.getElementById('sensorTabs');
       tabsDiv.innerHTML = '';
 
-      ids.forEach(id => {
+      const savedOrder = JSON.parse(localStorage.getItem('sensorTabOrder') || '[]');
+      if (savedOrder.length) {
+        sensorIds.sort((a, b) => savedOrder.indexOf(a) - savedOrder.indexOf(b));
+      }
+
+      sensorIds.forEach(id => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'tab-wrapper';
+        wrapper.setAttribute('draggable', 'true');
+        wrapper.dataset.sensorId = id;
+
         const tab = document.createElement('div');
         tab.className = 'tab';
         tab.textContent = sensorNames[id] || `Sensor ${id}`;
@@ -110,12 +149,82 @@
 
         tab.onclick = () => {
           selectedSensor = id;
-          renderSensorTabs(ids);
+          renderSensorTabs(sensorIds);
           renderChart();
         };
 
-        tabsDiv.appendChild(tab);
+        // Rechtsklick für Umbenennung
+        tab.addEventListener('contextmenu', e => {
+          e.preventDefault();
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = sensorNames[id] || `Sensor ${id}`;
+          input.className = 'name-input';
+
+          const saveBtn = document.createElement('button');
+          saveBtn.className = 'save-btn';
+          saveBtn.textContent = 'Speichern';
+          saveBtn.onclick = () => {
+            const newName = input.value.trim();
+            if (newName) saveSensorName(id, newName);
+          };
+
+          wrapper.innerHTML = '';
+          wrapper.appendChild(input);
+          wrapper.appendChild(saveBtn);
+        });
+
+        wrapper.appendChild(tab);
+        tabsDiv.appendChild(wrapper);
+
+        // Drag & Drop
+        wrapper.addEventListener('dragstart', e => {
+          wrapper.classList.add('dragging');
+          e.dataTransfer.setData('text/plain', id);
+        });
+
+        wrapper.addEventListener('dragend', () => {
+          wrapper.classList.remove('dragging');
+          const newOrder = Array.from(tabsDiv.children).map(el => el.dataset.sensorId);
+          localStorage.setItem('sensorTabOrder', JSON.stringify(newOrder));
+        });
+
+        wrapper.addEventListener('dragover', e => {
+          e.preventDefault();
+          const dragging = document.querySelector('.dragging');
+          if (dragging && dragging !== wrapper) {
+            const bounding = wrapper.getBoundingClientRect();
+            const offset = e.clientY - bounding.top;
+            if (offset < bounding.height / 2) {
+              tabsDiv.insertBefore(dragging, wrapper);
+            } else {
+              tabsDiv.insertBefore(dragging, wrapper.nextSibling);
+            }
+          }
+        });
       });
+    }
+
+    function saveSensorName(id, newName) {
+      fetch('/api/sensor-names', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name: newName })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            sensorNames[id] = newName;
+            renderSensorTabs(Object.keys(historyData));
+            renderChart();
+          } else {
+            alert('Fehler beim Speichern.');
+          }
+        })
+        .catch(err => {
+          console.error('Speicherfehler:', err);
+          alert('Speichern fehlgeschlagen.');
+        });
     }
 
     function renderMetricTabs() {
@@ -171,7 +280,6 @@
       if (!entries) return;
 
       const aggregated = aggregateByInterval(entries, selectedMetric, aggregationInterval);
-
       const timestamps = aggregated.map(e => new Date(e.timestamp));
       const y = aggregated.map(e => e.avg);
 
@@ -210,18 +318,20 @@
     fetchSensorNames();
     setInterval(fetchHistory, 60000);
   </script>
-    <div class="button-bar">
-      <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
-      <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
-      <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
-      <button type="button" onclick="location.href='/system-status'">🩺 System-Status</button>
-      <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
-      <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
-      <button type="button" onclick="location.href='/shelly-control'">🌱 Klima-Automatisierung</button>
-      <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
-      <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
-      <button type="button" onclick="location.href='/ui'">Zur Übersicht</button>
-    </div>
-  </body>
+
+  <!-- Navigation -->
+  <div class="button-bar">
+    <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
+    <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
+    <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
+    <button type="button" onclick="location.href='/system-status'">🩺 System-Status</button>
+    <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
+    <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
+    <button type="button" onclick="location.href='/klima-control'">🌱 Klima-Automatisierung</button>
+    <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
+    <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
+    <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
+    <button type="button" onclick="location.href='/ui'">Zur Übersicht</button>
+  </div>
 </body>
 </html>

@@ -35,3 +35,31 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.peterpan.restartble.
 launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.peterpan.restartble.plist
 launchctl list | grep restartble
 
+//-----------------------------------------------------------------------------------------------
+Dienst Löschen Windows
+
+Unregister-ScheduledTask -TaskName "StartEvoDrip" -Confirm:$false
+
+
+Prüfen ob Dienst läuft
+Start-ScheduledTask -TaskName "StartEvoDrip"
+Stop-ScheduledTask -TaskName "StartEvoDrip"
+Get-ScheduledTask -TaskName "StartEvoDrip" | Get-ScheduledTaskInfo
+
+Log anzeigen
+notepad "C:\Users\miche\EvoDrip\newdrip.log"
+Get-Content "C:\Users\miche\EvoDrip\newdrip.log" -Tail 100
+Get-Content "C:\Users\miche\EvoDrip\newdrip.log" -Wait -Tail 20
+
+
+
+
+
+Linus Instalatin systemctl
+
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable evodrip.service
+sudo systemctl start evodrip.service
+sudo systemctl status evodrip.service
+journalctl -u evodrip.service -f

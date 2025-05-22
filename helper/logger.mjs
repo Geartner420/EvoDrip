@@ -14,8 +14,10 @@ const logFormat = winston.format.printf(({ timestamp, level, message }) =>
 );
 
 // Haupt-Logger (newdrip.log)
+const debugMode = ['1', 'true', 'yes'].includes((process.env.DEBUG || '').toLowerCase())
+
 const logger = winston.createLogger({
-  level: process.env.DEBUG === 'true' ? 'debug' : 'info',
+  level: debugMode ? 'debug' : 'info',
   format: winston.format.combine(
     winston.format.timestamp({ format: 'DD.MM.YYYY HH:mm:ss' }),
     logFormat
@@ -28,7 +30,7 @@ const logger = winston.createLogger({
 
 // Zusätzlicher Logger speziell für die Regel-Engine (rule_engine.log)
 const ruleEngineLogger = winston.createLogger({
-  level: process.env.DEBUG === 'true' ? 'debug' : 'info',
+   level: debugMode ? 'debug' : 'info',
   format: winston.format.combine(
     winston.format.timestamp({ format: 'DD.MM.YYYY HH:mm:ss' }),
     logFormat

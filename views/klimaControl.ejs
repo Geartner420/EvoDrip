@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>🌱 Klima-Automatisierung 🌱</title>
+  <link rel="stylesheet" href="/styles/card.css" />
+  <link rel="stylesheet" href="/styles/klimaCard.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+  <h1>🌱Klima-Automatisierung</h1>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
+  <div class="card-container" id="sensor-cards-container"></div>
+  <div id="root"></div>
+
+  <!-- Theme-Logik -->
+  <script>
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    }
+    (function () {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+
+  <!-- Sensor-Daten laden -->
+  <script>
+    let sensorNameMap = {};
+    fetch('/api/sensor-names')
+      .then(res => res.json())
+      .then(data => {
+        sensorNameMap = data;
+        fetchSensorData();
+        setInterval(fetchSensorData, 10000);
+      });
+
+    async function fetchSensorData() {
+      try {
+        const res = await fetch('/api/sensor-status');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const sensors = await res.json();
+
+        const container = document.getElementById('sensor-cards-container');
+        if (!container) return;
+
+        container.innerHTML = '';
+        for (const [id, data] of Object.entries(sensors)) {
+          const card = document.createElement('div');
+          const nameKey = id.replace('sensor_', '').replace('.json', '');
+          const sensorName = sensorNameMap[nameKey] || `Sensor ${id}`;
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="card-title">${sensorName}</div>
+            <div class="card-value">🌡️ ${data.temperature} °C</div>
+            <div class="card-value">💧 ${data.humidity} %</div>
+            <div class="card-footer">🕛 ${new Date(data.timestamp).toLocaleString('de-DE')}</div>
+          `;
+          container.appendChild(card);
+        }
+      } catch (err) {
+        console.error('Sensorwerte konnten nicht geladen werden:', err);
+        const container = document.getElementById('sensor-cards-container');
+        if (container) {
+          container.innerHTML = '<div class="error-msg">Fehler beim Laden der Sensorwerte.</div>';
+        }
+      }
+    }
+  </script>
+  <!-- 📦 React + Babel + Drag-and-Drop -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/react-beautiful-dnd@13.1.1/dist/react-beautiful-dnd.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const { DragDropContext, Droppable, Draggable } = window.ReactBeautifulDnd;
+
+    const operatorLabels = {
+      '>': 'größer als',
+      '<': 'kleiner als',
+      '>=': 'größer oder gleich',
+      '<=': 'kleiner oder gleich',
+      '==': 'gleich'
+    };
+
+    const normalizeFloat = (value) => (value || '').replace(',', '.');
+
+    function convertCommaToDot(rule) {
+      return {
+        ...rule,
+        conditions: rule.conditions.map(cond => ({
+          ...cond,
+          value: normalizeFloat(cond.value),
+          hysteresis: normalizeFloat(cond.hysteresis)
+        }))
+      };
+    }
+
+    function reorder(list, startIndex, endIndex) {
+      const result = Array.from(list);
+      const [removed] = result.splice(startIndex, 1);
+      result.splice(endIndex, 0, removed);
+      return result;
+    }
+function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap, sensors }) {
+  const [editMode, setEditMode] = useState(false);
+  const [editRule, setEditRule] = useState(r);
+  const [originalRule] = useState(() => structuredClone(r));
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
+
+  const displayRelays = Array.isArray(r.relays) ? r.relays.join(', ') : r.relay;
+
+  function saveEdit() {
+    const updatedRule = convertCommaToDot(editRule);
+    fetch('/api/rules/updateRule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ oldRule: originalRule, newRule: updatedRule })
+    })
+    .then(res => {
+      if (res.ok) {
+        onUpdate(originalRule, updatedRule);
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 2000);
+        setEditMode(false);
+      } else {
+        throw new Error('Serverfehler');
+      }
+    })
+    .catch(() => {
+      setError(true);
+      setTimeout(() => setError(false), 2000);
+    });
+  }
+
+  function toggleEnabled() {
+    const updated = { ...r, enabled: r.enabled === false };
+    fetch('/api/rules/updateRule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ oldRule: r, newRule: updated })
+    }).then(res => {
+      if (res.ok) {
+        onUpdate(r, updated);
+      } else {
+        console.error('Aktivierungswechsel fehlgeschlagen');
+      }
+    });
+  }
+
+  return (
+    <div className="card rule-card">
+      <div className="card-title">
+        {!editMode ? (
+          <strong>{r.name || '🛠 Unbenannte Regel'}</strong>
+        ) : (
+          <input
+            type="text"
+            placeholder="Regelname"
+            value={editRule.name || ''}
+            onChange={e => setEditRule({ ...editRule, name: e.target.value })}
+          />
+        )}
+        <div className="subinfo">Relais: {displayRelays}</div>
+      </div>
+
+      <div className="card-content">
+        {!editMode ? (
+          <>
+            <strong>{r.action === 'on' ? '🟢 EIN' : '🔴 AUS'}</strong><br />
+            {r.enabled === false && <div className="disabled-flag">⏸️ Deaktiviert</div>}
+            <ul>
+              {r.conditions.map((c, i) => (
+                <li key={i}>
+                  {sensorNameMap[c.sensor?.replace('sensor_', '').replace('.json', '')] || c.sensor}:
+                  {` ${c.param} ${operatorLabels[c.op] || c.op} ${c.value}`}
+                  {c.hysteresis ? ` ±${c.hysteresis}` : ''}
+                </li>
+              ))}
+            </ul>
+            {r.activeFrom && r.activeTo && (
+              <div className="active-time">
+                Aktiv von {r.activeFrom} bis {r.activeTo}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <label>Aktion:
+              <select value={editRule.action} onChange={e => setEditRule({ ...editRule, action: e.target.value })}>
+                <option value="on">einschalten</option>
+                <option value="off">ausschalten</option>
+              </select>
+            </label>
+            <input type="time" value={editRule.activeFrom} onChange={e => setEditRule({ ...editRule, activeFrom: e.target.value })} />
+            <input type="time" value={editRule.activeTo} onChange={e => setEditRule({ ...editRule, activeTo: e.target.value })} />
+
+            {editRule.conditions.map((c, i) => (
+              <div className="condition-row" key={i}>
+                <select value={c.sensor} onChange={e => {
+                  const updated = [...editRule.conditions];
+                  updated[i].sensor = e.target.value;
+                  setEditRule({ ...editRule, conditions: updated });
+                }}>
+                  <option value="">Sensor wählen</option>
+                  {sensors.map(id => (
+                    <option key={id} value={id}>
+                      {sensorNameMap[id.replace('sensor_', '').replace('.json', '')] || id}
+                    </option>
+                  ))}
+                </select>
+                <select value={c.param} onChange={e => {
+                  const updated = [...editRule.conditions];
+                  updated[i].param = e.target.value;
+                  setEditRule({ ...editRule, conditions: updated });
+                }}>
+                  <option value="vpd">VPD</option>
+                  <option value="temperature">Temperatur</option>
+                  <option value="humidity">Luftfeuchtigkeit</option>
+                </select>
+                <select value={c.op} onChange={e => {
+                  const updated = [...editRule.conditions];
+                  updated[i].op = e.target.value;
+                  setEditRule({ ...editRule, conditions: updated });
+                }}>
+                  <option value=">">größer als</option>
+                  <option value="<">kleiner als</option>
+                  <option value=">=">größer oder gleich</option>
+                  <option value="<=">kleiner oder gleich</option>
+                  <option value="==">gleich</option>
+                </select>
+                <input type="text" value={c.value} onChange={e => {
+                  const updated = [...editRule.conditions];
+                  updated[i].value = e.target.value;
+                  setEditRule({ ...editRule, conditions: updated });
+                }} />
+                <input type="number" step="0.1" placeholder="Hysterese" value={c.hysteresis || ''} onChange={e => {
+                  const updated = [...editRule.conditions];
+                  updated[i].hysteresis = e.target.value;
+                  setEditRule({ ...editRule, conditions: updated });
+                }} />
+                <button className="delete-btn" onClick={() => {
+                  const updated = [...editRule.conditions];
+                  updated.splice(i, 1);
+                  setEditRule({ ...editRule, conditions: updated });
+                }}>🗑️</button>
+              </div>
+            ))}
+            <button onClick={() =>
+              setEditRule({ ...editRule, conditions: [...editRule.conditions, { sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }] })
+            }>➕ Bedingung</button>
+          </>
+        )}
+      </div>
+
+      <div className="card-footer-rules" style={{ justifyContent: 'space-between', display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <button
+            className={`power-btn ${r.enabled === false ? 'off' : 'on'}`}
+            title={r.enabled === false ? 'Regel aktivieren' : 'Regel deaktivieren'}
+            onClick={toggleEnabled}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 2v10" />
+              <path d="M18.36 5.64a9 9 0 1 1-12.73 0" />
+            </svg>
+          </button>
+
+
+        {!editMode ? (
+          <>
+            <button onClick={() => setEditMode(true)}>✏️ Bearbeiten</button>
+            <button className="delete-btn" onClick={() => {
+              if (confirm('Diese Regel wirklich löschen?')) onDelete(r);
+            }}>🗑️ Löschen</button>
+          </>
+        ) : (
+          <>
+            <button onClick={saveEdit}>💾 Speichern</button>
+            <button onClick={() => {
+              setEditRule(r);
+              setEditMode(false);
+            }}>Abbrechen</button>
+          </>
+        )}
+        {success && <span className="success-msg">✅ Gespeichert</span>}
+        {error && <span className="error-msg">❌ Fehler</span>}
+      </div>
+    </div>
+  );
+}
+
+    function App() {
+      const [rules, setRules] = useState([]);
+      const [relays, setRelays] = useState([]);
+      const [sensors, setSensors] = useState([]);
+      const [sensorNameMap, setSensorNameMap] = useState({});
+      const [newRule, setNewRule] = useState({
+        name: '',
+        relays: [],
+        action: '',
+        activeFrom: '',
+        activeTo: '',
+        conditions: [{ sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }]
+      });
+      const [saveMessage, setSaveMessage] = useState('');
+
+      useEffect(() => {
+        fetch('/api/rules').then(res => res.json()).then(setRules);
+        fetch('/api/relaysRules').then(res => res.json()).then(setRelays);
+        fetch('/api/sensors').then(res => res.json()).then(setSensors);
+        fetch('/api/sensor-names').then(res => res.json()).then(setSensorNameMap);
+      }, []);
+
+      function deleteRule(ruleToDelete) {
+        fetch('/api/rules/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ruleToDelete)
+        }).then(() => {
+          setRules(rules => rules.filter(rule => JSON.stringify(rule) !== JSON.stringify(ruleToDelete)));
+        });
+      }
+
+      function updateRuleInUI(oldRule, newRule) {
+        setRules(rules => rules.map(r =>
+          JSON.stringify(r) === JSON.stringify(oldRule) ? newRule : r
+        ));
+      }
+
+      function onDragEnd(result) {
+        if (!result.destination) return;
+        const reordered = reorder(rules, result.source.index, result.destination.index);
+        setRules(reordered);
+        fetch('/api/rules/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(reordered)
+        });
+      }
+
+      function addNewRule() {
+        const newRuleToAdd = convertCommaToDot(newRule);
+        fetch('/api/rules/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newRuleToAdd)
+        }).then(res => {
+          if (res.ok) {
+            setRules(prev => [...prev, newRuleToAdd]);
+            setNewRule({
+              name: '',
+              relays: [],
+              action: '',
+              activeFrom: '',
+              activeTo: '',
+              conditions: [{ sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }]
+            });
+            setSaveMessage('✅ Regel hinzugefügt');
+            setTimeout(() => setSaveMessage(''), 2000);
+          } else {
+            throw new Error();
+          }
+        }).catch(() => {
+          setSaveMessage('❌ Fehler beim Hinzufügen');
+          setTimeout(() => setSaveMessage(''), 2000);
+        });
+      }
+
+      return (
+        <div>
+          <div className="rule-list">
+            <h2>Regeln</h2>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="droppable-rules">
+                {(provided) => (
+                  <div className="card-list" ref={provided.innerRef} {...provided.droppableProps}>
+                    {rules.map((rule, index) => (
+                      <Draggable key={index} draggableId={`rule-${index}`} index={index}>
+                        {(provided) => (
+                          <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                            <EditableRuleCard
+                              r={rule}
+                              operatorLabels={operatorLabels}
+                              onDelete={deleteRule}
+                              onUpdate={updateRuleInUI}
+                              sensorNameMap={sensorNameMap}
+                              sensors={sensors}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </div>
+
+          <div className="form-container">
+            <h2>Neue Regel erstellen</h2>
+            <div className="field-group">
+              <label>Regelname</label>
+              <input type="text" value={newRule.name} onChange={e => setNewRule(r => ({ ...r, name: e.target.value }))} />
+            </div>
+            <div className="field-group">
+              <label>Relais (Strg/Cmd für Mehrfachauswahl)</label>
+              <select multiple value={newRule.relays} onChange={e => {
+                const selected = Array.from(e.target.selectedOptions).map(o => o.value);
+                setNewRule(r => ({ ...r, relays: selected }));
+              }}>
+                {relays.map(r => (
+                  <option key={r.name} value={r.name}>{r.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="field-group">
+              <label>Aktion</label>
+              <select value={newRule.action} onChange={e => setNewRule(r => ({ ...r, action: e.target.value }))}>
+                <option value="on">einschalten</option>
+                <option value="off">ausschalten</option>
+              </select>
+            </div>
+            <div className="field-group">
+              <label>Aktiv von</label>
+              <input type="time" value={newRule.activeFrom} onChange={e => setNewRule(r => ({ ...r, activeFrom: e.target.value }))} />
+            </div>
+            <div className="field-group">
+              <label>Aktiv bis</label>
+              <input type="time" value={newRule.activeTo} onChange={e => setNewRule(r => ({ ...r, activeTo: e.target.value }))} />
+            </div>
+
+            {newRule.conditions.map((cond, i) => (
+              <div key={i} style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <label>Bedingung {i + 1}</label>
+                <select value={cond.sensor} onChange={e => {
+                  const updated = [...newRule.conditions];
+                  updated[i].sensor = e.target.value;
+                  setNewRule({ ...newRule, conditions: updated });
+                }}>
+                  <option value="">Sensor wählen</option>
+                  {sensors.map(s => (
+                    <option key={s} value={s}>
+                      {sensorNameMap[s.replace('sensor_', '').replace('.json', '')] || s}
+                    </option>
+                  ))}
+                </select>
+                <select value={cond.param} onChange={e => {
+                  const updated = [...newRule.conditions];
+                  updated[i].param = e.target.value;
+                  setNewRule({ ...newRule, conditions: updated });
+                }}>
+                  <option value="vpd">VPD</option>
+                  <option value="temperature">Temperatur</option>
+                  <option value="humidity">Luftfeuchtigkeit</option>
+                </select>
+                <select value={cond.op} onChange={e => {
+                  const updated = [...newRule.conditions];
+                  updated[i].op = e.target.value;
+                  setNewRule({ ...newRule, conditions: updated });
+                }}>
+                  <option value=">">größer als</option>
+                  <option value="<">kleiner als</option>
+                  <option value=">=">größer oder gleich</option>
+                  <option value="<=">kleiner oder gleich</option>
+                  <option value="==">gleich</option>
+                </select>
+                <input type="text" value={cond.value} onChange={e => {
+                  const updated = [...newRule.conditions];
+                  updated[i].value = e.target.value;
+                  setNewRule({ ...newRule, conditions: updated });
+                }} />
+                <input type="number" step="0.1" placeholder="Hysterese" value={cond.hysteresis || ''} onChange={e => {
+                  const updated = [...newRule.conditions];
+                  updated[i].hysteresis = e.target.value;
+                  setNewRule({ ...newRule, conditions: updated });
+                }} />
+                <button className="delete-btn" onClick={() => {
+                  const updated = [...newRule.conditions];
+                  updated.splice(i, 1);
+                  setNewRule({ ...newRule, conditions: updated });
+                }}>🗑️</button>
+              </div>
+            ))}
+
+            <div className="field-group">
+              <button onClick={() => setNewRule({ ...newRule, conditions: [...newRule.conditions, { sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }] })}>
+                ➕ Bedingung
+              </button>
+            </div>
+
+            <div className="field-group">
+              <button onClick={addNewRule}>➕ Regel hinzufügen</button>
+              {saveMessage && <div className={saveMessage.startsWith('✅') ? 'success-msg' : 'error-msg'}>{saveMessage}</div>}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const root = document.getElementById('root');
+    if (root) {
+      ReactDOM.createRoot(root).render(<App />);
+    }
+  </script>
+
+  <!-- Navigationsleiste -->
+  <div class="button-bar">
+    <button onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
+    <button onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
+    <button onclick="location.href='/log'">📜 Logbuch</button>
+    <button onclick="location.href='/system-status'">🩺 System-Status</button>
+    <button onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
+    <button onclick="location.href='/sensordata'">🌡️💧 Temp/RH-Diagramme</button>
+    <button onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
+    <button onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
+    <button onclick="location.href='/rulelog'">📋 Regel-Log</button>
+    <button onclick="location.href='/combined-dashboard'">📊 Combi-Dashboard</button>
+    <button onclick="location.href='/ui'">📁 Zur Übersicht</button>
+  </div>
+</body>
+</html>

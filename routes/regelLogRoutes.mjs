@@ -17,7 +17,7 @@ router.get('/rulelog', (req, res) => {
     }
 
     router.get('/log/raw', (req, res) => {
-      const limit = Number(req.query.limit) || 2000;
+      const limit = Number(req.query.limit) || 200;
       fs.readFile(logPath, 'utf8', (err, data) => {
         if (err) return res.status(500).json({ error: err.message });
         const lines = data

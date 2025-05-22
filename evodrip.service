@@ -1,0 +1,14 @@
+[Unit]
+Description=EvoDrip Climate & Irrigation Server
+After=network.target
+
+[Service]
+WorkingDirectory=/home/pi/EvoDrip
+ExecStart=/usr/bin/node /home/pi/EvoDrip/server.mjs
+Restart=on-failure
+RestartSec=3
+Environment=NODE_ENV=production
+User=pi
+
+[Install]
+WantedBy=multi-user.target

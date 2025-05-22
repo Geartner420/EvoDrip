@@ -17,8 +17,8 @@
 
   <h2>Klima-Automatik & Bewässerungssystem – Einstellungen</h2>
 
-  <form method="POST" action="/update">
-    <div class="form-container">
+  <form method="POST" action="/updateEnv">
+    <div class="form-container-form">
       <% felder.forEach(field => {
         const [id, label, type, long, customValue] = field;
         if (type === 'timer') { %>
@@ -64,10 +64,10 @@
       <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
       <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
       <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
-      <button type="button" onclick="location.href='/shelly-control'">🌱 Klima-Automatisierung</button>
+      <button type="button" onclick="location.href='/klima-control'">🌱 Klima-Automatisierung</button>
       <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
       <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
-      <button type="button" onclick="location.href='/combined-dashboard'">Kombiniertes Dashboard</button>
+      <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
     </div>
   </form>
 </body>

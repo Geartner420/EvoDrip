@@ -9,19 +9,41 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(__dirname, '../../sensor_data');
 const rulesFile = path.join(dataDir, 'relay_rules.json');
 
+// GET Ping
 router.get('/ping', (req, res) => res.json({ pong: true }));
 
+// Regeln laden (einfaches Array)
 function loadRules() {
   try {
     if (fs.existsSync(rulesFile)) {
-      return JSON.parse(fs.readFileSync(rulesFile, 'utf-8'));
+      const raw = JSON.parse(fs.readFileSync(rulesFile, 'utf-8'));
+
+      if (Array.isArray(raw)) return raw;
+
+      // Falls versehentlich altes Programmschema vorhanden ist
+      if (typeof raw === 'object' && (raw.programs || raw.singleRules)) {
+        const rules = [];
+
+        if (Array.isArray(raw.singleRules)) rules.push(...raw.singleRules);
+        if (Array.isArray(raw.programs)) {
+          for (const prog of raw.programs) {
+            if (Array.isArray(prog.rules)) rules.push(...prog.rules);
+          }
+        }
+
+        return rules;
+      }
+
+      return [];
     }
   } catch (err) {
     logger.error(`❌ Fehler beim Laden der Regeln: ${err.message}`);
   }
+
   return [];
 }
 
+// Regeln speichern
 function saveRules(rules) {
   try {
     fs.writeFileSync(rulesFile, JSON.stringify(rules, null, 2), 'utf-8');
@@ -86,7 +108,6 @@ function normalizeRule(rule) {
   };
 }
 
-
 // POST Regel aktualisieren
 router.post('/updateRule', (req, res) => {
   try {
@@ -96,36 +117,21 @@ router.post('/updateRule', (req, res) => {
       throw new Error('❌ Ungültiger Body: oldRule oder newRule fehlt');
     }
 
-    logger.debug('🧾 oldRule:', JSON.stringify(oldRule, null, 2));
-    logger.debug('🆕 newRule:', JSON.stringify(newRule, null, 2));
-
     const rules = loadRules();
     const normOld = normalizeRule(oldRule);
     const normNew = normalizeRule(newRule);
 
     const index = rules.findIndex((rule, i) => {
       const normRule = normalizeRule(rule);
-      const match =
+      return (
         normRule.sensor === normOld.sensor &&
         normRule.relay === normOld.relay &&
         normRule.action === normOld.action &&
         normRule.activeFrom === normOld.activeFrom &&
         normRule.activeTo === normOld.activeTo &&
-        JSON.stringify(normRule.conditions) === JSON.stringify(normOld.conditions);
-    
-      if (!match) {
-        logger.debug(`❌ Kein Match bei Regel #${i}`);
-        logger.debug('Verglichen mit:');
-        logger.debug(JSON.stringify(normRule, null, 2));
-        logger.debug('Gegen oldRule:');
-        logger.debug(JSON.stringify(normOld, null, 2));
-      } else {
-        logger.debug(`✅ Match bei Regel #${i}`);
-      }
-    
-      return match;
+        JSON.stringify(normRule.conditions) === JSON.stringify(normOld.conditions)
+      );
     });
-    
 
     if (index === -1) {
       logger.warn(`⚠️ Regel nicht gefunden zum Aktualisieren`);

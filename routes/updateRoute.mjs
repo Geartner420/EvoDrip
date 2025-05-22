@@ -1,6 +1,7 @@
 import express from 'express';
 import Joi from 'joi';
 import { writeEnv, readEnv } from '../services/envService.mjs'; // Wir importieren jetzt auch readEnv
+import logger from '../helper/logger.mjs';
 
 const router = express.Router();
 
@@ -64,8 +65,9 @@ function buildValidationSchema(fields) {
   return Joi.object(schema);
 }
 
-router.post('/update', (req, res) => {
-  console.log('🛠 Eingehender POST /update');
+router.post('/updateEnv', (req, res) => {
+
+  logger.info('🛠 Eingehender POST /update');
 
   const formSchema = buildValidationSchema(envFields);
 
@@ -75,7 +77,7 @@ router.post('/update', (req, res) => {
   });
 
   if (error) {
-    console.error('❌ Joi Validation Error:', error.details);
+    logger.error('❌ Joi Validation Error:', error.details);
     return res.status(400).send('Ungültige Eingaben:\n' + error.details.map(d => d.message).join('\n'));
   }
 

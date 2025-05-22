@@ -24,6 +24,11 @@
   --sensor-header-color: #fff;
 }
 
+/* ========== Reset ========== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
   font-family: Arial, sans-serif;
   background: var(--bg-color);
@@ -42,6 +47,7 @@ h1, h2, h3 {
   margin-bottom: 20px;
 }
 
+/* ========== Formular-Container ========== */
 .form-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -51,10 +57,12 @@ h1, h2, h3 {
   padding: 15px;
   border-radius: 8px;
   max-width: 1100px;
+  width: 100%;
   margin: auto;
   border: 1px solid var(--border-color);
 }
 
+/* ========== Eingabefelder ========== */
 .field-group {
   display: flex;
   flex-direction: column;
@@ -69,6 +77,7 @@ input, select {
   color: var(--text-color);
 }
 
+/* ========== Regel-Liste ========== */
 .rule-list {
   margin: 10px auto 20px auto;
   max-width: 1100px;
@@ -78,6 +87,7 @@ input, select {
   gap: 5px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
+  width: 100%;
 }
 
 .rule-item {
@@ -86,14 +96,17 @@ input, select {
   padding: 20px 0;
   gap: 20px;
   border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
 }
 
+/* ========== Buttons ========== */
 .button-bar {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  max-width: 1100px;
   gap: 12px;
-  margin-top: 20px;
+  margin: auto;
   padding: 10px;
 }
 
@@ -145,6 +158,7 @@ button:hover {
   width: max-content;
 }
 
+/* ========== Kartenanzeige ========== */
 .card-container {
   display: flex;
   flex-wrap: wrap;
@@ -156,21 +170,67 @@ button:hover {
 
 .card {
   background: var(--card-bg);
-  color: var(--text-color); /* ✅ WICHTIG: Jetzt korrekt */
+  color: var(--text-color);
   border-radius: 12px;
   width: 300px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   margin-bottom: 20px;
-  
 }
 
 .card:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
+ .card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  align-items: stretch;
+}
 
+.power-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.power-btn svg {
+  stroke-width: 2;
+}
+
+.power-btn.on {
+  border-color: #2ecc71;      /* grün */
+  color: #2ecc71;
+}
+
+.power-btn.off {
+  border-color: #e74c3c;      /* rot */
+  color: #e74c3c;
+}
+
+.power-btn:hover {
+  background-color: #f5f5f5;
+}
+
+
+
+
+
+/* ========== Dark Mode Toggle ========== */
 .dark-toggle {
   position: fixed;
   top: 10px;
@@ -183,35 +243,149 @@ button:hover {
   cursor: pointer;
 }
 
+/* ========== Sensor Header ========== */
 .sensor-header {
   cursor: pointer;
   padding: 8px;
   border-radius: 5px;
   font-weight: bold;
   border: 1px solid #ccc;
-  background: #e9f5e9;
-  color: #000;
+  background: var(--sensor-header-bg);
+  color: var(--sensor-header-color);
 }
 
 .dark .sensor-header {
-  background: #2e2e2e;
-  color: #fff;
+  background: var(--sensor-header-bg);
+  color: var(--sensor-header-color);
+}
+
+/* Container für alle Karten */
+.card-list {
+  display:  grid;
+  max-width: 1200px;
+  width: 100%;
+  margin:  auto;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* Einzelkarte */
+.card {
+  background: var(--bg, #fff);
+  color: var(--fg, #000);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Regelkarten gezielt */
+.rule-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  background-color: var(--card-bg, white);
+  width: 300px;
+  min-height: 260px;
+  margin: 12px;
+  border-left: 6px solid transparent;
+  transition: transform 0.2s ease;
+}
+
+.rule-card:hover {
+  transform: scale(1.02);
+}
+
+
+/* Titel fett & absetzen */
+.card-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Inhalt strukturieren */
+.card-content {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Footer optisch trennen */
+.card-footer {
+  font-size: 0.85rem;
+  color: #666;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Dark Mode Style (wenn .dark auf html/body gesetzt) */
+html.dark .card {
+  --bg: #1f1f1f;
+  --fg: #e0e0e0;
+  border-color: #388e3c;
+}
+
+
+/* ========== Responsive Design ========== */
+@media (max-width: 1024px) {
+  .form-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
+  .form-container {
+    grid-template-columns: 1fr;
+  }
+
   .card-container {
-    justify-content: center;
+    gap: 40px;
   }
 
   .card {
-    width: 200px;
+    width: 240px;
   }
-}
 
+  .rule-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .button-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .button-bar button {
+    width: 100%;
+  }
+   
+}
 
 @media (max-width: 600px) {
   .card {
     width: 100%;
     margin-bottom: 10px;
   }
+
+  .form-container,
+  .rule-list {
+    padding: 10px;
+  }
+
+  .button-bar {
+    padding: 8px;
+  }
+
 }

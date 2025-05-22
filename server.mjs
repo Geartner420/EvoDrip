@@ -1,27 +1,40 @@
+import logger from './helper/logger.mjs';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+//Setzte dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+//.enc laden
+dotenv.config({ path: path.join(__dirname, '.env') });
+console.log('[DEBUG] DEBUG-Modus ist:', process.env.DEBUG);
+
+
 
 import express from 'express';
-import path from 'path';
 import fs from 'fs';
 import bodyParser from 'body-parser';
 import basicAuth from 'express-basic-auth';
+
 import { fetchMoisture } from './services/fytaservice.mjs';
 import { triggerShelly } from './services/shellyService.mjs';
 import { loadState, saveState } from './services/stateService.mjs';
 import { loadMoistureData, saveMoistureData } from './services/moistureService.mjs';
-import { isNightTime } from './services/timeService.mjs';
 import { checkAndWater } from './services/wateringService.mjs';
+import { isNightTime } from './services/timeService.mjs';
 import { loadRoutes } from './helper/loadRoutes.mjs';
 import { watchEnvAndRestart } from './services/watchEnv.mjs';
 import { buildWateringOptions } from './helper/wateringOptions.mjs';
 import config from './helper/config.mjs';
-import logger from './helper/logger.mjs';
+
 import { cta, getLatestSensorValues } from './services/connectAll.mjs';
 import { startSensorProcessing } from './services/vpdService.mjs';
 import { startRuleEngine } from './services/rule_engine.mjs';
 import { controlRelays } from './services/umluftContol.mjs';
-import { fileURLToPath } from 'url';
 
-// Direkt-Importierte Routen
+// Routen
 import sensorDataRoutes from './routes/sensorDataRoutes.mjs';
 import historyRoute from './routes/historyRoute.mjs';
 import historyViewRoute from './routes/historyView.mjs';
@@ -33,10 +46,9 @@ import relayRulesRoutes from './routes/api/relaysRules.mjs';
 import chartSwitches from './routes/api/chartSwitches.mjs';
 import regelLogRouter from './routes/regelLogRoutes.mjs';
 import envUpdateRoute from './routes/updateRoute.mjs';
-import uiRoutes from './routes/uiRoutes.mjs'; // stellt '/' bereit
+import uiRoutes from './routes/uiRoutes.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+
 
 const {
   UI_USERNAME,
@@ -48,48 +60,40 @@ const {
 async function startServer() {
   const app = express();
 
-  // View Engine + Middleware
+  // ✅ Views absolut setzen
   app.set('view engine', 'ejs');
-  app.set('views', './views');
+  app.set('views', path.join(__dirname, 'views'));
+
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
-  // Statische Dateien
   app.use('/styles', express.static(path.join(__dirname, 'public/styles')));
   app.use('/scripts', express.static(path.join(__dirname, 'public/scripts')));
   app.use(express.static(path.join(__dirname, 'public')));
 
-  // Authentifizierung
   app.use(basicAuth({ users: { [UI_USERNAME]: UI_PASSWORD }, challenge: true }));
 
-  // Einzelne API-Endpunkte
+  // API + UI
   app.use('/sensor-data', sensorDataRoutes);
-  app.use(historyRoute);
-  app.use(historyViewRoute);
+  app.use('/api', chartSwitches);
   app.use('/api/rules', rulesRoutes);
   app.use('/api/relays', relaysRoutes);
   app.use('/api/sensors', sensorsRoutes);
   app.use('/api/sensor-status', sensorStatusRoute);
   app.use('/api/relaysRules', relayRulesRoutes);
-  app.use('/api', chartSwitches);
   app.use('/rulelog', regelLogRouter);
-  app.use('/updateEnv', envUpdateRoute); // POST für /update
+  app.use('/updateEnv', envUpdateRoute);
+  app.use(historyRoute);
+  app.use(historyViewRoute);
+  app.use('/ui', uiRoutes);
 
-  // Relaissteuerung UI
-  app.get('/shelly-control', (req, res) => {
-    res.render('index'); // Steuerelement-UI
-  });
+  app.get('/klima-control', (req, res) => res.render('klimaControl'));
+  app.get('/relay-cycle', (req, res) => res.render('shellyControl'));
+  app.get('/combined-dashboard', (req, res) => res.render('combinedDashboard'));
 
-  app.get('/relay-cycle', (req, res) => {
-    res.render('shellyControl');
-  });
+  // Sensor-Namen
+  const filePath = path.join(__dirname, 'sensor_data', 'sensorNames.json');
 
-  app.get('/combined-dashboard', (req, res) => {
-    res.render('combinedDashboard');
-  });
-
-  // Sensor-Namenszuweisung
-  const filePath = './sensor_data/sensorNames.json';
   app.get('/api/sensor-names', (req, res) => {
     fs.readFile(filePath, (err, data) => {
       if (err) return res.status(500).json({});
@@ -106,7 +110,6 @@ async function startServer() {
     fs.readFile(filePath, (err, data) => {
       const current = err ? {} : JSON.parse(data);
       current[id] = name;
-
       fs.writeFile(filePath, JSON.stringify(current, null, 2), err => {
         if (err) return res.status(500).json({ success: false });
         res.json({ success: true });
@@ -114,20 +117,11 @@ async function startServer() {
     });
   });
 
-
-  // Feuchtigkeitsdaten initial laden
+  // Interne Initialisierung
   let lastTriggerTime = loadState();
   loadMoistureData();
-
-  // Dynamische Routenerkennung
   await loadRoutes(app, path.join(__dirname, 'routes'));
 
-  // Haupt-UI unter /
-  app.use('/ui', uiRoutes);
-    app.get('/', (req, res) => res.redirect('/ui'));
-    
-
-    // Relais-Zyklus starten
   app.post('/start-relay-cycle', async (req, res) => {
     try {
       await controlRelays();
@@ -137,8 +131,6 @@ async function startServer() {
     }
   });
 
-
-  // Automatisierung starten
   global.busy = false;
   const getLastTriggerTime = () => lastTriggerTime;
   const setLastTriggerTime = (ts) => { lastTriggerTime = ts; };
@@ -148,8 +140,7 @@ async function startServer() {
   setInterval(() => checkAndWater(wateringOptions), CHECK_INTERVAL_MINUTES * 60000);
   setInterval(saveMoistureData, MOISTURE_SAVE_INTERVAL_MS);
 
-  // Server starten
-  const PORT = process.env.PORT || 3500;
+  const PORT = process.env.PORT || 3600;
   app.listen(PORT, '0.0.0.0', () =>
     logger.info(`🛜 Interface läuft auf http://localhost:${PORT}`)
   );
@@ -157,7 +148,6 @@ async function startServer() {
   logger.info(`💾 Feuchtigkeitsdaten werden alle ${MOISTURE_SAVE_INTERVAL_MS / 1000} Sekunden gespeichert`);
 }
 
-// Boot
 startServer();
 cta();
 controlRelays();

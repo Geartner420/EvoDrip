@@ -9,106 +9,111 @@
       {
         "param": "humidity",
         "op": ">=",
-        "value": "62",
-        "hysteresis": "3"
+        "value": "55",
+        "hysteresis": "2",
+        "sensor": "sensor_1.json"
       }
-    ]
+    ],
+    "name": "Abluft/ D/ RH 55%",
+    "enabled": true
   },
   {
     "sensor": "sensor_1.json",
     "relay": "Abluft",
-    "action": "off",
-    "activeFrom": "06:00",
-    "activeTo": "18:00",
-    "conditions": [
-      {
-        "param": "humidity",
-        "op": "<=",
-        "value": "58",
-        "hysteresis": "3"
-      }
-    ]
-  },
-  {
-    "sensor": "sensor_2.json",
-    "relay": "Dunstabzug",
     "action": "on",
-    "activeFrom": "06:00",
-    "activeTo": "18:00",
+    "activeFrom": "18:00",
+    "activeTo": "06:00",
     "conditions": [
       {
         "param": "humidity",
-        "op": ">=",
-        "value": "62",
-        "hysteresis": "3"
-      }
-    ]
-  },
-  {
-    "sensor": "sensor_2.json",
-    "relay": "Dunstabzug",
-    "action": "off",
-    "activeFrom": "06:00",
-    "activeTo": "18:00",
-    "conditions": [
-      {
-        "param": "humidity",
-        "op": "<=",
-        "value": "52",
-        "hysteresis": "3"
-      }
-    ]
-  },
-  {
-    "sensor": "sensor_1.json",
-    "relay": "Befeuchter",
-    "action": "on",
-    "activeFrom": "06:00",
-    "activeTo": "18:00",
-    "conditions": [
-      {
-        "param": "vpd",
         "op": ">",
-        "value": "1.2",
-        "hysteresis": "0.05"
+        "value": "40",
+        "hysteresis": "2",
+        "sensor": "sensor_1.json"
       },
       {
-        "param": "humidity",
-        "op": "<=",
-        "value": "58",
-        "hysteresis": "3"
+        "param": "temperature",
+        "op": ">",
+        "value": "16",
+        "hysteresis": "3",
+        "sensor": "sensor_1.json"
       }
-    ]
+    ],
+    "logic": "OR",
+    "enabled": true,
+    "name": "Abluft/ N/ RH 40%/ T 16°"
   },
   {
-    "sensor": "sensor_2.json",
+    "sensor": "sensor_1.json",
     "relay": "Abluft",
     "action": "on",
-    "activeFrom": "18:00",
-    "activeTo": "06:00",
+    "activeFrom": "06:00",
+    "activeTo": "18:00",
+    "conditions": [
+      {
+        "param": "temperature",
+        "op": ">",
+        "value": "22",
+        "hysteresis": "",
+        "sensor": "sensor_1.json"
+      }
+    ],
+    "enabled": true,
+    "name": "Abluft/ D/ T22°"
+  },
+  {
+    "sensor": "sensor_1.json",
+    "relay": "Abluft",
+    "action": "off",
+    "activeFrom": "06:00",
+    "activeTo": "18:00",
     "conditions": [
       {
         "param": "humidity",
-        "op": ">=",
-        "value": "69",
-        "hysteresis": "3"
+        "op": "<=",
+        "value": "48",
+        "hysteresis": "2",
+        "sensor": "sensor_1.json"
       }
-    ]
+    ],
+    "enabled": true,
+    "name": "Abluft/ D/ RH 55%"
   },
   {
-    "sensor": "sensor_2.json",
+    "sensor": "sensor_1.json",
     "relay": "Abluft",
     "action": "off",
     "activeFrom": "18:00",
     "activeTo": "06:00",
     "conditions": [
       {
-        "param": "humidity",
+        "param": "temperature",
         "op": "<=",
-        "value": "54",
-        "hysteresis": "3"
+        "value": "14",
+        "hysteresis": "1",
+        "sensor": "sensor_1.json"
       }
-    ]
+    ],
+    "enabled": true,
+    "name": "Abluft/ N/ RH 40%/ T 16°"
+  },
+  {
+    "sensor": "sensor_1.json",
+    "relay": "Abluft",
+    "action": "off",
+    "activeFrom": "06:00",
+    "activeTo": "18:00",
+    "conditions": [
+      {
+        "param": "temperature",
+        "op": "<=",
+        "value": "20",
+        "hysteresis": "",
+        "sensor": "sensor_1.json"
+      }
+    ],
+    "enabled": true,
+    "name": "Abluft/ D/ T22°"
   },
   {
     "sensor": "sensor_2.json",
@@ -121,9 +126,79 @@
         "param": "humidity",
         "op": ">=",
         "value": "54",
-        "hysteresis": "3"
+        "hysteresis": "3",
+        "sensor": "sensor_2.json"
       }
-    ]
+    ],
+    "enabled": true
+  },
+  {
+    "sensor": "sensor_1.json",
+    "relay": "Dunstabzug",
+    "action": "on",
+    "activeFrom": "06:00",
+    "activeTo": "18:00",
+    "conditions": [
+      {
+        "param": "temperature",
+        "op": ">",
+        "value": "22",
+        "hysteresis": "",
+        "sensor": "sensor_2.json"
+      }
+    ],
+    "enabled": true
+  },
+  {
+    "sensor": "sensor_2.json",
+    "relay": "Dunstabzug",
+    "action": "on",
+    "activeFrom": "06:00",
+    "activeTo": "18:00",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": ">=",
+        "value": "55",
+        "hysteresis": "3",
+        "sensor": "sensor_2.json"
+      }
+    ],
+    "enabled": true
+  },
+  {
+    "sensor": "sensor_2.json",
+    "relay": "Dunstabzug",
+    "action": "off",
+    "activeFrom": "06:00",
+    "activeTo": "18:00",
+    "conditions": [
+      {
+        "param": "humidity",
+        "op": "<=",
+        "value": "48",
+        "hysteresis": "3",
+        "sensor": "sensor_2.json"
+      }
+    ],
+    "enabled": true
+  },
+  {
+    "sensor": "sensor_1.json",
+    "relay": "Dunstabzug",
+    "action": "off",
+    "activeFrom": "06:00",
+    "activeTo": "18:00",
+    "conditions": [
+      {
+        "param": "temperature",
+        "op": "<",
+        "value": "20",
+        "hysteresis": "",
+        "sensor": "sensor_2.json"
+      }
+    ],
+    "enabled": true
   },
   {
     "sensor": "sensor_2.json",
@@ -136,75 +211,10 @@
         "param": "humidity",
         "op": "<=",
         "value": "51",
-        "hysteresis": "3"
-      }
-    ]
-  },
-  {
-    "sensor": "sensor_1.json",
-    "relay": "Abluft",
-    "action": "on",
-    "activeFrom": "18:00",
-    "activeTo": "06:00",
-    "conditions": [
-      {
-        "param": "humidity",
-        "op": ">",
-        "value": "59",
-        "hysteresis": "2"
-      },
-      {
-        "param": "temperature",
-        "op": ">",
-        "value": "22",
-        "hysteresis": "3"
+        "hysteresis": "3",
+        "sensor": "sensor_2.json"
       }
     ],
-    "logic": "OR"
-  },
-  {
-    "sensor": "sensor_2.json",
-    "relay": "Abluft",
-    "action": "on",
-    "activeFrom": "06:00",
-    "activeTo": "18:00",
-    "conditions": [
-      {
-        "param": "temperature",
-        "op": ">=",
-        "value": "25.5",
-        "hysteresis": "2"
-      }
-    ]
-  },
-  {
-    "sensor": "sensor_2.json",
-    "relay": "Abluft",
-    "action": "off",
-    "activeFrom": "06:00",
-    "activeTo": "18:00",
-    "conditions": [
-      {
-        "param": "temperature",
-        "op": "<=",
-        "value": "23",
-        "hysteresis": "1"
-      }
-    ]
-  },
-  {
-    "sensor": "sensor_3.json",
-    "relay": "Befeuchter",
-    "action": "off",
-    "activeFrom": "06:00",
-    "activeTo": "18:00",
-    "conditions": [
-      {
-        "param": "humidity",
-        "op": ">=",
-        "value": "68",
-        "hysteresis": "1"
-      }
-    ]
+    "enabled": true
   }
 ]

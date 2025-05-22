@@ -14,7 +14,23 @@
   <div class="container">
     <h1>📈 TP357S Sensor Dashboard</h1>
     <div id="updateTime"></div>
-    <div id="tabsContainer" class="tabs"></div>
+    <div id="tabsContainer" class="tabs">
+  </div>
+
+    <div style="text-align: center; margin: 10px 0;">
+      <label for="dataLimitSelect">Anzahl Datenpunkte:</label>
+      <select id="dataLimitSelect">
+      <option value="10">10</option>
+      <option value="100">100</option>	
+      <option value="200">200</option>
+      <option value="300">300</option>
+      <option value="500">500</option>
+      <option value="1000" selected>1000</option>
+      <option value="3000">3000</option>
+      <option value="10000">10000</option>
+      </select>
+  </div>
+
     <div id="chartsContainer"></div>
   </div>
 
@@ -37,24 +53,25 @@
         .catch(err => console.error('Fehler beim Abrufen der Namen:', err));
     }
 
-    function fetchSensorData() {
-      fetch('/api/sensordata')
-        .then(res => res.json())
-        .then(data => {
-          sensorData = data;
-          const ids = Object.keys(data);
-          if (!selectedSensorId || !sensorData[selectedSensorId]) {
-            selectedSensorId = ids[0];
-          }
-          if (!tabsContainer.hasChildNodes()) {
-            createEditableTabs(ids);
-          }
-          highlightActiveTab();
-          drawCharts(sensorData[selectedSensorId], selectedSensorId);
-          updateTime.textContent = `Letzte Aktualisierung: ${new Date().toLocaleTimeString()}`;
-        })
-        .catch(err => console.error('Fehler beim Laden:', err));
-    }
+function fetchSensorData(limit = 100) {
+  fetch(`/api/sensordata?limit=${limit}`)
+    .then(res => res.json())
+    .then(data => {
+      sensorData = data;
+      const ids = Object.keys(data);
+      if (!selectedSensorId || !sensorData[selectedSensorId]) {
+        selectedSensorId = ids[0];
+      }
+      if (!tabsContainer.hasChildNodes()) {
+        createEditableTabs(ids);
+      }
+      highlightActiveTab();
+      drawCharts(sensorData[selectedSensorId], selectedSensorId);
+      updateTime.textContent = `Letzte Aktualisierung: ${new Date().toLocaleTimeString()}`;
+    })
+    .catch(err => console.error('Fehler beim Laden:', err));
+}
+
 
     function createEditableTabs(sensorIds) {
       tabsContainer.innerHTML = '';
@@ -185,11 +202,11 @@
               VPD: <strong>–</strong>
             </div>
           </div>
-          <div class="chart-container">
+          <div class="chart-container-sensor">
             <h3>🌡️ Temperatur-Verlauf – ${sensorNames[sensorId] || `Sensor ${sensorId}`}</h3>
             <div id="tempChart" data-sensor-id="${sensorId}"></div>
           </div>
-          <div class="chart-container">
+          <div class="chart-container-sensor">
             <h3>💧 Feuchtigkeits-Verlauf – ${sensorNames[sensorId] || `Sensor ${sensorId}`}</h3>
             <div id="humChart"></div>
           </div>
@@ -222,7 +239,7 @@
           yref: 'y', y0: 0, y1: 40,
           fillcolor: bgColor, line: { width: 0 }
         }],
-        margin: { t: 20, r: 20, b: 60, l: 60 }
+        margin: { t: 20, r: 20, b: 60, l: 60, b: 100 }
       });
 
       Plotly.react("humChart", [{
@@ -241,7 +258,7 @@
           yref: 'y', y0: 0, y1: 100,
           fillcolor: bgColor, line: { width: 0 }
         }],
-        margin: { t: 20, r: 20, b: 60, l: 60 }
+        margin: { t: 20, r: 20, b: 60, l: 60, b: 100 }
       });
     }
 
@@ -251,9 +268,17 @@
       return parseFloat((es - ea).toFixed(2));
     }
 
+    let currentLimit = 100;
+
+    document.getElementById('dataLimitSelect').addEventListener('change', (e) => {
+      currentLimit = parseInt(e.target.value);
+      fetchSensorData(currentLimit);
+    });
+
+    // Initialer Aufruf
     fetchSensorNames();
-    fetchSensorData();
-    setInterval(fetchSensorData, 10000);
+    fetchSensorData(currentLimit);
+  
   </script>
     <div class="button-bar">
       <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
@@ -262,9 +287,10 @@
       <button type="button" onclick="location.href='/system-status'">🩺 System-Status</button>
       <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
       <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
-      <button type="button" onclick="location.href='/shelly-control'">🌱 Klima-Automatisierung</button>
+      <button type="button" onclick="location.href='/klima-control'">🌱 Klima-Automatisierung</button>
       <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
       <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
+      <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
       <button type="button" onclick="location.href='/ui'">Zur Übersicht</button>
     </div>
   </body>
