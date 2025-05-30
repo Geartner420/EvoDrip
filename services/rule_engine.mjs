@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
 import { ruleEngineLogger as logger } from '../helper/logger.mjs';
 
-// Basisverzeichnisse und Pfade zu JSON-Dateien
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(__dirname, '../sensor_data');
 
@@ -22,13 +21,23 @@ const operatorMap = {
   '==': 'gleich'
 };
 
-function loadJson(filePath) {
-  if (!fs.existsSync(filePath)) return [];
+// 🔁 JSON-Caching
+const cache = {};
+function loadJsonCached(filePath) {
   try {
+    const stats = fs.statSync(filePath);
+    const mtime = stats.mtimeMs;
+
+    if (cache[filePath] && cache[filePath].mtime === mtime) {
+      return cache[filePath].data;
+    }
+
     const content = fs.readFileSync(filePath, 'utf-8');
-    return JSON.parse(content);
+    const data = JSON.parse(content);
+    cache[filePath] = { data, mtime };
+    return data;
   } catch (err) {
-    logger.error(`[rule_engine] Fehler beim Lesen von ${filePath}: ${err.message}`);
+    logger.error(`[rule_engine] Fehler beim Caching von ${filePath}: ${err.message}`);
     return [];
   }
 }
@@ -54,6 +63,7 @@ function saveRelayLogEntry(entry) {
     logger.error(`[rule_engine] Fehler beim Schreiben von relay_log.json: ${err.message}`);
   }
 }
+
 async function fetchWithTimeout(url, timeout = 5000) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
@@ -112,6 +122,7 @@ function isWithinTimeWindow(startTime, endTime) {
   logger.debug(`[zeitfenster] ${startTime}–${endTime} | now=${now.getHours()}:${now.getMinutes()} → ${inWindow}`);
   return inWindow;
 }
+
 function evaluateCondition(sensorData, { param, op, value, hysteresis }, currentState) {
   const actual = sensorData?.[param];
   const expected = parseFloat(value);
@@ -128,10 +139,11 @@ function evaluateCondition(sensorData, { param, op, value, hysteresis }, current
     default:   return false;
   }
 }
+
 async function runRuleEngine() {
-  const rules = loadJson(rulesFile);
-  const relays = loadJson(relaysFile);
-  const sensors = loadJson(sensorFile);
+  const rules = loadJsonCached(rulesFile);
+  const relays = loadJsonCached(relaysFile);
+  const sensors = loadJsonCached(sensorFile);
 
   const relayMap = Object.fromEntries(relays.map(r => [r.name, r.ip]));
   const sensorMap = Object.fromEntries(
@@ -142,13 +154,8 @@ async function runRuleEngine() {
   let switched = 0;
   const pendingStates = {};
 
- for (const rule of rules) {
-  // Standardmäßig ist eine Regel aktiviert, wenn 'enabled' fehlt oder true ist
-  const isEnabled = rule.enabled !== false;
-  if (!isEnabled) {
-    logger.debug(`[rule_engine] ⏸️ Regel "${rule.name || '(ohne Namen)'}" deaktiviert – wird übersprungen`);
-    continue;
-  }
+  for (const rule of rules) {
+    if (rule.enabled === false) continue;
     const logic = (rule.logic || 'AND').toUpperCase();
     const relayNames = Array.isArray(rule.relays) ? rule.relays : [rule.relay];
     const inTimeWindow = isWithinTimeWindow(rule.activeFrom, rule.activeTo);
@@ -156,14 +163,14 @@ async function runRuleEngine() {
     const conditionResults = rule.conditions.map(cond => {
       const sensorData = sensorMap[cond.sensor];
       const actual = sensorData?.[cond.param];
-      const passed = evaluateCondition(sensorData, cond, 'off'); // pauschal off, Details später
+      const passed = evaluateCondition(sensorData, cond, 'off');
       const hStr = cond.hysteresis ? ` ±${cond.hysteresis}` : '';
       const label = cond.param === 'temperature' ? '🌡' :
                     cond.param === 'humidity' ? '💧' :
                     cond.param === 'vpd' ? '📈' : '📊';
       const opText = operatorMap[cond.op] || cond.op;
       const desc = `${label} ${cond.param} ${opText} ${cond.value}${hStr} @${cond.sensor} → aktuell: ${actual}`;
-      return { passed, desc, cond };
+      return { passed, desc };
     });
 
     const conditionsPassed = logic === 'OR'
@@ -173,15 +180,11 @@ async function runRuleEngine() {
     const shouldActivate = inTimeWindow && conditionsPassed;
     checked++;
 
-    if (!shouldActivate) {
-      const reason = !inTimeWindow ? '⏰ Zeitfenster ungültig' : '❌ Bedingungen nicht erfüllt';
-      logger.debug(`[rule_engine] Regel [${relayNames.join(', ')}] (${rule.action}) übersprungen – ${reason}`);
-      continue;
-    }
+    if (!shouldActivate) continue;
 
     for (const relayName of relayNames) {
       const already = pendingStates[relayName];
-      if (already?.action === 'on') continue; // "on" hat Vorrang
+      if (already?.action === 'on') continue;
       if (rule.action === 'on' || !already) {
         pendingStates[relayName] = {
           rule,
@@ -191,27 +194,18 @@ async function runRuleEngine() {
       }
     }
   }
-  // Relais schalten
+
   for (const [relayName, { rule, action, desc }] of Object.entries(pendingStates)) {
     const ip = relayMap[relayName];
-    if (!ip) {
-      logger.warn(`[rule_engine] ⚠️ Keine IP für Relais "${relayName}".`);
-      continue;
-    }
+    if (!ip) continue;
 
     const actualState = await getRelayState(ip);
-    if (actualState === action) {
-      logger.debug(`[rule_engine] ${relayName} ist laut Shelly bereits ${action.toUpperCase()} – kein neuer Befehl`);
-      continue;
-    }
+    if (actualState === action) continue;
 
     const url = getShellyUrl(ip, action);
-    const emoji = action === 'on' ? '🟢' : '🔴';
-
-    logger.debug(`[rule_engine] Regel ${relayName} wird jetzt geschaltet – Zeitfenster gültig`);
     try {
       await safeSwitch(url);
-      logger.info(`${emoji} ${relayName} → ${desc}`);
+      logger.info(`${action === 'on' ? '🟢' : '🔴'} ${relayName} → ${desc}`);
       saveRelayLogEntry({
         timestamp: new Date().toISOString(),
         relay: relayName,
@@ -228,20 +222,24 @@ async function runRuleEngine() {
     }
   }
 
-  if (logger.isDebugEnabled()) {
-    logger.debug(`[rule_engine] ✅ ${checked} Regeln geprüft, ${switched} geschaltet`);
-  }
+  const usedMB = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
+  logger.debug(`[rule_engine] ✅ ${checked} Regeln geprüft, ${switched} geschaltet | RAM: ${usedMB} MB`);
 }
+
+// ▶️ Sichere Initialisierung
+let intervalRef = null;
 let tick = 0;
 function runRuleEngineSafe() {
   logger.debug(`⏲ Tick ${++tick}`);
-  runRuleEngine().catch(err =>
-    logger.error(`❌ Ungefangener Fehler: ${err.message}`)
-  );
+  runRuleEngine().catch(err => logger.error(`❌ Ungefangener Fehler: ${err.message}`));
 }
 
 export function startRuleEngine() {
-  logger.info('🚀 Regel-Engine gestartet (alle 5s)');
+  if (intervalRef) {
+    clearInterval(intervalRef);
+    logger.warn('[rule_engine] Vorheriges Intervall gestoppt (Restart)');
+  }
+  logger.info('🚀 Regel-Engine gestartet (alle 5 s)');
   runRuleEngineSafe();
-  setInterval(runRuleEngineSafe, 5000);
+  intervalRef = setInterval(runRuleEngineSafe, 5000);
 }

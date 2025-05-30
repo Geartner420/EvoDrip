@@ -106,9 +106,13 @@
       result.splice(endIndex, 0, removed);
       return result;
     }
-function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap, sensors }) {
+function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap, sensors, relays, }) {
   const [editMode, setEditMode] = useState(false);
-  const [editRule, setEditRule] = useState(r);
+  const [editRule, setEditRule] = useState({
+    ...r,
+    action: r.action || 'on' // oder 'off', je nach Default
+  });
+
   const [originalRule] = useState(() => structuredClone(r));
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
@@ -166,7 +170,26 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
             onChange={e => setEditRule({ ...editRule, name: e.target.value })}
           />
         )}
-        <div className="subinfo">Relais: {displayRelays}</div>
+        {!editMode ? (
+          <div className="subinfo">Relais: {displayRelays}</div>
+        ) : (
+          <label>
+            Relais:
+            <select
+              multiple
+              value={editRule.relays || []}
+              onChange={(e) => {
+                const selected = Array.from(e.target.selectedOptions).map(o => o.value);
+                setEditRule({ ...editRule, relays: selected });
+              }}
+            >
+              {relays.map(r => (
+                <option key={r.name} value={r.name}>{r.name}</option>
+              ))}
+            </select>
+          </label>
+        )}
+
       </div>
 
       <div className="card-content">
@@ -312,7 +335,7 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
       const [newRule, setNewRule] = useState({
         name: '',
         relays: [],
-        action: '',
+        action: 'on',
         activeFrom: '',
         activeTo: '',
         conditions: [{ sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }]
@@ -400,6 +423,7 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
                               onUpdate={updateRuleInUI}
                               sensorNameMap={sensorNameMap}
                               sensors={sensors}
+                              relays={relays}
                             />
                           </div>
                         )}

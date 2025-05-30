@@ -13,6 +13,7 @@ const DATA_DIR = path.join(__dirname, '../sensor_data');
 const OFFLINE_TIMEOUT_MS = 4 * 60 * 60 * 1000; // 4 Stunden
 const OFFLINE_CHECK_INTERVAL_MS = 10 * 60 * 1000; // 10 Minuten
 const WRITE_THROTTLE_MS = 20_000;
+const MAX_SENSOR_CACHE = 500;  // max Anzahl Sensorspeicher
 
 let noble;
 const offlineNotified = new Set();
@@ -124,6 +125,11 @@ setInterval(checkForOfflineSensors, OFFLINE_CHECK_INTERVAL_MS);
 // ================== Main BLE Init ===================
 export async function cta() {
   loadSensorIdMapping();
+    if (global.bleStarted) {
+    logger.info('[BLE] Schon aktiv – kein erneuter Start');
+    return;
+  }
+  global.bleStarted = true;
 
   try {
     if (os.platform() === 'darwin') {
@@ -162,6 +168,14 @@ export async function cta() {
     const decoded = decodeAdvertisement(manufacturerData);
     if (!decoded) return;
 
+        // Speicherbegrenzung
+    if (latestValues.size >= MAX_SENSOR_CACHE) {
+      const oldest = latestValues.keys().next().value;
+      latestValues.delete(oldest);
+      lastUpdateTime.delete(oldest);
+      offlineNotified.delete(oldest);
+    }
+
     latestValues.set(sensorId, decoded);
 
     logger.debug(`📡 [Sensor ${sensorId}] ${decoded.timestamp} 🌡️ ${decoded.temperature} °C | 💧 ${decoded.humidity} %`);
@@ -194,4 +208,8 @@ export function getLatestSensorValues() {
 }
 export { loadSensorIdMapping, saveSensorIdMapping };
 
-//Test
+// ================== Speicherdiagnose alle 10 Min ===================
+setInterval(() => {
+  const mb = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
+  logger.info(`[MEM] Heap-Nutzung: ${mb} MB`);
+}, 600_000);

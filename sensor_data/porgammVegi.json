@@ -1,0 +1,129 @@
+[
+  {
+    "name": "RH 80%/ D-N/ ON",
+    "relays": [
+      "Abluft"
+    ],
+    "action": "on",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "sensor": "sensor_1.json",
+        "param": "humidity",
+        "op": ">",
+        "value": "82",
+        "hysteresis": "2"
+      }
+    ]
+  },
+  {
+    "name": "T 30°/ D-N/ ON",
+    "relays": [
+      "Abluft"
+    ],
+    "action": "on",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "sensor": "sensor_2.json",
+        "param": "temperature",
+        "op": ">",
+        "value": "30",
+        "hysteresis": "2"
+      }
+    ]
+  },
+  {
+    "name": "RH 78%/ D-N/ ON",
+    "relays": [
+      "Dunstabzug"
+    ],
+    "action": "on",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "sensor": "sensor_1.json",
+        "param": "humidity",
+        "op": ">",
+        "value": "78",
+        "hysteresis": "2"
+      }
+    ]
+  },
+  {
+    "name": "RH 80%/ D-N/ OFF",
+    "relays": [
+      "Abluft",
+      "Dunstabzug"
+    ],
+    "action": "off",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "sensor": "sensor_1.json",
+        "param": "humidity",
+        "op": "<",
+        "value": "78",
+        "hysteresis": "2"
+      }
+    ]
+  },
+  {
+    "name": "T 30°/ D-N/ OFF",
+    "relays": [
+      "Abluft"
+    ],
+    "action": "off",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "sensor": "sensor_2.json",
+        "param": "temperature",
+        "op": "<",
+        "value": "28",
+        "hysteresis": "2"
+      }
+    ]
+  },
+  {
+    "name": "Hum 78%/ ON ",
+    "relays": [
+      "Befeuchter"
+    ],
+    "action": "on",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "sensor": "sensor_1.json",
+        "param": "humidity",
+        "op": "<",
+        "value": "76",
+        "hysteresis": ""
+      }
+    ]
+  },
+  {
+    "name": "Hum 78%/ OFF",
+    "relays": [
+      "Befeuchter"
+    ],
+    "action": "off",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "sensor": "sensor_1.json",
+        "param": "humidity",
+        "op": ">",
+        "value": "79",
+        "hysteresis": ""
+      }
+    ]
+  }
+]

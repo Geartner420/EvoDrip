@@ -1,32 +1,32 @@
 [
   {
-    "temperature": 20.9,
-    "humidity": 38,
-    "timestamp": "2025-05-22T22:22:38.055Z",
+    "temperature": 27.7,
+    "humidity": 71,
+    "timestamp": "2025-05-30T07:28:51.677Z",
     "sensor": "sensor_1.json",
-    "vpd": 1.5,
-    "leaf_vpd": 1.3,
-    "dew_point": 6.04,
-    "absolute_humidity": 6.9
+    "vpd": 1.1,
+    "leaf_vpd": 0.9,
+    "dew_point": 21.95,
+    "absolute_humidity": 18.95
   },
   {
-    "temperature": 20.8,
-    "humidity": 39,
-    "timestamp": "2025-05-22T22:22:38.072Z",
+    "temperature": 29.9,
+    "humidity": 66,
+    "timestamp": "2025-05-30T07:28:51.681Z",
     "sensor": "sensor_2.json",
-    "vpd": 1.5,
-    "leaf_vpd": 1.3,
-    "dew_point": 6.33,
-    "absolute_humidity": 7.05
+    "vpd": 1.4,
+    "leaf_vpd": 1.2,
+    "dew_point": 22.84,
+    "absolute_humidity": 19.87
   },
   {
-    "temperature": 20.3,
-    "humidity": 37,
-    "timestamp": "2025-05-22T22:22:38.088Z",
+    "temperature": 27.9,
+    "humidity": 71,
+    "timestamp": "2025-05-30T07:28:51.684Z",
     "sensor": "sensor_3.json",
-    "vpd": 1.5,
-    "leaf_vpd": 1.3,
-    "dew_point": 5.13,
-    "absolute_humidity": 6.49
+    "vpd": 1.1,
+    "leaf_vpd": 0.9,
+    "dew_point": 22.14,
+    "absolute_humidity": 19.16
   }
 ]

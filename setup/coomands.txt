@@ -63,3 +63,15 @@ sudo systemctl enable evodrip.service
 sudo systemctl start evodrip.service
 sudo systemctl status evodrip.service
 journalctl -u evodrip.service -f
+
+
+
+
+pm2 commands
+
+pm2 logs evo-server         # Live Logs
+pm2 restart evo-server      # Manuell neustarten
+pm2 stop evo-server         # Stoppen
+pm2 delete evo-server       # Entfernen
+pm2 save                    # Save Setup für Autostart
+pm2 startup                 # Autostart beim Boot konfigurieren

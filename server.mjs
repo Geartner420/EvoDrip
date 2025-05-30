@@ -25,14 +25,16 @@ import { loadMoistureData, saveMoistureData } from './services/moistureService.m
 import { checkAndWater } from './services/wateringService.mjs';
 import { isNightTime } from './services/timeService.mjs';
 import { loadRoutes } from './helper/loadRoutes.mjs';
-import { watchEnvAndRestart } from './services/watchEnv.mjs';
 import { buildWateringOptions } from './helper/wateringOptions.mjs';
 import config from './helper/config.mjs';
 
-import { cta, getLatestSensorValues } from './services/connectAll.mjs';
+import { cta } from './services/connectAll.mjs';
 import { startSensorProcessing } from './services/vpdService.mjs';
 import { startRuleEngine } from './services/rule_engine.mjs';
 import { controlRelays } from './services/umluftContol.mjs';
+import os from 'os';
+import { spawn } from 'child_process';
+
 
 // Routen
 import sensorDataRoutes from './routes/sensorDataRoutes.mjs';
@@ -56,6 +58,18 @@ const {
   CHECK_INTERVAL_MINUTES,
   MOISTURE_SAVE_INTERVAL_MS
 } = config;
+function keepAwake() {
+  if (os.platform() !== 'win32') return;
+
+  try {
+    spawn('powercfg', ['/requestsoverride', 'PROCESS', 'node.exe', 'SYSTEM', 'DISPLAY'], {
+      stdio: 'ignore'
+    });
+    logger.info('💡 Energiesparmodus blockiert (Windows)');
+  } catch (err) {
+    logger.warn('⚠️ Konnte Sleep-Block nicht setzen:', err.message);
+  }
+}
 
 async function startServer() {
   const app = express();
@@ -148,10 +162,23 @@ async function startServer() {
   logger.info(`💾 Feuchtigkeitsdaten werden alle ${MOISTURE_SAVE_INTERVAL_MS / 1000} Sekunden gespeichert`);
 }
 
-startServer();
-cta();
-controlRelays();
-getLatestSensorValues();
-startSensorProcessing();
-startRuleEngine();
-watchEnvAndRestart();
+async function main() {
+  try {
+    await startServer();            // erst Express starten
+    keepAwake();                    // dann Sleep blockieren
+    cta();                          // dann BLE
+    startSensorProcessing();        // dann VPD etc
+    startRuleEngine();
+    if (!global.umluftStarted) {
+      controlRelays();
+      global.umluftStarted = true;
+      logger.info('[umluft] Umluftsteuerung beim Start aktiviert');
+    }
+  } catch (err) {
+    logger.error('❌ Fehler beim Start des Servers:', err);
+    process.exit(1); // wichtiger! Sonst hängt PM2 im "online"-Zustand
+  }
+}
+
+main();
+

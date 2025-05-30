@@ -1,12 +1,4 @@
-// watchEnvStandalone.mjs
-// -----------------------------------------
-// Läuft ohne Windows-Dienst oder Task-Scheduler.
-// Überwacht die .env-Datei des Projekts und startet
-// sich selbst neu, sobald sich ihr Inhalt ändert.
-// Optional kann der Sleep-Modus unter Windows
-// blockiert werden (siehe keepAwake()).
-//
-//   Start:  node ./watchEnvStandalone.mjs
+// watchEnv.mjs
 // -----------------------------------------
 
 import fs from 'fs';
@@ -68,7 +60,7 @@ export function watchEnvAndRestart () {
 // ------------------------------------------------------------
 function restartSelf () {
   const node   = process.argv[0];      // Pfad zu node.exe
-  const script = process.argv[1];      // dieses File
+  const script = path.join(__dirname, '../server.mjs');  // immer den Server starten
   const args   = process.argv.slice(2);// zusätzliche CLI-Argumente übernehmen
 
   logger.info(`[watchEnv] 🔄 Starte neu: ${node} ${[script, ...args].join(' ')}`);
@@ -103,6 +95,5 @@ function keepAwake () {
 //   Einstiegspunkt
 // ------------------------------------------------------------
 keepAwake();
-watchEnvAndRestart();
 
 logger.info('[watchEnv] ✅ Watcher gestartet.');

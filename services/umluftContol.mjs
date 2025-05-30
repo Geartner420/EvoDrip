@@ -178,7 +178,13 @@ async function switchAllRelays(on, duration = 4 * 60_000) {
 // Steuerung starten / stoppen
 // ----------------------------------------------
 export async function startControl() {
-  if (abortCtrl?.signal && !abortCtrl.signal.aborted) return;   // läuft bereits
+  if (global.umluftStarted) {
+    logger.info('[umluft] Steuerung bereits aktiv (global flag) – kein Neustart');
+    return;
+  }
+  if (abortCtrl?.signal && !abortCtrl.signal.aborted) return;
+  global.umluftStarted = true;
+
   abortCtrl = new AbortController();
   simultaneouslyCycleInterval = getRandomInt(DEFAULT_SIMULT_MIN, DEFAULT_SIMULT_MAX);
 
@@ -190,6 +196,7 @@ export async function startControl() {
 
   logger.info('🚀 Umluftsteuerung gestartet.');
 }
+
 
 async function stopControl() {
   abortCtrl?.abort();
