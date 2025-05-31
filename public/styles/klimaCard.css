@@ -189,5 +189,7 @@ button.edit-btn:hover {
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
+
+

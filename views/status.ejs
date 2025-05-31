@@ -195,6 +195,7 @@ button, form.button, .button {
             <div class="card-title">${name}</div>
             <div class="card-value">🌡️ ${data.temperature} °C</div>
             <div class="card-value">💧 ${data.humidity} %</div>
+            <div class="card-value"> 💨 VPD: ${calcVPD(data.temperature, data.humidity)} kPa</div>
             <div class="card-value">🕛 ${new Date(data.timestamp).toLocaleString('de-DE')}</div>
           `;
           container.appendChild(card);
@@ -207,6 +208,12 @@ button, form.button, .button {
 
     fetchSensorData();
     setInterval(fetchSensorData, 10000);
+
+        function calcVPD(tempC, rh) {
+      const es = 0.6108 * Math.exp((17.27 * tempC) / (tempC + 237.3));
+      const ea = es * (rh / 100);
+      return parseFloat((es - ea).toFixed(2));
+    }
   </script>
     <div class="button-bar">
       <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>

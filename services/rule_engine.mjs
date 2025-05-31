@@ -140,6 +140,51 @@ function evaluateCondition(sensorData, { param, op, value, hysteresis }, current
   }
 }
 
+function formatConditionGroup(groups) {
+  return groups
+    .map(group => {
+      const inner = group
+        .map(cond => {
+          const label = cond.param === 'temperature' ? '🌡' :
+                        cond.param === 'humidity' ? '💧' :
+                        cond.param === 'vpd' ? '📈' : '📊';
+          const op = cond.op;
+          const val = cond.value;
+          const src = cond.sensor || '?';
+          return `${label} ${cond.param} ${op} ${val} @${src}`;
+        })
+        .join(' AND ');
+      return `(${inner})`;
+    })
+    .join(' OR ');
+}
+
+// 👇 ersetzt groupConditions()
+function groupConditions(conditions, fallback = 'AND') {
+  const groups = [];
+  let currentGroup = [];
+
+  for (let i = 0; i < conditions.length; i++) {
+    const cond = { ...conditions[i] };
+    const prevLogic = i > 0 ? (conditions[i - 1].logic || fallback).toUpperCase() : fallback;
+
+    if (i > 0 && prevLogic === 'OR') {
+      groups.push(currentGroup);
+      currentGroup = [cond];
+    } else {
+      currentGroup.push(cond);
+    }
+  }
+
+  if (currentGroup.length) {
+    groups.push(currentGroup);
+  }
+
+  return groups;
+}
+
+
+
 async function runRuleEngine() {
   const rules = loadJsonCached(rulesFile);
   const relays = loadJsonCached(relaysFile);
@@ -154,46 +199,71 @@ async function runRuleEngine() {
   let switched = 0;
   const pendingStates = {};
 
-  for (const rule of rules) {
-    if (rule.enabled === false) continue;
-    const logic = (rule.logic || 'AND').toUpperCase();
-    const relayNames = Array.isArray(rule.relays) ? rule.relays : [rule.relay];
-    const inTimeWindow = isWithinTimeWindow(rule.activeFrom, rule.activeTo);
+for (const rule of rules) {
+  const ruleName = rule.name || '🛠 Unbenannte Regel';
 
-    const conditionResults = rule.conditions.map(cond => {
-      const sensorData = sensorMap[cond.sensor];
-      const actual = sensorData?.[cond.param];
-      const passed = evaluateCondition(sensorData, cond, 'off');
-      const hStr = cond.hysteresis ? ` ±${cond.hysteresis}` : '';
-      const label = cond.param === 'temperature' ? '🌡' :
-                    cond.param === 'humidity' ? '💧' :
-                    cond.param === 'vpd' ? '📈' : '📊';
-      const opText = operatorMap[cond.op] || cond.op;
-      const desc = `${label} ${cond.param} ${opText} ${cond.value}${hStr} @${cond.sensor} → aktuell: ${actual}`;
-      return { passed, desc };
-    });
+  if (rule.enabled === false) {
+    logger.debug(`[skip] ❎ ${ruleName} → deaktiviert`);
+    continue;
+  }
 
-    const conditionsPassed = logic === 'OR'
-      ? conditionResults.some(r => r.passed)
-      : conditionResults.every(r => r.passed);
+  const relayNames = Array.isArray(rule.relays) ? rule.relays : [rule.relay];
+  const inTimeWindow = isWithinTimeWindow(rule.activeFrom, rule.activeTo);
 
-    const shouldActivate = inTimeWindow && conditionsPassed;
-    checked++;
+  if (!inTimeWindow) {
+    logger.debug(`[skip] 🕛 ${ruleName} → außerhalb Zeitfenster ${rule.activeFrom}-${rule.activeTo}`);
+    continue;
+  }
 
-    if (!shouldActivate) continue;
+  const fallbackLogic = (rule.logic || 'AND').toUpperCase();
+  const groupedConditions = groupConditions(rule.conditions, fallbackLogic);
+  logger.debug(`📐 Bedingungslogik für "${ruleName}": ${formatConditionGroup(groupedConditions)}`);
 
-    for (const relayName of relayNames) {
-      const already = pendingStates[relayName];
-      if (already?.action === 'on') continue;
-      if (rule.action === 'on' || !already) {
-        pendingStates[relayName] = {
-          rule,
-          action: rule.action,
-          desc: conditionResults.filter(r => r.passed).map(r => r.desc).join(logic === 'OR' ? ' ODER ' : ' UND ')
-        };
-      }
+
+  const groupResults = groupedConditions.map((group, i) => {
+    const result = group.every(cond => evaluateCondition(sensorMap[cond.sensor], cond, 'off'));
+    logger.debug(`🔍 Gruppe ${i + 1} von ${ruleName} → ${result ? '✅ erfüllt' : '❌ nicht erfüllt'}`);
+    return result;
+  });
+
+  const shouldActivate = inTimeWindow && groupResults.some(result => result);
+  checked++;
+
+  if (!shouldActivate) {
+    logger.debug(`[skip] 🚫 ${ruleName} → Keine Gruppe erfüllt (${groupResults.length} Gruppen)`);
+    continue;
+  }
+
+  logger.debug(` [Schaltung]🔥 ${ruleName} → Zeit ok, Gruppe erfüllt → Schalte: ${rule.action.toUpperCase()}`);
+
+  const passedConditionsFlat = groupedConditions
+    .flat()
+    .filter(cond => evaluateCondition(sensorMap[cond.sensor], cond, 'off'));
+
+  const descList = passedConditionsFlat.map(cond => {
+    const sensorData = sensorMap[cond.sensor];
+    const actual = sensorData?.[cond.param];
+    const hStr = cond.hysteresis ? ` ±${cond.hysteresis}` : '';
+    const label = cond.param === 'temperature' ? '🌡' :
+                  cond.param === 'humidity' ? '💧' :
+                  cond.param === 'vpd' ? '📈' : '📊';
+    const opText = operatorMap[cond.op] || cond.op;
+    return `${label} ${cond.param} ${opText} ${cond.value}${hStr} @${cond.sensor} → aktuell: ${actual}`;
+  });
+
+  for (const relayName of relayNames) {
+    const already = pendingStates[relayName];
+    if (already?.action === 'on') continue;
+    if (rule.action === 'on' || !already) {
+      pendingStates[relayName] = {
+        rule,
+        action: rule.action,
+        desc: descList.join(' UND/ODER ')
+      };
     }
   }
+}
+
 
   for (const [relayName, { rule, action, desc }] of Object.entries(pendingStates)) {
     const ip = relayMap[relayName];
@@ -226,7 +296,6 @@ async function runRuleEngine() {
   logger.debug(`[rule_engine] ✅ ${checked} Regeln geprüft, ${switched} geschaltet | RAM: ${usedMB} MB`);
 }
 
-// ▶️ Sichere Initialisierung
 let intervalRef = null;
 let tick = 0;
 function runRuleEngineSafe() {

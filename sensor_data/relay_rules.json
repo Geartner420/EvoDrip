@@ -13,7 +13,8 @@
         "param": "humidity",
         "op": ">",
         "value": "82",
-        "hysteresis": "2"
+        "hysteresis": "2",
+        "logic": "AND"
       }
     ]
   },
@@ -31,7 +32,8 @@
         "param": "humidity",
         "op": ">",
         "value": "78",
-        "hysteresis": "2"
+        "hysteresis": "2",
+        "logic": "AND"
       }
     ]
   },
@@ -49,7 +51,8 @@
         "param": "temperature",
         "op": ">",
         "value": "29.5",
-        "hysteresis": "2"
+        "hysteresis": "2",
+        "logic": "AND"
       }
     ]
   },
@@ -62,16 +65,17 @@
     "action": "off",
     "activeFrom": "00:00",
     "activeTo": "23:59",
+    "enabled": true,
     "conditions": [
       {
         "sensor": "sensor_1.json",
         "param": "humidity",
         "op": "<",
         "value": "78",
-        "hysteresis": "2"
+        "hysteresis": "2",
+        "logic": "AND"
       }
-    ],
-    "enabled": true
+    ]
   },
   {
     "name": "T 30°/ D-N/ OFF",
@@ -81,19 +85,20 @@
     "action": "off",
     "activeFrom": "00:00",
     "activeTo": "23:59",
+    "enabled": true,
     "conditions": [
       {
         "sensor": "sensor_2.json",
         "param": "temperature",
         "op": "<",
         "value": "28",
-        "hysteresis": "2"
+        "hysteresis": "2",
+        "logic": "AND"
       }
-    ],
-    "enabled": true
+    ]
   },
   {
-    "name": "VPD 0,8-1,2",
+    "name": "VPD 0,8-1,2 ON",
     "relays": [
       "Befeuchter"
     ],
@@ -102,16 +107,34 @@
     "activeTo": "00:00",
     "conditions": [
       {
+        "sensor": "sensor_2.json",
+        "param": "",
+        "op": ">=",
+        "value": "0.9",
+        "hysteresis": "",
+        "logic": "OR"
+      },
+      {
+        "sensor": "sensor_3.json",
+        "param": "",
+        "op": ">=",
+        "value": "0.9",
+        "hysteresis": "",
+        "logic": "OR"
+      },
+      {
         "sensor": "sensor_1.json",
         "param": "vpd",
         "op": ">=",
-        "value": "1.2",
-        "hysteresis": ""
+        "value": "0.9",
+        "hysteresis": "",
+        "logic": "OR"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
-    "name": "VPD 0,8-1,2",
+    "name": "VPD 0,8-1,2 OFF",
     "relays": [
       "Befeuchter"
     ],
@@ -120,11 +143,28 @@
     "activeTo": "23:59",
     "conditions": [
       {
+        "sensor": "sensor_2.json",
+        "param": "",
+        "op": "<=",
+        "value": "0.8",
+        "hysteresis": "",
+        "logic": "OR"
+      },
+      {
+        "sensor": "sensor_3.json",
+        "param": "",
+        "op": "<=",
+        "value": "0.8",
+        "hysteresis": "",
+        "logic": "OR"
+      },
+      {
         "sensor": "sensor_1.json",
         "param": "vpd",
-        "op": "<",
+        "op": "<=",
         "value": "0.8",
-        "hysteresis": ""
+        "hysteresis": "",
+        "logic": "OR"
       }
     ]
   },
@@ -142,7 +182,8 @@
         "param": "humidity",
         "op": ">",
         "value": "80",
-        "hysteresis": "2"
+        "hysteresis": "2",
+        "logic": "AND"
       }
     ]
   },
@@ -161,7 +202,8 @@
         "param": "temperature",
         "op": ">",
         "value": "32",
-        "hysteresis": ""
+        "hysteresis": "",
+        "logic": "AND"
       }
     ]
   },
@@ -179,23 +221,61 @@
         "param": "vpd",
         "op": "<",
         "value": "0.8",
-        "hysteresis": ""
+        "hysteresis": "",
+        "logic": "OR"
       },
       {
         "sensor": "sensor_2.json",
         "param": "vpd",
         "op": "<",
         "value": "0.8",
-        "hysteresis": ""
+        "hysteresis": "",
+        "logic": "OR"
       },
       {
         "sensor": "sensor_3.json",
         "param": "vpd",
         "op": "<",
         "value": "0.8",
-        "hysteresis": ""
+        "hysteresis": "",
+        "logic": "OR"
       }
+    ]
+  },
+  {
+    "name": "Test",
+    "relays": [
+      "Abluft"
     ],
-    "logic": "OR"
+    "action": "on",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "enabled": false,
+    "conditions": [
+      {
+        "sensor": "sensor_1.json",
+        "param": "temperature",
+        "op": ">",
+        "value": "27.5",
+        "hysteresis": "",
+        "logic": "AND"
+      },
+      {
+        "sensor": "sensor_2.json",
+        "param": "temperature",
+        "op": ">",
+        "value": "30",
+        "hysteresis": "",
+        "logic": "OR"
+      },
+      {
+        "sensor": "sensor_3.json",
+        "param": "temperature",
+        "op": ">",
+        "value": "18",
+        "hysteresis": "",
+        "logic": "AND"
+      }
+    ]
   }
 ]

@@ -20,14 +20,10 @@
     <div style="text-align: center; margin: 10px 0;">
       <label for="dataLimitSelect">Anzahl Datenpunkte:</label>
       <select id="dataLimitSelect">
-      <option value="10">10</option>
-      <option value="100">100</option>	
-      <option value="200">200</option>
-      <option value="300">300</option>
-      <option value="500">500</option>
-      <option value="1000" selected>1000</option>
-      <option value="3000">3000</option>
-      <option value="10000">10000</option>
+      <option value="5000">5000</option>
+      <option value="10000" selected>10000</option>
+      <option value="30000">30000</option>
+      <option value="100000">100000</option>
       </select>
   </div>
 
@@ -268,7 +264,7 @@ function fetchSensorData(limit = 100) {
       return parseFloat((es - ea).toFixed(2));
     }
 
-    let currentLimit = 100;
+    let currentLimit = 10000;
 
     document.getElementById('dataLimitSelect').addEventListener('change', (e) => {
       currentLimit = parseInt(e.target.value);

@@ -97,16 +97,18 @@
 
     const normalizeFloat = (value) => (value || '').replace(',', '.');
 
-    function convertCommaToDot(rule) {
-      return {
-        ...rule,
-        conditions: rule.conditions.map(cond => ({
-          ...cond,
-          value: normalizeFloat(cond.value),
-          hysteresis: normalizeFloat(cond.hysteresis)
-        }))
-      };
-    }
+      function convertCommaToDot(rule) {
+        return {
+          ...rule,
+          conditions: rule.conditions.map(cond => ({
+            ...cond,
+            value: normalizeFloat(cond.value),
+            hysteresis: normalizeFloat(cond.hysteresis),
+            logic: cond.logic || 'AND'
+          }))
+        };
+      }
+
 
     function reorder(list, startIndex, endIndex) {
       const result = Array.from(list);
@@ -265,8 +267,6 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
                   <option value="<=">kleiner oder gleich</option>
                   <option value="==">gleich</option>
                 </select>
-
-
                 <input type="text" value={c.value} onChange={e => {
                   const updated = [...editRule.conditions];
                   updated[i].value = e.target.value;
@@ -277,22 +277,24 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
                   updated[i].hysteresis = e.target.value;
                   setEditRule({ ...editRule, conditions: updated });
                 }} />
+                <select value={c.logic} onChange={e => {
+                  const updated = [...editRule.conditions];
+                  updated[i].logic = e.target.value;
+                  setEditRule({ ...editRule, conditions: updated });
+                }}>
+                  <option value="AND">UND</option>
+                  <option value="OR">ODER</option>
+                </select>
                 <button className="delete-btn" onClick={() => {
                   const updated = [...editRule.conditions];
                   updated.splice(i, 1);
                   setEditRule({ ...editRule, conditions: updated });
                 }}>🗑️</button>
-                  <select 
-                  value={editRule.logic || 'AND'} 
-                  onChange={e => setEditRule({ ...editRule, logic: e.target.value })}
-                >
-                  <option value="AND">UND</option>
-                  <option value="OR">ODER</option>
-                </select>
               </div>
             ))}
+
             <button onClick={() =>
-              setEditRule({ ...editRule, conditions: [...editRule.conditions, { sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }] })
+              setEditRule({ ...editRule, conditions: [...editRule.conditions, { sensor: '', param: '', op: '', value: '', hysteresis: '', logic: 'AND' }] })
             }>➕ Bedingung</button>
           </>
         )}
@@ -344,20 +346,22 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
   );
 }
 
-    function App() {
+function App() {
       const [rules, setRules] = useState([]);
       const [relays, setRelays] = useState([]);
       const [sensors, setSensors] = useState([]);
       const [sensorNameMap, setSensorNameMap] = useState({});
-      const [newRule, setNewRule] = useState({
-        name: '',
-        relays: [],
-        action: 'on',
-        activeFrom: '',
-        activeTo: '',
-        conditions: [{ sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }],
-        logic: 'AND',
-      });
+        const [newRule, setNewRule] = useState({
+          name: '',
+          relays: [],
+          action: 'on',
+          activeFrom: '',
+          activeTo: '',
+          conditions: [
+            { sensor: '', param: '', op: '', value: '', hysteresis: '', logic: 'AND' }
+          ]
+        });
+
       const [saveMessage, setSaveMessage] = useState('');
 
       useEffect(() => {
@@ -406,11 +410,10 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
             setNewRule({
               name: '',
               relays: [],
-              action: '',
+              action: 'on',
               activeFrom: '',
               activeTo: '',
-              conditions: [{ sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }],
-              logic: 'AND',
+              conditions: [{ sensor: '', param: '', op: '', value: '', hysteresis: '', logic: 'AND' }],
             });
             setSaveMessage('✅ Regel hinzugefügt');
             setTimeout(() => setSaveMessage(''), 2000);
@@ -491,69 +494,76 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
            
 
             </div>
-              {newRule.conditions.map((cond, i) => (
-              <div key={i} style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <label>Bedingung {i + 1}</label>
-                <select value={cond.sensor} onChange={e => {
-                  const updated = [...newRule.conditions];
-                  updated[i].sensor = e.target.value;
-                  setNewRule({ ...newRule, conditions: updated });
-                }}>
-                  <option value="">Sensor wählen</option>
-                  {sensors.map(s => (
-                    <option key={s} value={s}>
-                      {sensorNameMap[s.replace('sensor_', '').replace('.json', '')] || s}
-                    </option>
-                  ))}
-                </select>
-                <select value={cond.param} onChange={e => {
-                  const updated = [...newRule.conditions];
-                  updated[i].param = e.target.value;
-                  setNewRule({ ...newRule, conditions: updated });
-                }}>
-                  <option value="vpd">VPD</option>
-                  <option value="temperature">Temperatur</option>
-                  <option value="humidity">Luftfeuchtigkeit</option>
-                </select>
-                <select value={cond.op} onChange={e => {
-                  const updated = [...newRule.conditions];
-                  updated[i].op = e.target.value;
-                  setNewRule({ ...newRule, conditions: updated });
-                }}>
-                  <option value=">">größer als</option>
-                  <option value="<">kleiner als</option>
-                  <option value=">=">größer oder gleich</option>
-                  <option value="<=">kleiner oder gleich</option>
-                  <option value="==">gleich</option>
-                </select>
-                <input type="text" value={cond.value} onChange={e => {
-                  const updated = [...newRule.conditions];
-                  updated[i].value = e.target.value;
-                  setNewRule({ ...newRule, conditions: updated });
-                }} />
-                <input type="number" step="0.1" placeholder="Hysterese" value={cond.hysteresis || ''} onChange={e => {
-                  const updated = [...newRule.conditions];
-                  updated[i].hysteresis = e.target.value;
-                  setNewRule({ ...newRule, conditions: updated });
-                }} />
-                <button className="delete-btn" onClick={() => {
-                  const updated = [...newRule.conditions];
-                  updated.splice(i, 1);
-                  setNewRule({ ...newRule, conditions: updated });
-                }}>🗑️</button>
-              </div>
-            ))}
-
-            <div className="field-group">
-               <label>Bedingungen verknüpfen mit</label>
-              <select value={newRule.logic} onChange={e => setNewRule(r => ({ ...r, logic: e.target.value }))}>
+                  {newRule.conditions.map((cond, i) => (
+          <div key={i} style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <label>Bedingung {i + 1}</label>
+            <select value={cond.sensor} onChange={e => {
+              const updated = [...newRule.conditions];
+              updated[i].sensor = e.target.value;
+              setNewRule({ ...newRule, conditions: updated });
+            }}>
+              <option value="">Sensor wählen</option>
+              {sensors.map(s => (
+                <option key={s} value={s}>
+                  {sensorNameMap[s.replace('sensor_', '').replace('.json', '')] || s}
+                </option>
+              ))}
+            </select>
+            <select value={cond.param} onChange={e => {
+              const updated = [...newRule.conditions];
+              updated[i].param = e.target.value;
+              setNewRule({ ...newRule, conditions: updated });
+            }}>
+              <option value="vpd">VPD</option>
+              <option value="temperature">Temperatur</option>
+              <option value="humidity">Luftfeuchtigkeit</option>
+            </select>
+            <select value={cond.op} onChange={e => {
+              const updated = [...newRule.conditions];
+              updated[i].op = e.target.value;
+              setNewRule({ ...newRule, conditions: updated });
+            }}>
+              <option value=">">größer als</option>
+              <option value="<">kleiner als</option>
+              <option value=">=">größer oder gleich</option>
+              <option value="<=">kleiner oder gleich</option>
+              <option value="==">gleich</option>
+            </select>
+            <input type="text" value={cond.value} onChange={e => {
+              const updated = [...newRule.conditions];
+              updated[i].value = e.target.value;
+              setNewRule({ ...newRule, conditions: updated });
+            }} />
+            <input type="number" step="0.1" placeholder="Hysterese" value={cond.hysteresis || ''} onChange={e => {
+              const updated = [...newRule.conditions];
+              updated[i].hysteresis = e.target.value;
+              setNewRule({ ...newRule, conditions: updated });
+            }} />
+            <select value={cond.logic} onChange={e => {
+              const updated = [...newRule.conditions];
+              updated[i].logic = e.target.value;
+              setNewRule({ ...newRule, conditions: updated });
+            }}>
               <option value="AND">UND</option>
               <option value="OR">ODER</option>
-            </select>              
-            <button onClick={() => setNewRule({ ...newRule, conditions: [...newRule.conditions, { sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }] })}>
-                ➕ Bedingung
-            </button>
-            </div>
+            </select>
+            <button className="delete-btn" onClick={() => {
+              const updated = [...newRule.conditions];
+              updated.splice(i, 1);
+              setNewRule({ ...newRule, conditions: updated });
+            }}>🗑️</button>
+          </div>
+        ))}
+
+
+        <div className="field-group">
+          <button onClick={() =>
+            setNewRule({ ...newRule, conditions: [...newRule.conditions, { sensor: '', param: '', op: '', value: '', hysteresis: '', logic: 'AND' }] })
+          }>
+            ➕ Bedingung
+          </button>
+        </div>
+
 
             <div className="field-group">
               <button onClick={addNewRule}>➕ Regel hinzufügen</button>
