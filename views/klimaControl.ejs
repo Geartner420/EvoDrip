@@ -56,6 +56,7 @@
             <div class="card-title">${sensorName}</div>
             <div class="card-value">🌡️ ${data.temperature} °C</div>
             <div class="card-value">💧 ${data.humidity} %</div>
+            <div class="card-value">💨 VPD ${calcVPD(data.temperature, data.humidity)} kPa</div>
             <div class="card-footer">🕛 ${new Date(data.timestamp).toLocaleString('de-DE')}</div>
           `;
           container.appendChild(card);
@@ -68,6 +69,13 @@
         }
       }
     }
+    
+    function calcVPD(tempC, rh) {
+      const es = 0.6108 * Math.exp((17.27 * tempC) / (tempC + 237.3));
+      const ea = es * (rh / 100);
+      return parseFloat((es - ea).toFixed(2));
+    }
+
   </script>
   <!-- 📦 React + Babel + Drag-and-Drop -->
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
@@ -257,6 +265,8 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
                   <option value="<=">kleiner oder gleich</option>
                   <option value="==">gleich</option>
                 </select>
+
+
                 <input type="text" value={c.value} onChange={e => {
                   const updated = [...editRule.conditions];
                   updated[i].value = e.target.value;
@@ -272,6 +282,13 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
                   updated.splice(i, 1);
                   setEditRule({ ...editRule, conditions: updated });
                 }}>🗑️</button>
+                  <select 
+                  value={editRule.logic || 'AND'} 
+                  onChange={e => setEditRule({ ...editRule, logic: e.target.value })}
+                >
+                  <option value="AND">UND</option>
+                  <option value="OR">ODER</option>
+                </select>
               </div>
             ))}
             <button onClick={() =>
@@ -338,7 +355,8 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
         action: 'on',
         activeFrom: '',
         activeTo: '',
-        conditions: [{ sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }]
+        conditions: [{ sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }],
+        logic: 'AND',
       });
       const [saveMessage, setSaveMessage] = useState('');
 
@@ -391,7 +409,8 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
               action: '',
               activeFrom: '',
               activeTo: '',
-              conditions: [{ sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }]
+              conditions: [{ sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }],
+              logic: 'AND',
             });
             setSaveMessage('✅ Regel hinzugefügt');
             setTimeout(() => setSaveMessage(''), 2000);
@@ -468,8 +487,11 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
               <label>Aktiv bis</label>
               <input type="time" value={newRule.activeTo} onChange={e => setNewRule(r => ({ ...r, activeTo: e.target.value }))} />
             </div>
+            <div className="field-group">
+           
 
-            {newRule.conditions.map((cond, i) => (
+            </div>
+              {newRule.conditions.map((cond, i) => (
               <div key={i} style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <label>Bedingung {i + 1}</label>
                 <select value={cond.sensor} onChange={e => {
@@ -523,9 +545,14 @@ function EditableRuleCard({ r, operatorLabels, onDelete, onUpdate, sensorNameMap
             ))}
 
             <div className="field-group">
-              <button onClick={() => setNewRule({ ...newRule, conditions: [...newRule.conditions, { sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }] })}>
+               <label>Bedingungen verknüpfen mit</label>
+              <select value={newRule.logic} onChange={e => setNewRule(r => ({ ...r, logic: e.target.value }))}>
+              <option value="AND">UND</option>
+              <option value="OR">ODER</option>
+            </select>              
+            <button onClick={() => setNewRule({ ...newRule, conditions: [...newRule.conditions, { sensor: '', param: 'vpd', op: '>', value: '', hysteresis: '' }] })}>
                 ➕ Bedingung
-              </button>
+            </button>
             </div>
 
             <div className="field-group">

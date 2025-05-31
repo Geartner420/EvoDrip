@@ -2,22 +2,29 @@ import logger from './helper/logger.mjs';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
+import express from 'express';
+import bodyParser from 'body-parser';
+import basicAuth from 'express-basic-auth';
+import os from 'os';
+import { spawn } from 'child_process';
 
-//Setzte dirname
+// Setze __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-//.enc laden
+// .env laden
 dotenv.config({ path: path.join(__dirname, '.env') });
 console.log('[DEBUG] DEBUG-Modus ist:', process.env.DEBUG);
 
+// sensor_data-Ordner sicherstellen
+const sensorDataDir = path.join(__dirname, 'sensor_data');
+if (!fs.existsSync(sensorDataDir)) {
+  fs.mkdirSync(sensorDataDir, { recursive: true });
+  console.log('📁 sensor_data-Verzeichnis erstellt');
+}
 
-
-import express from 'express';
-import fs from 'fs';
-import bodyParser from 'body-parser';
-import basicAuth from 'express-basic-auth';
-
+// Services + Helfer
 import { fetchMoisture } from './services/fytaservice.mjs';
 import { triggerShelly } from './services/shellyService.mjs';
 import { loadState, saveState } from './services/stateService.mjs';
@@ -32,9 +39,6 @@ import { cta } from './services/connectAll.mjs';
 import { startSensorProcessing } from './services/vpdService.mjs';
 import { startRuleEngine } from './services/rule_engine.mjs';
 import { controlRelays } from './services/umluftContol.mjs';
-import os from 'os';
-import { spawn } from 'child_process';
-
 
 // Routen
 import sensorDataRoutes from './routes/sensorDataRoutes.mjs';
@@ -50,31 +54,16 @@ import regelLogRouter from './routes/regelLogRoutes.mjs';
 import envUpdateRoute from './routes/updateRoute.mjs';
 import uiRoutes from './routes/uiRoutes.mjs';
 
-
-
 const {
   UI_USERNAME,
   UI_PASSWORD,
   CHECK_INTERVAL_MINUTES,
   MOISTURE_SAVE_INTERVAL_MS
 } = config;
-function keepAwake() {
-  if (os.platform() !== 'win32') return;
-
-  try {
-    spawn('powercfg', ['/requestsoverride', 'PROCESS', 'node.exe', 'SYSTEM', 'DISPLAY'], {
-      stdio: 'ignore'
-    });
-    logger.info('💡 Energiesparmodus blockiert (Windows)');
-  } catch (err) {
-    logger.warn('⚠️ Konnte Sleep-Block nicht setzen:', err.message);
-  }
-}
 
 async function startServer() {
   const app = express();
 
-  // ✅ Views absolut setzen
   app.set('view engine', 'ejs');
   app.set('views', path.join(__dirname, 'views'));
 
@@ -101,12 +90,13 @@ async function startServer() {
   app.use(historyViewRoute);
   app.use('/ui', uiRoutes);
 
+  // UI Views
   app.get('/klima-control', (req, res) => res.render('klimaControl'));
   app.get('/relay-cycle', (req, res) => res.render('shellyControl'));
   app.get('/combined-dashboard', (req, res) => res.render('combinedDashboard'));
 
   // Sensor-Namen
-  const filePath = path.join(__dirname, 'sensor_data', 'sensorNames.json');
+  const filePath = path.join(sensorDataDir, 'sensorNames.json');
 
   app.get('/api/sensor-names', (req, res) => {
     fs.readFile(filePath, (err, data) => {
@@ -163,11 +153,23 @@ async function startServer() {
 }
 
 async function main() {
+  function keepAwake() {
+    if (os.platform() !== 'win32') return;
+    try {
+      spawn('powercfg', ['/requestsoverride', 'PROCESS', 'node.exe', 'SYSTEM', 'DISPLAY'], {
+        stdio: 'ignore'
+      });
+      logger.info('💡 Energiesparmodus blockiert (Windows)');
+    } catch (err) {
+      logger.warn('⚠️ Konnte Sleep-Block nicht setzen:', err.message);
+    }
+  }
+
   try {
-    await startServer();            // erst Express starten
-    keepAwake();                    // dann Sleep blockieren
-    cta();                          // dann BLE
-    startSensorProcessing();        // dann VPD etc
+    await startServer();
+    keepAwake();
+    cta();
+    startSensorProcessing();
     startRuleEngine();
     if (!global.umluftStarted) {
       controlRelays();
@@ -176,9 +178,8 @@ async function main() {
     }
   } catch (err) {
     logger.error('❌ Fehler beim Start des Servers:', err);
-    process.exit(1); // wichtiger! Sonst hängt PM2 im "online"-Zustand
+    process.exit(1);
   }
 }
 
 main();
-

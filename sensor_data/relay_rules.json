@@ -18,24 +18,6 @@
     ]
   },
   {
-    "name": "T 30°/ D-N/ ON",
-    "relays": [
-      "Abluft"
-    ],
-    "action": "on",
-    "activeFrom": "00:00",
-    "activeTo": "23:59",
-    "conditions": [
-      {
-        "sensor": "sensor_2.json",
-        "param": "temperature",
-        "op": ">",
-        "value": "30",
-        "hysteresis": "2"
-      }
-    ]
-  },
-  {
     "name": "RH 78%/ D-N/ ON",
     "relays": [
       "Dunstabzug"
@@ -49,6 +31,24 @@
         "param": "humidity",
         "op": ">",
         "value": "78",
+        "hysteresis": "2"
+      }
+    ]
+  },
+  {
+    "name": "T30°/ D-N/ ON",
+    "relays": [
+      "Abluft"
+    ],
+    "action": "on",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "sensor": "sensor_1.json",
+        "param": "temperature",
+        "op": ">",
+        "value": "29.5",
         "hysteresis": "2"
       }
     ]
@@ -70,7 +70,8 @@
         "value": "78",
         "hysteresis": "2"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "name": "T 30°/ D-N/ OFF",
@@ -88,28 +89,29 @@
         "value": "28",
         "hysteresis": "2"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
-    "name": "Hum 78%/ ON ",
+    "name": "VPD 0,8-1,2",
     "relays": [
       "Befeuchter"
     ],
     "action": "on",
-    "activeFrom": "00:00",
-    "activeTo": "23:59",
+    "activeFrom": "06:00",
+    "activeTo": "00:00",
     "conditions": [
       {
         "sensor": "sensor_1.json",
-        "param": "humidity",
-        "op": "<",
-        "value": "76",
+        "param": "vpd",
+        "op": ">=",
+        "value": "1.2",
         "hysteresis": ""
       }
     ]
   },
   {
-    "name": "Hum 78%/ OFF",
+    "name": "VPD 0,8-1,2",
     "relays": [
       "Befeuchter"
     ],
@@ -119,9 +121,9 @@
     "conditions": [
       {
         "sensor": "sensor_1.json",
-        "param": "humidity",
-        "op": ">",
-        "value": "79",
+        "param": "vpd",
+        "op": "<",
+        "value": "0.8",
         "hysteresis": ""
       }
     ]
@@ -143,5 +145,57 @@
         "hysteresis": "2"
       }
     ]
+  },
+  {
+    "name": "T Max",
+    "relays": [
+      "Abluft",
+      "Dunstabzug"
+    ],
+    "action": "on",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "sensor": "sensor_2.json",
+        "param": "temperature",
+        "op": ">",
+        "value": "32",
+        "hysteresis": ""
+      }
+    ]
+  },
+  {
+    "name": "VPD < 0,8 ",
+    "relays": [
+      "Abluft"
+    ],
+    "action": "on",
+    "activeFrom": "00:00",
+    "activeTo": "23:59",
+    "conditions": [
+      {
+        "sensor": "sensor_1.json",
+        "param": "vpd",
+        "op": "<",
+        "value": "0.8",
+        "hysteresis": ""
+      },
+      {
+        "sensor": "sensor_2.json",
+        "param": "vpd",
+        "op": "<",
+        "value": "0.8",
+        "hysteresis": ""
+      },
+      {
+        "sensor": "sensor_3.json",
+        "param": "vpd",
+        "op": "<",
+        "value": "0.8",
+        "hysteresis": ""
+      }
+    ],
+    "logic": "OR"
   }
 ]

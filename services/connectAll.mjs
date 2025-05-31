@@ -78,9 +78,24 @@ function writeSensorData(sensorId, data) {
   if (existingData.length > 200000) existingData = existingData.slice(-200000);
 
   const tmpFile = file + '.tmp';
-  fs.writeFileSync(tmpFile, JSON.stringify(existingData, null, 2));
-  fs.renameSync(tmpFile, file);
-  logger.debug(`💾 Gespeichert in ${file}`);
+  try {
+    fs.writeFileSync(tmpFile, JSON.stringify(existingData, null, 2), 'utf-8');
+  } catch (err) {
+    logger.error(`❌ Fehler beim Schreiben von ${tmpFile}: ${err.message}`);
+    return;
+  }
+
+  try {
+    if (fs.existsSync(tmpFile)) {
+      fs.renameSync(tmpFile, file);
+      logger.debug(`💾 Gespeichert in ${file}`);
+    } else {
+      logger.warn(`⚠️ Temporäre Datei ${tmpFile} nicht gefunden – kein Rename.`);
+    }
+  } catch (err) {
+    logger.error(`❌ Fehler beim Umbenennen ${tmpFile} → ${file}: ${err.message}`);
+  }
+
   
 }
 
