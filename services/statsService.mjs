@@ -14,15 +14,29 @@ export function loadStats() {
   } catch (err) {
     logger.error('❌ Fehler beim Laden der Stats:', err.message);
   }
-  return { nightWaterCount: 0, dayWaterCount: 0 };
+  return {
+    dayWaterCount: 0,
+    nightWaterCount: 0,
+    dayWatering: 0,
+    nightWatering: 0,
+    lastReset: null
+  };
 }
 
 export function saveStats(stats) {
   try {
-    fs.writeFileSync(STATS_FILE, JSON.stringify(stats));
+    fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2));
   } catch (err) {
     logger.error('❌ Fehler beim Speichern der Stats:', err.message);
   }
+}
+
+// === Deine bestehenden Exports ===
+
+export function incrementDayWater() {
+  const stats = loadStats();
+  stats.dayWaterCount += 1;
+  saveStats(stats);
 }
 
 export function incrementNightWater() {
@@ -31,8 +45,29 @@ export function incrementNightWater() {
   saveStats(stats);
 }
 
-export function incrementDayWater() {
+// === Ergänzt: Menge hinzufügen ===
+
+export function incrementDayWatering(amount) {
   const stats = loadStats();
-  stats.dayWaterCount += 1;
+  stats.dayWatering += amount;
+  saveStats(stats);
+}
+
+export function incrementNightWatering(amount) {
+  const stats = loadStats();
+  stats.nightWatering += amount;
+  saveStats(stats);
+}
+
+export function getTodayTotalWater() {
+  const stats = loadStats();
+  return stats.dayWatering;
+}
+
+export function resetTodayStats() {
+  const stats = loadStats();
+  stats.dayWaterCount = 0;
+  stats.dayWatering = 0;
+  stats.lastReset = new Date().toISOString();
   saveStats(stats);
 }

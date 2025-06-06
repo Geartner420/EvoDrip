@@ -4,9 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bewässerungs-Statistiken</title>
-   <link rel="stylesheet" href="/styles/card.css" />
-   <link rel="stylesheet" href="/styles/main.css" />
- 
+  <link rel="stylesheet" href="/styles/main.css" />
+
   <script defer>
     function toggleDarkMode() {
       document.documentElement.classList.toggle('dark');
@@ -20,93 +19,6 @@
       }
     });
   </script>
-  <style>
-    :root {
-      --bg-color: #f4f4f9;
-      --text-color: #111;
-      --button-bg: #4CAF50;
-      --button-hover: #45a049;
-    }
-
-    .dark {
-      --bg-color: #1e1e1e;
-      --text-color: #f1f1f1;
-      --button-bg: #2e7d32;
-      --button-hover: #388e3c;
-    }
-
-    html {
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 30px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      min-height: 100vh;
-    }
-
-    h1 {
-      margin-bottom: 40px;
-      text-align: center;
-    }
-
-    .card-container {
-      display: flex;
-      gap: 30px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 30px;
-    }
-
-    .meta {
-      margin-bottom: 30px;
-      font-size: 1rem;
-      color: #666;
-    }
-
-    .button-bar {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .back-button {
-      background-color: var(--button-bg);
-      color: white;
-      border: none;
-      padding: 12px 18px;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .back-button:hover {
-      background-color: var(--button-hover);
-    }
-
-    .dark-toggle {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: var(--card-bg);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  padding: 6px 10px;
-  cursor: pointer;
-}
-  </style>
 </head>
 <body>
   <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
@@ -114,35 +26,47 @@
   <h1>🚿 Bewässerungs-Statistiken</h1>
 
   <div class="card-container">
+
     <div class="card" title="Zählt wie oft nachts gegossen wurde (z. B. unter 40 %)">
       <div class="card-title">🌙 Nachtbewässerungen</div>
       <div class="card-value"><%= nightWaterCount %></div>
     </div>
+
     <div class="card" title="Zählt alle automatischen Bewässerungen am Tag">
       <div class="card-title">☀️ Tagesbewässerungen</div>
       <div class="card-value"><%= dayWaterCount %></div>
     </div>
-  </div>
 
-  <div class="meta">
-    Letzter Reset: <em><%= lastReset || '– nicht verfügbar –' %></em>
+    <div class="card" title="Gesamte Wassermenge, die nachts verabreicht wurde (ml)">
+      <div class="card-title">🌙 Nacht-Wassermenge</div>
+      <div class="card-value"><%= nightWatering %> ml</div>
+    </div>
+
+    <div class="card" title="Gesamte Wassermenge, die tagsüber verabreicht wurde (ml)">
+      <div class="card-title">☀️ Tages-Wassermenge</div>
+      <div class="card-value"><%= dayWatering %> ml</div>
+    </div>
+
+    <div class="meta">
+      Letzter Reset: <em><%= lastReset || '– nicht verfügbar –' %></em>
+    </div>
   </div>
 
   <div class="button-bar">
     <form action="/stats/reset" method="POST" onsubmit="return confirm('⚠️ Statistiken wirklich zurücksetzen?');">
-      <button type="submit" class="button">⛔️ Statistiken zurücksetzen</button>
+      <button type="submit" class="button">Zurücksetzen</button>
     </form>
-      <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
-      <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
-      <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
-      <button type="button" onclick="location.href='/system-status'">🩺 System-Status</button>
-      <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
-      <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
-      <button type="button" onclick="location.href='/klima-control'">🌱 Klima-Automatisierung</button>
-      <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
-      <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
-      <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
-      <button type="button" onclick="location.href='/ui'">Zur Übersicht</button>
+    <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
+    <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
+    <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
+    <button type="button" onclick="location.href='/system-status'">🩺 System-Status</button>
+    <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
+    <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
+    <button type="button" onclick="location.href='/klima-control'">🌱 Klima-Automatisierung</button>
+    <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
+    <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
+    <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
+    <button type="button" onclick="location.href='/ui'">Zur Übersicht</button>
   </div>
 </body>
 </html>

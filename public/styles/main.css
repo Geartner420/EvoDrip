@@ -110,7 +110,16 @@ input[type="password"] {
   background: var(--bg-color);
   color: var(--text-color);
 }
-
+.fieldset {
+  border: 1px solid var(--border-color, #aaa);
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 6px;
+}
+.fieldset legend {
+  font-weight: bold;
+  padding: 0 10px;
+}
 /* ========== Timer-Inputs ========== */
 .timer-row {
   display: flex;
@@ -122,6 +131,8 @@ input[type="password"] {
   width: 80px;
   text-align: right;
 }
+
+
 
 /* ========== Button-Leiste ========== */
 .button-bar {

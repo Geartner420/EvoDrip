@@ -79,6 +79,10 @@
         <option value="60">1 Stunde</option>
       </select>
     </div>
+    <div class="tabs" style="justify-content: center;">
+  <label><input type="checkbox" id="filterSpikesCheckbox" /> 📉 Anomalien entfernen</label>
+</div>
+
 
     <!-- Hauptdiagramm -->
     <div class="chart-container" style="width: 100%; max-width: none;">
@@ -248,38 +252,99 @@
       });
     }
 
-    function aggregateByInterval(data, metric, intervalMinutes = 10) {
-      const grouped = {};
 
-      data.forEach(entry => {
-        const time = new Date(entry.timestamp);
-        const roundedTime = new Date(Math.floor(time.getTime() / (intervalMinutes * 60 * 1000)) * intervalMinutes * 60 * 1000);
-        const key = roundedTime.toISOString();
+function filterWithQuarantine(data, metric, windowSize = 50, tolerance = 0.5, quarantineSize = 10) {
+  const accepted = [];
+  const window = [];
+  let quarantine = [];
 
-        if (!grouped[key]) {
-          grouped[key] = { sum: 0, count: 0 };
-        }
+  for (let i = 0; i < data.length; i++) {
+    const entry = data[i];
+    const value = parseFloat(entry[metric]);
+    if (isNaN(value)) continue;
 
-        const value = parseFloat(entry[metric]);
-        if (!isNaN(value)) {
-          grouped[key].sum += value;
-          grouped[key].count += 1;
-        }
-      });
-
-      return Object.entries(grouped)
-        .map(([timestamp, { sum, count }]) => ({
-          timestamp,
-          avg: sum / count
-        }))
-        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    // initiales Fenster befüllen
+    if (window.length < windowSize) {
+      window.push(value);
+      accepted.push({ timestamp: entry.timestamp, value });
+      continue;
     }
+
+    const sorted = [...window].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    const median = sorted.length % 2 === 0
+      ? (sorted[mid - 1] + sorted[mid]) / 2
+      : sorted[mid];
+
+    const delta = Math.abs(value - median);
+
+    if (delta <= tolerance) {
+      accepted.push({ timestamp: entry.timestamp, value });
+      window.push(value);
+      if (window.length > windowSize) window.shift();
+
+      // Wenn vorher Quarantäne war: verwerfen
+      quarantine = [];
+    } else {
+      // erstmal in Quarantäne
+      quarantine.push({ timestamp: entry.timestamp, value });
+
+      if (quarantine.length > quarantineSize) {
+        // verwerfen: Quarantäne zu groß → akzeptieren wir nicht
+        console.log(`⛔ Verwerfe Quarantäne-Serie mit ${quarantine.length} Werten (ab ${entry.timestamp})`);
+        quarantine = [];
+      } else {
+        console.log(`⚠️ Quarantäne: ${value} (∆${delta.toFixed(2)} von Median ${median.toFixed(2)})`);
+      }
+    }
+  }
+
+  return accepted;
+}
+
+
+
+function aggregateByInterval(data, metric, intervalMinutes = 10) {
+  const filterSpikes = document.getElementById('filterSpikesCheckbox')?.checked;
+
+  // Werte vorbereiten (timestamp + metric-Wert)
+  let values = data
+    .filter(entry => !isNaN(parseFloat(entry[metric])))
+    .map(entry => ({
+      timestamp: new Date(entry.timestamp),
+      value: parseFloat(entry[metric])
+    }));
+
+  // 📉 Filterung aktiv
+if (filterSpikes) {
+ values = filterWithQuarantine(values, 'value', 10, 0.45, 100);
+
+}
+
+
+  // Aggregation nach Intervall
+  const grouped = {};
+  values.forEach(({ timestamp, value }) => {
+    const rounded = new Date(Math.floor(timestamp.getTime() / (intervalMinutes * 60000)) * intervalMinutes * 60000);
+    const key = rounded.toISOString();
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(value);
+  });
+
+  return Object.entries(grouped).map(([timestamp, arr]) => ({
+    timestamp,
+    avg: arr.reduce((a, b) => a + b, 0) / arr.length
+  }));
+}
+
+
 
     function renderChart() {
       const entries = historyData[selectedSensor];
       if (!entries) return;
 
-      const aggregated = aggregateByInterval(entries, selectedMetric, aggregationInterval);
+     const aggregated = aggregateByInterval(entries, selectedMetric, aggregationInterval);
+
       const timestamps = aggregated.map(e => new Date(e.timestamp));
       const y = aggregated.map(e => e.avg);
 
@@ -314,6 +379,9 @@
       aggregationInterval = parseInt(e.target.value, 10);
       renderChart();
     });
+
+    document.getElementById('filterSpikesCheckbox').addEventListener('change', () => renderChart());
+
 
     fetchSensorNames();
     setInterval(fetchHistory, 60000);

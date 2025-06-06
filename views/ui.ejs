@@ -4,57 +4,79 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Klima-Automatik & Bewässerungssystem – Einstellungen</title>
-  
-  <!-- 💅 Externes Stylesheet -->
   <link rel="stylesheet" href="/styles/main.css" />
-
-  <!-- ⚙️ Externes JavaScript (wird erst ausgeführt, wenn DOM geladen ist) -->
   <script src="/scripts/darkmode.js" defer></script>
 </head>
 <body>
-  <!-- 🌗 Dark-Mode-Schalter -->
   <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
-
   <h2>Klima-Automatik & Bewässerungssystem – Einstellungen</h2>
 
   <form method="POST" action="/updateEnv">
     <div class="form-container-form">
-      <% felder.forEach(field => {
-        const [id, label, type, long, customValue] = field;
-        if (type === 'timer') { %>
-          <div class="field-group longfield">
-            <label><%= label %> (h:min:s)</label>
-            <div class="timer-row">
-              <input type="number" name="SHELLY_TIMER_HOURS" value="<%= h %>" step="1" /> h
-              <input type="number" name="SHELLY_TIMER_MINUTES" value="<%= m %>" step="0.1" /> min
-              <input type="number" name="SHELLY_TIMER_SECONDS" value="<%= s %>" step="1" /> s
-            </div>
-          </div>
-      <% } else if (type === 'checkbox') { %>
-          <div class="field-group longfield">
-            <label for="<%= id %>"><%= label %></label>
-            <input type="checkbox" id="<%= id %>" name="<%= id %>" value="true" <%= cfg[id] === 'true' ? 'checked' : '' %> />
-          </div>
-      <% } else {
-          let value = cfg[id] || '';
-          if (id === 'MOISTURE_SAVE_INTERVAL_MS' && value !== '') {
-            value = parseInt(value, 10) / 1000;
-          }
-      %>
-          <div class="field-group <%= long ? 'longfield' : '' %>">
-            <label for="<%= id %>"><%= label %></label>
-            <input 
-              type="<%= type %>" 
-              id="<%= id %>" 
-              name="<%= id %>" 
-              value="<%= customValue || value %>" 
-              <%- id === 'LEAF_TEMP_DIFF' ? 'step="0.1"' : '' %>
-            />
-          </div>
-      <% } %>
+
+      <!-- Bewässerungsmodus-Dropdown -->
+      <div class="field-group">
+        <label for="WATERING_MODE">Bewässerungsmodus</label>
+        <select id="WATERING_MODE" name="WATERING_MODE">
+          <option value="organisch" <%= cfg.WATERING_MODE === 'organisch' ? 'selected' : '' %>>Organisch (Erde, Kompost, Bio)</option>
+          <option value="mineralisch" <%= cfg.WATERING_MODE === 'mineralisch' ? 'selected' : '' %>>Mineralisch (Perlit, Coco, Steinwolle)</option>
+        </select>
+      </div>
+
+      <!-- Eingabefelder gruppiert anzeigen -->
+      <% felder.forEach(gruppe => { %>
+        <fieldset class="fieldset">
+          <legend><%= gruppe.title %></legend>
+
+          <% gruppe.fields.forEach(field => {
+            const [id, label, type, long, customValue] = field;
+
+            if (type === 'timer') { %>
+              <div class="field-group longfield">
+                <label><%= label %> (h:min:s)</label>
+                <div class="timer-row">
+                  <input type="number" name="SHELLY_TIMER_HOURS" value="<%= h %>" step="1" /> h
+                  <input type="number" name="SHELLY_TIMER_MINUTES" value="<%= m %>" step="0.1" /> min
+                  <input type="number" name="SHELLY_TIMER_SECONDS" value="<%= s %>" step="1" /> s
+                </div>
+              </div>
+            <% } else if (type === 'timerMineral') { %>
+              <div class="field-group longfield">
+                <label><%= label %> (h:min:s)</label>
+                <div class="timer-row">
+                  <input type="number" name="SHELLY_TIMER_MINERAL_HOURS" value="<%= hm %>" step="1" /> h
+                  <input type="number" name="SHELLY_TIMER_MINERAL_MINUTES" value="<%= mm %>" step="0.1" /> min
+                  <input type="number" name="SHELLY_TIMER_MINERAL_SECONDS" value="<%= sm %>" step="1" /> s
+                </div>
+              </div>
+            <% } else if (type === 'checkbox') { %>
+              <div class="field-group longfield">
+                <label for="<%= id %>"><%= label %></label>
+                <input type="checkbox" id="<%= id %>" name="<%= id %>" value="true" <%= cfg[id] === 'true' ? 'checked' : '' %> />
+              </div>
+            <% } else {
+              let value = cfg[id] || '';
+              if (id === 'MOISTURE_SAVE_INTERVAL_MS' && value !== '') {
+                value = parseInt(value, 10) / 1000;
+              }
+            %>
+              <div class="field-group <%= long ? 'longfield' : '' %>">
+                <label for="<%= id %>"><%= label %></label>
+                <input 
+                  type="<%= type %>" 
+                  id="<%= id %>" 
+                  name="<%= id %>" 
+                  value="<%= customValue || value %>" 
+                  <%- id === 'LEAF_TEMP_DIFF' ? 'step="0.1"' : '' %>
+                />
+              </div>
+            <% } %>
+          <% }); %>
+        </fieldset>
       <% }); %>
     </div>
 
+    <!-- Navigationsbuttons -->
     <div class="button-bar">
       <button type="submit">Speichern und Neustart</button>
       <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>

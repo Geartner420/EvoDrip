@@ -8,7 +8,9 @@ router.get('/stats', (req, res) => {
   res.render('stats', {
     nightWaterCount: stats.nightWaterCount,
     dayWaterCount: stats.dayWaterCount,
-    lastReset: stats.lastReset || null  // 🔧 hier ergänzt
+    nightWatering: stats.nightWatering,
+    dayWatering: stats.dayWatering,
+    lastReset: stats.lastReset || null
   });
 });
 

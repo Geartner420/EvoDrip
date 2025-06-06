@@ -24,41 +24,84 @@ function readEnv() {
 }
 
 const felder = [
-  ['MOISTURE_THRESHOLD', 'Feuchtigkeitsgrenzwert (%)', 'number'],
-  ['NIGHT_START_HOUR', 'Nacht Start (h)', 'number'],
-  ['TELEGRAM_CHAT_ID', 'Telegram Chat ID', 'text'],
+  {
+    title: '🌱 Allgemeine Einstellungen',
+    fields: [
+      ['NIGHT_START_HOUR', 'Nacht Start (h)', 'number'],
+      ['NIGHT_END_HOUR', 'Nacht Ende (h)', 'number'],
+      ['CHECK_INTERVAL_MINUTES', 'Prüf-Intervall (Min)', 'number'],
+      ['LEAF_TEMP_DIFF', 'Delta Blatt-Temperatur', 'number'],
+      ['MOISTURE_SAVE_INTERVAL_MS', 'Speicherintervall (Sek)', 'number'],
+      ['MOISTURE_SUMMARY_INTERVAL_MINUTES', 'Zusammenfassung (Min)', 'number']
+    ]
+  },
 
-  ['TARGET_MOISTURE_AFTER_WATERING', 'Ziel-Feuchtigkeit (%)', 'number'],
-  ['NIGHT_END_HOUR', 'Nacht Ende (h)', 'number'],
-  ['TELEGRAM_BOT_TOKEN', 'Telegram Bot Token', 'text'],
-
-  ['COOLDOWN_AFTER_WATER_MINUTES', 'Cooldown (Min)', 'number'],
-  ['ACCESS_TOKEN', 'FYTA API-Token', 'text'],
-  ['MOISTURE_SAVE_INTERVAL_MS', 'Speicherintervall (Sek)', 'number'],
-
-  ['MAX_DATA_AGE_MINUTES', 'Max. Datenalter (Min)', 'number'],
-  ['SHELLY_IP', 'Lokale Shelly-IP', 'text'],
-  ['CHECK_INTERVAL_MINUTES', 'Prüf-Intervall (Min)', 'number'],
-
-  ['TIMER', 'Tropfzeit', 'timer'],
-  ['UI_USERNAME', 'Benutzername', 'text'],
-  ['MOISTURE_SUMMARY_INTERVAL_MINUTES', 'Zusammenfassung (Min)', 'number'],
-
-  ['WAIT_AFTER_WATER_MINUTES', 'Wartezeit nach Gießen (Min)', 'number'],
-  ['UI_PASSWORD', 'Passwort', 'password'],
-  ['DEBUG', 'Debug-Modus', 'checkbox'],
-  ['LEAF_TEMP_DIFF', 'Delta Blatt-Temperatur', 'number'],
+  {
+    title: '🌿 Organischer Modus',
+    fields: [
+      ['MOISTURE_THRESHOLD', 'Feuchtigkeitsgrenzwert (%)', 'number'],
+      ['TARGET_MOISTURE_AFTER_WATERING', 'Ziel-Feuchte Biologisch', 'number'],
+      ['COOLDOWN_AFTER_WATER_MINUTES', 'Cooldown (Min)', 'number'],
+      ['WAIT_AFTER_WATER_MINUTES', 'Wartezeit nach Gießen (Min)', 'number'],
+      ['TIMER', 'Tropfzeit', 'timer']
+    ]
+  },
+  {
+    title: '🧪 Mineralischer Modus',
+    fields: [
+      ['POT_COUNT', 'Anzahl Töpfe', 'number'],
+      ['DRIPPERS_PER_POT', 'Tropfer pro Topf', 'number'],
+      ['FLOW_RATE_ML_PER_MINUTE', 'Durchflussrate (ml/min)', 'number'],
+      ['TIMER', 'Tropfzeit', 'timerMineral'],
+      ['MIN_TIME_BETWEEN_CYCLES_MIN', 'Mindestpause zw. Zyklen (Min)', 'number'],
+      ['MAX_DAILY_WATER_VOLUME_ML', 'Tägliches Limit (ml)', 'number'],
+      ['MAX_MOISTURE_MINERAL', 'Max. Feuchte (Mineralisch)', 'number']
+    ]
+  },
+  {
+    title: '📨 Telegram',
+    fields: [
+      ['TELEGRAM_CHAT_ID', 'Telegram Chat ID', 'text'],
+      ['TELEGRAM_BOT_TOKEN', 'Telegram Bot Token', 'text']
+    ]
+  },
+  {
+    title: '⚙️ System & Zugang',
+    fields: [
+      ['MAX_DATA_AGE_MINUTES', 'Max. Datenalter (Min)', 'number'],
+      ['SHELLY_IP', 'Lokale Shelly-IP', 'text'],
+      ['ACCESS_TOKEN', 'FYTA API-Token', 'text'],
+      ['UI_USERNAME', 'Benutzername', 'text'],
+      ['UI_PASSWORD', 'Passwort', 'password'],
+      ['DEBUG', 'Debug-Modus', 'checkbox']
+    ]
+  }
 ];
 
 router.get('/', (req, res) => {
   const cfg = readEnv();
+
+  // Organisch
   const totalSec = Math.round(parseFloat(cfg.SHELLY_TIMER_MINUTES || 0) * 60);
   const h = Math.floor(totalSec / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;
+
+  // Mineralisch
+  const mineralSec = Math.round(parseFloat(cfg.SHELLY_TIMER_MINUTES_MINERAL || 0) * 60);
+  const hm = Math.floor(mineralSec / 3600);
+  const mm = Math.floor((mineralSec % 3600) / 60);
+  const sm = mineralSec % 60;
+
   const saveIntervalSec = config.MOISTURE_SAVE_INTERVAL_MS / 1000;
 
-  res.render('ui', { cfg, saveIntervalSec, h, m, s, felder });
+  res.render('ui', {
+    cfg,
+    saveIntervalSec,
+    h, m, s,
+    hm, mm, sm,
+    felder
+  });
 });
 
 export default router;

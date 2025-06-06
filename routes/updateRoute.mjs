@@ -1,11 +1,12 @@
 import express from 'express';
 import Joi from 'joi';
-import { writeEnv, readEnv } from '../services/envService.mjs'; // Wir importieren jetzt auch readEnv
+import { writeEnv, readEnv } from '../services/envService.mjs';
 import logger from '../helper/logger.mjs';
 
 const router = express.Router();
 
 const envFields = [
+  { key: 'WATERING_MODE', type: 'wateringmode', required: true },
   { key: 'ACCESS_TOKEN', type: 'string', required: true },
   { key: 'SHELLY_IP', type: 'ip', required: true },
   { key: 'MOISTURE_THRESHOLD', type: 'number', min: 0, max: 100, required: true },
@@ -28,6 +29,16 @@ const envFields = [
   { key: 'TELEGRAM_CHAT_ID', type: 'string', required: false },
   { key: 'LEAF_TEMP_DIFF', type: 'number', min: -20, max: 20, required: false },
 
+  // Mineral-Modus
+  { key: 'POT_COUNT', type: 'number', min: 1, required: true },
+  { key: 'DRIPPERS_PER_POT', type: 'number', min: 1, required: true },
+  { key: 'FLOW_RATE_ML_PER_MINUTE', type: 'number', min: 0.1, required: true },
+  { key: 'SHELLY_TIMER_MINERAL_HOURS', type: 'number', min: 0, required: true },
+  { key: 'SHELLY_TIMER_MINERAL_MINUTES', type: 'number', min: 0, required: true },
+  { key: 'SHELLY_TIMER_MINERAL_SECONDS', type: 'number', min: 0, required: true },
+  { key: 'MIN_TIME_BETWEEN_CYCLES_MIN', type: 'number', min: 1, required: true },
+  { key: 'MAX_DAILY_WATER_VOLUME_ML', type: 'number', min: 0, required: true },
+  { key: 'MAX_MOISTURE_MINERAL', type: 'number', min: 0, max: 100, required: true }
 ];
 
 function buildValidationSchema(fields) {
@@ -35,7 +46,6 @@ function buildValidationSchema(fields) {
 
   for (const field of fields) {
     let rule;
-
     switch (field.type) {
       case 'string':
         rule = Joi.string();
@@ -54,11 +64,7 @@ function buildValidationSchema(fields) {
       default:
         rule = Joi.any();
     }
-
-    if (field.required) {
-      rule = rule.required();
-    }
-
+    if (field.required) rule = rule.required();
     schema[field.key] = rule;
   }
 
@@ -66,39 +72,37 @@ function buildValidationSchema(fields) {
 }
 
 router.post('/updateEnv', (req, res) => {
-
-  logger.info('🛠 Eingehender POST /update');
+  logger.info('🛠 POST /updateEnv');
 
   const formSchema = buildValidationSchema(envFields);
-
-  const { error, value } = formSchema.validate(req.body, {
-    abortEarly: false,
-    convert: true
-  });
+  const { error, value } = formSchema.validate(req.body, { abortEarly: false, convert: true });
 
   if (error) {
     logger.error('❌ Joi Validation Error:', error.details);
     return res.status(400).send('Ungültige Eingaben:\n' + error.details.map(d => d.message).join('\n'));
   }
 
-  const secs = value.SHELLY_TIMER_HOURS * 3600 +
-               value.SHELLY_TIMER_MINUTES * 60 +
-               value.SHELLY_TIMER_SECONDS;
+  // Timerberechnung für beide Modi
+  const timerOrganischSecs = value.SHELLY_TIMER_HOURS * 3600 +
+                             value.SHELLY_TIMER_MINUTES * 60 +
+                             value.SHELLY_TIMER_SECONDS;
+
+  const timerMineralSecs = value.SHELLY_TIMER_MINERAL_HOURS * 3600 +
+                           value.SHELLY_TIMER_MINERAL_MINUTES * 60 +
+                           value.SHELLY_TIMER_MINERAL_SECONDS;
 
   const updated = {
     ...value,
-    SHELLY_TIMER_MINUTES: (secs / 60).toFixed(2),
+    SHELLY_TIMER_MINUTES: (timerOrganischSecs / 60).toFixed(2),
+    SHELLY_TIMER_MINUTES_MINERAL: (timerMineralSecs / 60).toFixed(2),
     MOISTURE_SAVE_INTERVAL_MS: (parseInt(value.MOISTURE_SAVE_INTERVAL_MS) * 1000).toString(),
     MOISTURE_SUMMARY_INTERVAL_MINUTES: value.MOISTURE_SUMMARY_INTERVAL_MINUTES.toString()
   };
 
-  // .env Datei aktualisieren
   writeEnv(updated);
+  readEnv();
 
-  // Neue ENV-Variablen laden
-  readEnv(); // 🔥 Hier laden wir die neuen ENV-Werte
-
-  res.render('updateSuccess'); // Update-Erfolg anzeigen
+  res.render('updateSuccess');
 });
 
 export default router;

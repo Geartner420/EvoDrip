@@ -9,7 +9,7 @@ import basicAuth from 'express-basic-auth';
 import os from 'os';
 import { spawn } from 'child_process';
 
-// Setze __dirname
+// __dirname setzen
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -24,21 +24,20 @@ if (!fs.existsSync(sensorDataDir)) {
   console.log('📁 sensor_data-Verzeichnis erstellt');
 }
 
-// Services + Helfer
-import { fetchMoisture } from './services/fytaservice.mjs';
-import { triggerShelly } from './services/shellyService.mjs';
+// Services + Helper
 import { loadState, saveState } from './services/stateService.mjs';
 import { loadMoistureData, saveMoistureData } from './services/moistureService.mjs';
 import { checkAndWater } from './services/wateringService.mjs';
-import { isNightTime } from './services/timeService.mjs';
-import { loadRoutes } from './helper/loadRoutes.mjs';
+import { checkAndWaterMineralSubstrate } from './services/wateringMineralService.mjs';
 import { buildWateringOptions } from './helper/wateringOptions.mjs';
-import config from './helper/config.mjs';
-
+import { buildMineralWateringOptions } from './helper/mineralWateringOptions.mjs';
+import { loadRoutes } from './helper/loadRoutes.mjs';
 import { cta } from './services/connectAll.mjs';
 import { startSensorProcessing } from './services/vpdService.mjs';
 import { startRuleEngine } from './services/rule_engine.mjs';
 import { controlRelays } from './services/umluftContol.mjs';
+import config from './helper/config.mjs';
+import { isNightTime } from './services/timeService.mjs';
 
 // Routen
 import sensorDataRoutes from './routes/sensorDataRoutes.mjs';
@@ -140,9 +139,17 @@ async function startServer() {
   const setLastTriggerTime = (ts) => { lastTriggerTime = ts; };
 
   const wateringOptions = buildWateringOptions(getLastTriggerTime, setLastTriggerTime, logger);
-  checkAndWater(wateringOptions);
-  setInterval(() => checkAndWater(wateringOptions), CHECK_INTERVAL_MINUTES * 60000);
-  setInterval(saveMoistureData, MOISTURE_SAVE_INTERVAL_MS);
+  const wateringMineralOptions = buildMineralWateringOptions(getLastTriggerTime, setLastTriggerTime);
+
+  if (config.WATERING_MODE === 'organisch') {
+    logger.info('🟢 Organischer Gießmodus aktiv');
+    checkAndWater(wateringOptions);
+    setInterval(() => checkAndWater(wateringOptions), CHECK_INTERVAL_MINUTES * 60000);
+  } else if (config.WATERING_MODE === 'mineralisch') {
+    logger.info('🔵 Mineralischer Gießmodus aktiv');
+    checkAndWaterMineralSubstrate(wateringMineralOptions);
+    setInterval(() => checkAndWaterMineralSubstrate(wateringMineralOptions), CHECK_INTERVAL_MINUTES * 60000);
+  }
 
   const PORT = process.env.PORT || 3600;
   app.listen(PORT, '0.0.0.0', () =>

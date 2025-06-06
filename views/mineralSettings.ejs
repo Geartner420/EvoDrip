@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mineralische Bewässerung – Einstellungen</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script src="/scripts/darkmode.js" defer></script>
+</head>
+<body>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
+
+  <h2>Mineralische Bewässerung – Einstellungen</h2>
+
+  <form method="POST" action="/api/updateMineralWatering">
+    <div class="form-container-form">
+      <div class="field-group">
+        <label for="POT_COUNT">Anzahl Töpfe</label>
+        <input type="number" id="POT_COUNT" name="POT_COUNT" min="1" value="<%= cfg.POT_COUNT || 5 %>" />
+      </div>
+      <div class="field-group">
+        <label for="DRIPPERS_PER_POT">Tropfer pro Topf</label>
+        <input type="number" id="DRIPPERS_PER_POT" name="DRIPPERS_PER_POT" min="1" value="<%= cfg.DRIPPERS_PER_POT || 6 %>" />
+      </div>
+      <div class="field-group">
+        <label for="FLOW_RATE_ML_PER_MINUTE">Tropfer-Durchflussrate (ml/min)</label>
+        <input type="number" id="FLOW_RATE_ML_PER_MINUTE" name="FLOW_RATE_ML_PER_MINUTE" step="0.1" value="<%= cfg.FLOW_RATE_ML_PER_MINUTE || 60 %>" />
+      </div>
+      <div class="field-group">
+        <label for="WATERING_DURATION_MINUTES">Gießdauer pro Zyklus (Minuten)</label>
+        <input type="number" id="WATERING_DURATION_MINUTES" name="WATERING_DURATION_MINUTES" step="0.1" value="<%= cfg.WATERING_DURATION_MINUTES || 1 %>" />
+      </div>
+      <div class="field-group">
+        <label for="MIN_TIME_BETWEEN_CYCLES_MIN">Mindestpause zwischen Zyklen (Minuten)</label>
+        <input type="number" id="MIN_TIME_BETWEEN_CYCLES_MIN" name="MIN_TIME_BETWEEN_CYCLES_MIN" min="1" value="<%= cfg.MIN_TIME_BETWEEN_CYCLES_MIN || 30 %>" />
+      </div>
+      <div class="field-group">
+        <label for="MAX_DAILY_WATER_VOLUME_ML">Tägliches Wasserlimit (ml, optional)</label>
+        <input type="number" id="MAX_DAILY_WATER_VOLUME_ML" name="MAX_DAILY_WATER_VOLUME_ML" min="0" value="<%= cfg.MAX_DAILY_WATER_VOLUME_ML || 6000 %>" />
+      </div>
+      <div class="field-group">
+        <label for="TARGET_MOISTURE">Ziel-Feuchtigkeit (%)</label>
+        <input type="number" id="TARGET_MOISTURE" name="TARGET_MOISTURE" step="0.1" value="<%= cfg.TARGET_MOISTURE || 42 %>" />
+      </div>
+      <div class="field-group">
+        <label for="MAX_MOISTURE">Maximale Feuchtigkeit (%)</label>
+        <input type="number" id="MAX_MOISTURE" name="MAX_MOISTURE" step="0.1" value="<%= cfg.MAX_MOISTURE || 60 %>" />
+      </div>
+      <div class="field-group">
+        <label for="DAY_START_HOUR">Startzeit (Stunde, 24h)</label>
+        <input type="number" id="DAY_START_HOUR" name="DAY_START_HOUR" min="0" max="23" value="<%= cfg.DAY_START_HOUR || 8 %>" />
+      </div>
+      <div class="field-group">
+        <label for="DAY_END_HOUR">Endzeit (Stunde, 24h)</label>
+        <input type="number" id="DAY_END_HOUR" name="DAY_END_HOUR" min="0" max="23" value="<%= cfg.DAY_END_HOUR || 21 %>" />
+      </div>
+    </div>
+
+    <div class="button-bar">
+      <button type="submit">Speichern & Neustart</button>
+      <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
+      <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
+      <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
+      <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
+      <button type="button" onclick="location.href='/system-status'">🩺 System-Status</button>
+      <button type="button" onclick="location.href='/klima-control'">🌱 Klima-Automatisierung</button>
+    </div>
+  </form>
+</body>
+</html>

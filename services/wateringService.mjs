@@ -1,10 +1,11 @@
+// wateringService.mjs
 import { sendTelegramMessage } from './telegramService.mjs';
 import { incrementDayWater } from './statsService.mjs';
 import { incrementNightWater } from './statsService.mjs';
 import logger from '../helper/logger.mjs';
 
 export async function checkAndWater({
-  fetchMoisture, triggerShelly, logger,
+  fetchMoisture, triggerShelly,
   MOISTURE_THRESHOLD, TARGET_MOISTURE_AFTER_WATERING,
   COOLDOWN_AFTER_WATER_MINUTES, WAIT_AFTER_WATER_MINUTES,
   NIGHT_START_HOUR, NIGHT_END_HOUR,
@@ -106,3 +107,4 @@ export async function checkAndWater({
     global.busy = false;
   }
 }
+// services/wateringService.mjs
