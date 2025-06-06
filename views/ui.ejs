@@ -14,16 +14,9 @@
   <form method="POST" action="/updateEnv">
     <div class="form-container-form">
 
-      <!-- Bewässerungsmodus-Dropdown -->
-      <div class="field-group">
-        <label for="WATERING_MODE">Bewässerungsmodus</label>
-        <select id="WATERING_MODE" name="WATERING_MODE">
-          <option value="organisch" <%= cfg.WATERING_MODE === 'organisch' ? 'selected' : '' %>>Organisch (Erde, Kompost, Bio)</option>
-          <option value="mineralisch" <%= cfg.WATERING_MODE === 'mineralisch' ? 'selected' : '' %>>Mineralisch (Perlit, Coco, Steinwolle)</option>
-        </select>
-      </div>
 
-      <!-- Eingabefelder gruppiert anzeigen -->
+
+      <!-- Alle konfigurierten Gruppen -->
       <% felder.forEach(gruppe => { %>
         <fieldset class="fieldset">
           <legend><%= gruppe.title %></legend>
@@ -74,7 +67,78 @@
           <% }); %>
         </fieldset>
       <% }); %>
+
+      <!-- Crop-Steering Tabs -->
+      <fieldset class="fieldset">
+        <legend>🌤 Crop-Steering Phasen</legend>
+
+        <div class="tab-container">
+          <div class="tab-buttons">
+            <button type="button" class="tab-btn active" onclick="showTab('p1')">Phase 1</button>
+            <button type="button" class="tab-btn" onclick="showTab('p2')">Phase 2</button>
+            <button type="button" class="tab-btn" onclick="showTab('p3')">Phase 3</button>
+          </div>
+
+          <div class="tab-content" id="tab-p1">
+            <div class="field-group longfield">
+              <label for="P1_ENABLED">P1 aktiv</label>
+              <input type="checkbox" id="P1_ENABLED" name="P1_ENABLED" value="true" <%= cfg['P1_ENABLED'] === 'true' ? 'checked' : '' %> />
+            </div>
+            <div class="field-group"><label>Startzeit (h)</label><input type="number" name="P1_START_HOUR" value="<%= cfg['P1_START_HOUR'] || '' %>" /></div>
+            <div class="field-group"><label>Endzeit (h)</label><input type="number" name="P1_END_HOUR" value="<%= cfg['P1_END_HOUR'] || '' %>" /></div>
+            <div class="field-group"><label>Max. Feuchte (%)</label><input type="number" name="P1_MAX_MOISTURE" value="<%= cfg['P1_MAX_MOISTURE'] || '' %>" /></div>
+            <div class="field-group"><label>Mindestabstand (Min)</label><input type="number" name="P1_MIN_TIME_BETWEEN_CYCLES_MIN" value="<%= cfg['P1_MIN_TIME_BETWEEN_CYCLES_MIN'] || '' %>" /></div>
+            <div class="field-group longfield"><label>Tropfzeit (h:min:s)</label><div class="timer-row">
+              <input type="number" name="SHELLY_TIMER_MINERAL_P1_HOURS" value="<%= hm_p1 %>" step="1" /> h
+              <input type="number" name="SHELLY_TIMER_MINERAL_P1_MINUTES_RAW" value="<%= mm_p1 %>" step="1" /> min
+              <input type="number" name="SHELLY_TIMER_MINERAL_P1_SECONDS" value="<%= sm_p1 %>" step="1" /> s
+            </div></div>
+          </div>
+
+          <div class="tab-content hidden" id="tab-p2">
+            <div class="field-group longfield">
+              <label for="P2_ENABLED">P2 aktiv</label>
+              <input type="checkbox" id="P2_ENABLED" name="P2_ENABLED" value="true" <%= cfg['P2_ENABLED'] === 'true' ? 'checked' : '' %> />
+            </div>
+            <div class="field-group"><label>Startzeit (h)</label><input type="number" name="P2_START_HOUR" value="<%= cfg['P2_START_HOUR'] || '' %>" /></div>
+            <div class="field-group"><label>Endzeit (h)</label><input type="number" name="P2_END_HOUR" value="<%= cfg['P2_END_HOUR'] || '' %>" /></div>
+            <div class="field-group"><label>Max. Feuchte (%)</label><input type="number" name="P2_MAX_MOISTURE" value="<%= cfg['P2_MAX_MOISTURE'] || '' %>" /></div>
+            <div class="field-group"><label>Mindestabstand (Min)</label><input type="number" name="P2_MIN_TIME_BETWEEN_CYCLES_MIN" value="<%= cfg['P2_MIN_TIME_BETWEEN_CYCLES_MIN'] || '' %>" /></div>
+            <div class="field-group longfield"><label>Tropfzeit (h:min:s)</label><div class="timer-row">
+              <input type="number" name="SHELLY_TIMER_MINERAL_P2_HOURS" value="<%= hm_p2 %>" step="1" /> h
+              <input type="number" name="SHELLY_TIMER_MINERAL_P2_MINUTES_RAW" value="<%= mm_p2 %>" step="1" /> min
+              <input type="number" name="SHELLY_TIMER_MINERAL_P2_SECONDS" value="<%= sm_p2 %>" step="1" /> s
+            </div></div>
+          </div>
+
+          <div class="tab-content hidden" id="tab-p3">
+            <div class="field-group longfield">
+              <label for="P3_ENABLED">P3 aktiv</label>
+              <input type="checkbox" id="P3_ENABLED" name="P3_ENABLED" value="true" <%= cfg['P3_ENABLED'] === 'true' ? 'checked' : '' %> />
+            </div>
+            <div class="field-group"><label>Startzeit (h)</label><input type="number" name="P3_START_HOUR" value="<%= cfg['P3_START_HOUR'] || '' %>" /></div>
+            <div class="field-group"><label>Endzeit (h)</label><input type="number" name="P3_END_HOUR" value="<%= cfg['P3_END_HOUR'] || '' %>" /></div>
+            <div class="field-group"><label>Max. Feuchte (%)</label><input type="number" name="P3_MAX_MOISTURE" value="<%= cfg['P3_MAX_MOISTURE'] || '' %>" /></div>
+            <div class="field-group"><label>Mindestabstand (Min)</label><input type="number" name="P3_MIN_TIME_BETWEEN_CYCLES_MIN" value="<%= cfg['P3_MIN_TIME_BETWEEN_CYCLES_MIN'] || '' %>" /></div>
+            <div class="field-group longfield"><label>Tropfzeit (h:min:s)</label><div class="timer-row">
+              <input type="number" name="SHELLY_TIMER_MINERAL_P3_HOURS" value="<%= hm_p3 %>" step="1" /> h
+              <input type="number" name="SHELLY_TIMER_MINERAL_P3_MINUTES_RAW" value="<%= mm_p3 %>" step="1" /> min
+              <input type="number" name="SHELLY_TIMER_MINERAL_P3_SECONDS" value="<%= sm_p3 %>" step="1" /> s
+            </div></div>
+          </div>
+        </div>
+      </fieldset>
+
+            <!-- Bewässerungsmodus-Dropdown -->
+      <div class="field-group">
+        <label for="WATERING_MODE">Bewässerungsmodus</label>
+        <select id="WATERING_MODE" name="WATERING_MODE">
+          <option value="organisch" <%= cfg.WATERING_MODE === 'organisch' ? 'selected' : '' %>>Organisch (Erde, Kompost, Bio)</option>
+          <option value="mineralisch" <%= cfg.WATERING_MODE === 'mineralisch' ? 'selected' : '' %>>Mineralisch (Perlit, Coco, Steinwolle)</option>
+        </select>
+      </div>
     </div>
+    
 
     <!-- Navigationsbuttons -->
     <div class="button-bar">
@@ -92,5 +156,33 @@
       <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
     </div>
   </form>
+
+  <!-- Styles + JS für Tabs -->
+  <style>
+    .tab-container { margin-top: 1em; }
+    .tab-buttons { display: flex; gap: 10px; margin-bottom: 10px; }
+    .tab-btn {
+      padding: 6px 12px;
+      border: 1px solid var(--border-color, #999);
+      background: var(--button-bg, #eee);
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      font-weight: bold;
+      background: var(--button-active-bg, #ccc);
+    }
+    .tab-content.hidden { display: none; }
+  </style>
+
+  <script>
+    function showTab(phase) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+      document.querySelector(`#tab-${phase}`).classList.remove('hidden');
+      document.querySelector(`.tab-btn[onclick*="${phase}"]`).classList.add('active');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => showTab('p1'));
+  </script>
 </body>
 </html>

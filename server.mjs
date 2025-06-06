@@ -37,6 +37,7 @@ import { startSensorProcessing } from './services/vpdService.mjs';
 import { startRuleEngine } from './services/rule_engine.mjs';
 import { controlRelays } from './services/umluftContol.mjs';
 import config from './helper/config.mjs';
+import { checkAllPhases } from './services/checkCropSteering.mjs';
 import { isNightTime } from './services/timeService.mjs';
 
 // Routen
@@ -134,22 +135,36 @@ async function startServer() {
     }
   });
 
-  global.busy = false;
-  const getLastTriggerTime = () => lastTriggerTime;
-  const setLastTriggerTime = (ts) => { lastTriggerTime = ts; };
+global.busy = false;
 
-  const wateringOptions = buildWateringOptions(getLastTriggerTime, setLastTriggerTime, logger);
-  const wateringMineralOptions = buildMineralWateringOptions(getLastTriggerTime, setLastTriggerTime);
+const getLastTriggerTime = (phase = 'default') => lastTriggerTime?.[phase] ?? null;
+const setLastTriggerTime = (phase = 'default', ts) => {
+  if (!lastTriggerTime) lastTriggerTime = {};
+  lastTriggerTime[phase] = ts;
+};
 
-  if (config.WATERING_MODE === 'organisch') {
-    logger.info('🟢 Organischer Gießmodus aktiv');
-    checkAndWater(wateringOptions);
-    setInterval(() => checkAndWater(wateringOptions), CHECK_INTERVAL_MINUTES * 60000);
-  } else if (config.WATERING_MODE === 'mineralisch') {
-    logger.info('🔵 Mineralischer Gießmodus aktiv');
-    checkAndWaterMineralSubstrate(wateringMineralOptions);
-    setInterval(() => checkAndWaterMineralSubstrate(wateringMineralOptions), CHECK_INTERVAL_MINUTES * 60000);
-  }
+const wateringOptions = buildWateringOptions(
+  () => getLastTriggerTime('organisch'),
+  ts => setLastTriggerTime('organisch', ts),
+  logger
+);
+
+const wateringMineralOptions = buildMineralWateringOptions(
+  () => getLastTriggerTime('mineralisch'),
+  ts => setLastTriggerTime('mineralisch', ts)
+);
+
+// Starte je nach Modus
+if (config.WATERING_MODE === 'organisch') {
+  logger.info('🟢 Organischer Gießmodus aktiv');
+  checkAndWater(wateringOptions);
+  setInterval(() => checkAndWater(wateringOptions), config.CHECK_INTERVAL_MINUTES * 60_000);
+
+} else if (config.WATERING_MODE === 'mineralisch') {
+  logger.info('🔵 Mineralischer Gießmodus (Crop Steering) aktiv');
+  checkAllPhases(); // ruft automatisch P1, P2, P3
+  setInterval(() => checkAllPhases(), config.CHECK_INTERVAL_MINUTES * 60_000);
+}
 
   const PORT = process.env.PORT || 3600;
   app.listen(PORT, '0.0.0.0', () =>

@@ -52,12 +52,11 @@ const felder = [
       ['POT_COUNT', 'Anzahl Töpfe', 'number'],
       ['DRIPPERS_PER_POT', 'Tropfer pro Topf', 'number'],
       ['FLOW_RATE_ML_PER_MINUTE', 'Durchflussrate (ml/min)', 'number'],
-      ['TIMER', 'Tropfzeit', 'timerMineral'],
-      ['MIN_TIME_BETWEEN_CYCLES_MIN', 'Mindestpause zw. Zyklen (Min)', 'number'],
-      ['MAX_DAILY_WATER_VOLUME_ML', 'Tägliches Limit (ml)', 'number'],
-      ['MAX_MOISTURE_MINERAL', 'Max. Feuchte (Mineralisch)', 'number']
+      ['MAX_DAILY_WATER_VOLUME_ML', 'Tägliches Limit (ml)', 'number']
     ]
   },
+ 
+
   {
     title: '📨 Telegram',
     fields: [
@@ -93,6 +92,20 @@ router.get('/', (req, res) => {
   const mm = Math.floor((mineralSec % 3600) / 60);
   const sm = mineralSec % 60;
 
+  // Crop-Steering P1
+const hm_p1 = parseInt(cfg.SHELLY_TIMER_MINERAL_P1_HOURS || 0);
+const mm_p1 = parseInt(cfg.SHELLY_TIMER_MINERAL_P1_MINUTES_RAW || 0);
+const sm_p1 = parseInt(cfg.SHELLY_TIMER_MINERAL_P1_SECONDS || 0);
+
+const hm_p2 = parseInt(cfg.SHELLY_TIMER_MINERAL_P2_HOURS || 0);
+const mm_p2 = parseInt(cfg.SHELLY_TIMER_MINERAL_P2_MINUTES_RAW || 0);
+const sm_p2 = parseInt(cfg.SHELLY_TIMER_MINERAL_P2_SECONDS || 0);
+
+const hm_p3 = parseInt(cfg.SHELLY_TIMER_MINERAL_P3_HOURS || 0);
+const mm_p3 = parseInt(cfg.SHELLY_TIMER_MINERAL_P3_MINUTES_RAW || 0);
+const sm_p3 = parseInt(cfg.SHELLY_TIMER_MINERAL_P3_SECONDS || 0);
+
+
   const saveIntervalSec = config.MOISTURE_SAVE_INTERVAL_MS / 1000;
 
   res.render('ui', {
@@ -100,8 +113,12 @@ router.get('/', (req, res) => {
     saveIntervalSec,
     h, m, s,
     hm, mm, sm,
+    hm_p1, mm_p1, sm_p1,
+    hm_p2, mm_p2, sm_p2,
+    hm_p3, mm_p3, sm_p3,
     felder
   });
 });
+
 
 export default router;

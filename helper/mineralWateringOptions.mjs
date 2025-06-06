@@ -21,7 +21,7 @@ export function buildMineralWateringOptions(getLastTriggerTime, setLastTriggerTi
     POT_COUNT: config.POT_COUNT,
     DRIPPERS_PER_POT: config.DRIPPERS_PER_POT,
     FLOW_RATE_ML_PER_MINUTE: config.FLOW_RATE_ML_PER_MINUTE,
-      SHELLY_TIMER_MINERAL_HOURS: config.SHELLY_TIMER_MINERAL_HOURS,
+    SHELLY_TIMER_MINERAL_HOURS: config.SHELLY_TIMER_MINERAL_HOURS,
     SHELLY_TIMER_MINERAL_MINUTES: config.SHELLY_TIMER_MINERAL_MINUTES,
     SHELLY_TIMER_MINERAL_SECONDS: config.SHELLY_TIMER_MINERAL_SECONDS,
     MIN_TIME_BETWEEN_CYCLES_MIN: config.MIN_TIME_BETWEEN_CYCLES_MIN,
@@ -33,5 +33,5 @@ export function buildMineralWateringOptions(getLastTriggerTime, setLastTriggerTi
     setLastTriggerTime,
     getTodayTotalWater, // Tageszähler (für Wasserlimit)
     saveState
-  };
+};
 }

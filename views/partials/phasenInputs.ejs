@@ -1,0 +1,26 @@
+<div class="field-group longfield">
+  <label for="<%= phase %>_ENABLED"><%= phase %> aktiv</label>
+  <input type="checkbox" id="<%= phase %>_ENABLED" name="<%= phase %>_ENABLED" value="true" <%= cfg[`${phase}_ENABLED`] === 'true' ? 'checked' : '' %> />
+</div>
+
+<div class="field-group">
+  <label for="<%= phase %>_START_HOUR">Startzeit (h)</label>
+  <input type="number" id="<%= phase %>_START_HOUR" name="<%= phase %>_START_HOUR" value="<%= cfg[`${phase}_START_HOUR`] || '' %>" />
+</div>
+
+<div class="field-group">
+  <label for="<%= phase %>_END_HOUR">Endzeit (h)</label>
+  <input type="number" id="<%= phase %>_END_HOUR" name="<%= phase %>_END_HOUR" value="<%= cfg[`${phase}_END_HOUR`] || '' %>" />
+</div>
+
+<div class="field-group">
+  <label for="<%= phase %>_MAX_MOISTURE">Max. Feuchte (%)</label>
+  <input type="number" id="<%= phase %>_MAX_MOISTURE" name="<%= phase %>_MAX_MOISTURE" value="<%= cfg[`${phase}_MAX_MOISTURE`] || '' %>" />
+</div>
+
+<div class="field-group">
+  <label for="<%= phase %>_MIN_TIME_BETWEEN_CYCLES_MIN">Mindestabstand (Min)</label>
+  <input type="number" id="<%= phase %>_MIN_TIME_BETWEEN_CYCLES_MIN" name="<%= phase %>_MIN_TIME_BETWEEN_CYCLES_MIN" value="<%= cfg[`${phase}_MIN_TIME_BETWEEN_CYCLES_MIN`] || '' %>" />
+</div>
+
+

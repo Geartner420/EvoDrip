@@ -1,3 +1,5 @@
+// config.mjs
+
 import dotenv from 'dotenv';
 import Joi from 'joi';
 import path from 'path';
@@ -24,7 +26,7 @@ const schema = Joi.object({
   NIGHT_END_HOUR: Joi.number().min(0).max(23).default(6),
   MAX_DATA_AGE_MINUTES: Joi.number().min(1).default(60),
   SHELLY_TIMER_MINUTES: Joi.number().min(0).default(5),
-  SHELLY_TIMER_MINUTES_MINERAL: Joi.number().min(0).default(5), // 🆕 hinzugefügt
+  SHELLY_TIMER_MINUTES_MINERAL: Joi.number().min(0).default(5),
   WAIT_AFTER_WATER_MINUTES: Joi.number().min(0).default(8),
   DEBUG: Joi.boolean().truthy('true').falsy('false').falsy('').default(false),
   UI_USERNAME: Joi.string().default('admin'),
@@ -35,6 +37,36 @@ const schema = Joi.object({
   TELEGRAM_CHAT_ID: Joi.string().required(),
   LEAF_TEMP_DIFF: Joi.number().min(-20).max(20).default(-2),
 
+  // Crop-Steering: Phasensteuerung
+  P1_ENABLED: Joi.boolean().truthy('true').falsy('false').default(false),
+  P1_START_HOUR: Joi.number().min(0).max(23).default(6),
+  P1_END_HOUR: Joi.number().min(0).max(23).default(10),
+  P1_MAX_MOISTURE: Joi.number().min(0).max(100).default(45),
+  P1_DURATION_MINUTES: Joi.number().min(1).max(60).default(2),
+  P1_MIN_TIME_BETWEEN_CYCLES_MIN: Joi.number().min(1).default(60),
+  SHELLY_TIMER_MINUTES_P1: Joi.number().min(0).default(1),
+  SHELLY_TIMER_MINERAL_P1_MINUTES_RAW: Joi.number().min(0).default(2),
+
+  P2_ENABLED: Joi.boolean().truthy('true').falsy('false').default(false),
+  P2_START_HOUR: Joi.number().min(0).max(23).default(10),
+  P2_END_HOUR: Joi.number().min(0).max(23).default(16),
+  P2_MAX_MOISTURE: Joi.number().min(0).max(100).default(40),
+  P2_DURATION_MINUTES: Joi.number().min(1).max(60).default(1),
+  P2_MIN_TIME_BETWEEN_CYCLES_MIN: Joi.number().min(1).default(45),
+  SHELLY_TIMER_MINUTES_P2: Joi.number().min(0).default(1),
+  SHELLY_TIMER_MINERAL_P2_MINUTES_RAW: Joi.number().min(0).default(1),
+
+
+
+  P3_ENABLED: Joi.boolean().truthy('true').falsy('false').default(false),
+  P3_START_HOUR: Joi.number().min(0).max(23).default(17),
+  P3_END_HOUR: Joi.number().min(0).max(23).default(20),
+  P3_MAX_MOISTURE: Joi.number().min(0).max(100).default(35),
+  P3_DURATION_MINUTES: Joi.number().min(1).max(60).default(1),
+  P3_MIN_TIME_BETWEEN_CYCLES_MIN: Joi.number().min(1).default(90),
+  SHELLY_TIMER_MINUTES_P3: Joi.number().min(0).default(1),
+  SHELLY_TIMER_MINERAL_P3_MINUTES_RAW: Joi.number().min(0).default(1),
+
   // Optional für Zyklussteuerung etc.
   initialOffset: Joi.number().optional(),
   minOnDuration: Joi.number().optional(),
@@ -43,14 +75,11 @@ const schema = Joi.object({
   maxOffDuration: Joi.number().optional(),
   simultaneousCycleInterval: Joi.number().optional(),
 
-  // 🧪 Mineral-Modus
+  // 🧪 Mineral-Modus allgemein
   POT_COUNT: Joi.number().min(1).default(5),
   DRIPPERS_PER_POT: Joi.number().min(1).default(6),
   FLOW_RATE_ML_PER_MINUTE: Joi.number().min(0.1).default(60),
-  WATERING_DURATION_MINUTES: Joi.number().min(0.1).default(1),
-  MIN_TIME_BETWEEN_CYCLES_MIN: Joi.number().min(1).default(30),
   MAX_DAILY_WATER_VOLUME_ML: Joi.number().min(0).default(6000),
-  MAX_MOISTURE_MINERAL: Joi.number().min(0).max(100).default(60),
 
   // 🌱 Modus-Umschaltung
   WATERING_MODE: Joi.string().valid('organisch', 'mineralisch').default('organisch')

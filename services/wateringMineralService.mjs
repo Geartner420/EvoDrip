@@ -1,109 +1,101 @@
-// wateringMineralService.mjs
 import { sendTelegramMessage } from './telegramService.mjs';
-import { incrementDayWatering } from './statsService.mjs'; // Muss implementiert sein: Summiert die Tageswassermenge!
+import { incrementDayWatering } from './statsService.mjs';
 import logger from '../helper/logger.mjs';
 
-
+/**
+ * Führt eine Crop-Steering-Bewässerung für eine Phase (P1, P2, P3) durch
+ * @param {Object} options - Enthält alle nötigen Funktionen und Einstellungen
+ */
 export async function checkAndWaterMineralSubstrate({
   fetchMoisture,
   triggerShelly,
-  POT_COUNT,
-  DRIPPERS_PER_POT,
-  FLOW_RATE_ML_PER_MINUTE,
-  WATERING_DURATION_MINUTES,
-  MIN_TIME_BETWEEN_CYCLES_MIN,
-  MAX_DAILY_WATER_VOLUME_ML,
-  MAX_MOISTURE,
   getLastTriggerTime,
   setLastTriggerTime,
   getTodayTotalWater,
-  saveState
+  saveState,
+  phase,
+  settings
 }) {
-  // Verhindert parallele Gießvorgänge
+  const phaseCfg = settings?.[phase];
+  if (!phaseCfg?.ENABLED) {
+    logger.debug(`[${phase}] Phase ist deaktiviert.`);
+    return;
+  }
+
+  const {
+    START_HOUR,
+    END_HOUR,
+    MAX_MOISTURE,
+    MIN_TIME_BETWEEN_CYCLES_MIN,
+    MAX_DAILY_WATER_VOLUME_ML,
+    FLOW_RATE_ML_PER_MINUTE,
+    DRIPPERS_PER_POT,
+    POT_COUNT
+  } = phaseCfg;
+
+  const now = new Date();
+  const hour = now.getHours();
+
+  // Zeitfensterprüfung
+  if (hour < START_HOUR || hour >= END_HOUR) {
+    logger.debug(`🕒 [${phase}] Liegt außerhalb des Bewässerungszeitfensters.`);
+    return;
+  }
+
+  // Verhindere Parallelzugriffe
   if (global.busy) return;
   global.busy = true;
 
   try {
-    // Zeitfenster prüfen
-    const now = new Date();
-    const hour = now.getHours();
-    if (isNightTime(NIGHT_START_HOUR, NIGHT_END_HOUR)) {
-    logger.debug("🌙 Nachtzeit erkannt – keine Bewässerung.");
-    return;
-    }
-
-
-    // Mindestabstand seit letzter Bewässerung
-    const last = getLastTriggerTime();
+    // Mindestabstand seit letzter Gießung
+    const last = getLastTriggerTime(phase);
     if (last && Date.now() - last.getTime() < MIN_TIME_BETWEEN_CYCLES_MIN * 60_000) {
-      logger.debug("⏳ Mindestpause zwischen Gaben noch aktiv.");
+      logger.debug(`⏳ [${phase}] Mindestabstand noch nicht erreicht.`);
       return;
     }
 
-    // Feuchte messen
-    let moisture = await fetchMoisture();
-    logger.info(`🌡 Aktuelle Feuchtigkeit: ${moisture}%`);
-
-    // Wenn Substrat bereits ausreichend feucht, keine Aktion
+    const moisture = await fetchMoisture();
+    logger.info(`🌡 [${phase}] Feuchtigkeit: ${moisture}%`);
     if (moisture >= MAX_MOISTURE) {
-      logger.info("💧 Substrat ist ausreichend feucht, keine Gabe nötig.");
+      logger.info(`💧 [${phase}] Substrat zu feucht – keine Aktion.`);
       return;
     }
 
-    // Wassermenge berechnen (ml)
-    const waterPerDripper = FLOW_RATE_ML_PER_MINUTE * WATERING_DURATION_MINUTES;
-    const totalWater = waterPerDripper * DRIPPERS_PER_POT * POT_COUNT;
+        const durationSeconds =
+      (parseInt(settings?.[`${phase}_HOURS`] ?? 0) * 3600) +
+      (parseInt(settings?.[`${phase}_MINUTES_RAW`] ?? 0) * 60) +
+      (parseInt(settings?.[`${phase}_SECONDS`] ?? 0));
 
-    // Tageslimit prüfen
-    const dailyTotal = getTodayTotalWater?.() ?? 0;
-    if (
-      MAX_DAILY_WATER_VOLUME_ML &&
-      (dailyTotal + totalWater > MAX_DAILY_WATER_VOLUME_ML)
-    ) {
-      logger.warn("🚫 Tageslimit erreicht – kein weiterer Gießzyklus.");
+    const durationMinutes = durationSeconds / 60;
+
+    const totalWater = FLOW_RATE_ML_PER_MINUTE * durationMinutes * DRIPPERS_PER_POT * POT_COUNT;
+
+    const todayTotal = getTodayTotalWater?.() ?? 0;
+
+    if (MAX_DAILY_WATER_VOLUME_ML && (todayTotal + totalWater > MAX_DAILY_WATER_VOLUME_ML)) {
+      logger.warn(`🚫 [${phase}] Tageslimit überschritten.`);
       return;
     }
 
-    // Telegram- und Log-Ausgabe, Start
-    logger.warn(`💧 Gieße ${totalWater} ml (⏳ ${WATERING_DURATION_MINUTES} Min) für mineralisches Substrat`);
-    await sendTelegramMessage(
-      `💧 Mineral-Gießung gestartet: ${totalWater} ml (${WATERING_DURATION_MINUTES} min, Feuchte: ${moisture}%)`
-    );
+    logger.info(`💧 [${phase}] Starte Bewässerung mit ${totalWater} ml (${durationMinutes.toFixed(2)} min)`);
 
-    // Bewässerung auslösen
-    const totalSeconds =
-    SHELLY_TIMER_MINERAL_HOURS * 3600 +
-    SHELLY_TIMER_MINERAL_MINUTES * 60 +
-    SHELLY_TIMER_MINERAL_SECONDS;
+    await sendTelegramMessage(`💧 [${phase}] Gießung: ${totalWater} ml (${durationMinutes.toFixed(2)} min)`);
 
-    const wateringDurationMs = totalSeconds * 1000;
-
-// Bewässerung auslösen
     await triggerShelly();
-    await new Promise(r => setTimeout(r, wateringDurationMs));
-        logger.info(`⏳ Bewässerung für ${WATERING_DURATION_MINUTES} Minuten gestartet...`);
+    await new Promise(r => setTimeout(r, durationSeconds * 1000));
 
-    // Nach der Gabe Feuchte messen und loggen
-    const afterMoisture = await fetchMoisture();
-    logger.info(`🌡 Neue Feuchtigkeit: ${afterMoisture}%`);
-    await sendTelegramMessage(
-      `✅ Mineral-Gießung beendet. Neue Feuchtigkeit: ${afterMoisture}%.`
-    );
 
-    // Tageszähler hochzählen, Zeitstempel speichern, Systemzustand sichern
+    const after = await fetchMoisture();
+    logger.info(`✅ [${phase}] Neue Feuchtigkeit: ${after}%`);
+    await sendTelegramMessage(`✅ [${phase}] beendet. Neue Feuchte: ${after}%`);
+
     incrementDayWatering(totalWater);
-    setLastTriggerTime(new Date());
+    setLastTriggerTime(phase, new Date());
     saveState();
 
   } catch (err) {
-    logger.error(`❌ Fehler bei mineralischem Gießmodus: ${err.message}`);
+    logger.error(`❌ [${phase}] Fehler: ${err.message}`);
   } finally {
-    global.busy = false; // Gieß-Flag wieder freigeben
+    global.busy = false;
   }
 }
-
-// Dieses Modul enthält die Kernlogik für die mineralische Tropfbewässerung.
-// Es prüft Feuchte, Zeitabstände, Tageslimit und führt die Steuerung samt Logging und Telegram-Alarmierung aus.
-// Die Funktion wird am besten von einem externen Scheduler/Timer regelmäßig aufgerufen.
-// Sie ist so gestaltet, dass sie nicht blockiert und parallele Aufrufe verhindert.
-// Die Parameter sollten aus der Konfiguration geladen werden, um Flexibilität zu gewährleisten.

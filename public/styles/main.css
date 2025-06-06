@@ -277,6 +277,38 @@ pre {
   background-color: var(--button-bg);
 }
 
+  .tab-container {
+    margin-top: 1em;
+  }
+
+  .tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .tab-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color, #999);
+    background: var(--button-bg, #eee);
+    cursor: pointer;
+  }
+
+  .tab-btn.active {
+    font-weight: bold;
+    background: var(--button-active-bg, #ccc);
+  }
+
+  .tab-content {
+    display: block;
+  }
+
+  .tab-content.hidden {
+    display: none !important;
+  }
+
+
+
 /* ========== Charts & Karten ========== */
 #chartsContainer {
   display: flex;
