@@ -40,6 +40,7 @@ const envFields = [
   { key: 'P1_ENABLED', type: 'boolean', required: false },
   { key: 'P1_START_HOUR', type: 'number', min: 0, max: 23, required: true },
   { key: 'P1_END_HOUR', type: 'number', min: 0, max: 23, required: true },
+  { key: 'P1_MIN_MOISTURE', type: 'number', min: 0, max: 100, required: true },
   { key: 'P1_MAX_MOISTURE', type: 'number', min: 0, max: 100, required: true },
   { key: 'P1_MIN_TIME_BETWEEN_CYCLES_MIN', type: 'number', min: 1, required: true },
   { key: 'SHELLY_TIMER_MINERAL_P1_HOURS', type: 'number', min: 0, required: true },
@@ -50,6 +51,7 @@ const envFields = [
   { key: 'P2_ENABLED', type: 'boolean', required: false },
   { key: 'P2_START_HOUR', type: 'number', min: 0, max: 23, required: true },
   { key: 'P2_END_HOUR', type: 'number', min: 0, max: 23, required: true },
+  { key: 'P2_MIN_MOISTURE', type: 'number', min: 0, max: 100, required: true },
   { key: 'P2_MAX_MOISTURE', type: 'number', min: 0, max: 100, required: true },
   { key: 'P2_MIN_TIME_BETWEEN_CYCLES_MIN', type: 'number', min: 1, required: true },
   { key: 'SHELLY_TIMER_MINERAL_P2_HOURS', type: 'number', min: 0, required: true },
@@ -60,6 +62,7 @@ const envFields = [
   { key: 'P3_ENABLED', type: 'boolean', required: false },
   { key: 'P3_START_HOUR', type: 'number', min: 0, max: 23, required: true },
   { key: 'P3_END_HOUR', type: 'number', min: 0, max: 23, required: true },
+  { key: 'P3_MIN_MOISTURE', type: 'number', min: 0, max: 100, required: true },
   { key: 'P3_MAX_MOISTURE', type: 'number', min: 0, max: 100, required: true },
   { key: 'P3_MIN_TIME_BETWEEN_CYCLES_MIN', type: 'number', min: 1, required: true },
   { key: 'SHELLY_TIMER_MINERAL_P3_HOURS', type: 'number', min: 0, required: true },
@@ -114,9 +117,7 @@ router.post('/updateEnv', (req, res) => {
                              value.SHELLY_TIMER_MINUTES * 60 +
                              value.SHELLY_TIMER_SECONDS;
 
-  const timerMineralSecs = value.SHELLY_TIMER_MINERAL_HOURS * 3600 +
-                           value.SHELLY_TIMER_MINERAL_MINUTES * 60 +
-                           value.SHELLY_TIMER_MINERAL_SECONDS;
+
                            // Tropfzeit für P1–P3 berechnen
   const timerP1Secs = value.SHELLY_TIMER_MINERAL_P1_HOURS * 3600 +
                       value.SHELLY_TIMER_MINERAL_P1_MINUTES_RAW * 60 +
