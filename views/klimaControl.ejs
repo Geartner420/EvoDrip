@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="/styles/card.css" />
   <link rel="stylesheet" href="/styles/klimaCard.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
 </head>
 <body>
   <h1>🌱Klima-Automatisierung</h1>
@@ -358,7 +359,7 @@ function App() {
           activeFrom: '',
           activeTo: '',
           conditions: [
-            { sensor: '', param: '', op: '', value: '', hysteresis: '', logic: 'AND' }
+            { sensor: '', param: 'vpd', op: '', value: '', hysteresis: '', logic: 'OR' }
           ]
         });
 
@@ -413,7 +414,7 @@ function App() {
               action: 'on',
               activeFrom: '',
               activeTo: '',
-              conditions: [{ sensor: '', param: '', op: '', value: '', hysteresis: '', logic: 'AND' }],
+              conditions: [{ sensor: '', param: 'vpd', op: '', value: '', hysteresis: '', logic: 'OR' }],
             });
             setSaveMessage('✅ Regel hinzugefügt');
             setTimeout(() => setSaveMessage(''), 2000);
@@ -592,6 +593,7 @@ function App() {
     <button onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
     <button onclick="location.href='/rulelog'">📋 Regel-Log</button>
     <button onclick="location.href='/combined-dashboard'">📊 Combi-Dashboard</button>
+    <button type="button" onclick="location.href='/climate-evaluation'">Klima-Evaluation</button>
     <button onclick="location.href='/ui'">📁 Zur Übersicht</button>
   </div>
 </body>

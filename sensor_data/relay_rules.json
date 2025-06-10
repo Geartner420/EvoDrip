@@ -1,6 +1,6 @@
 [
   {
-    "name": "RH 80%/ D-N/ ON",
+    "name": "Max. Parameter",
     "relays": [
       "Abluft"
     ],
@@ -47,24 +47,24 @@
         "sensor": "sensor_1.json",
         "param": "vpd",
         "op": "<",
-        "value": "0.8",
-        "hysteresis": "",
+        "value": "0.7",
+        "hysteresis": "0.1",
         "logic": "OR"
       },
       {
         "sensor": "sensor_2.json",
         "param": "vpd",
         "op": "<",
-        "value": "0.8",
-        "hysteresis": "",
+        "value": "0.7",
+        "hysteresis": "0.1",
         "logic": "OR"
       },
       {
         "sensor": "sensor_3.json",
         "param": "vpd",
         "op": "<",
-        "value": "0.8",
-        "hysteresis": "",
+        "value": "0.7",
+        "hysteresis": "0.1",
         "logic": "OR"
       }
     ]
@@ -80,17 +80,25 @@
     "conditions": [
       {
         "sensor": "sensor_2.json",
-        "param": "temperature",
-        "op": "",
-        "value": "32",
-        "hysteresis": "",
+        "param": "vpd",
+        "op": "<=",
+        "value": "0.8",
+        "hysteresis": "0.1",
+        "logic": "OR"
+      },
+      {
+        "sensor": "sensor_3.json",
+        "param": "vpd",
+        "op": "<=",
+        "value": "0.8",
+        "hysteresis": "0",
         "logic": "OR"
       },
       {
         "sensor": "sensor_1.json",
         "param": "vpd",
         "op": "<=",
-        "value": "0.9",
+        "value": "0.8",
         "hysteresis": "0.1",
         "logic": "OR"
       }
@@ -107,14 +115,6 @@
     "activeTo": "23:59",
     "enabled": true,
     "conditions": [
-      {
-        "sensor": "sensor_1.json",
-        "param": "temperature",
-        "op": "<",
-        "value": "28",
-        "hysteresis": "",
-        "logic": "OR"
-      },
       {
         "sensor": "sensor_1.json",
         "param": "vpd",
@@ -136,7 +136,7 @@
     "conditions": [
       {
         "sensor": "sensor_2.json",
-        "param": "",
+        "param": "vpd",
         "op": ">=",
         "value": "0.9",
         "hysteresis": "",
@@ -144,7 +144,7 @@
       },
       {
         "sensor": "sensor_3.json",
-        "param": "",
+        "param": "vpd",
         "op": ">=",
         "value": "0.9",
         "hysteresis": "",

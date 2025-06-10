@@ -1,7 +1,7 @@
 {
   "global": {
     "initialOffset": 120000,
-    "minOn": 240000,
+    "minOn": 120000,
     "maxOn": 480000,
     "minOff": 120000,
     "maxOff": 300000,

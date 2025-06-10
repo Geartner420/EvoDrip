@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Klima-Evaluierung</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script src="/scripts/darkmode.js" defer></script>
+  <style>
+    :root {
+      --success-color: green;
+      --error-color: red;
+      --border-color: #888;
+      --background-dim: #f9f9f9;
+    }
+
+    .dark {
+      --success-color: #8fff8f;
+      --error-color: #ff8f8f;
+      --border-color: #666;
+      --background-dim: #1f1f1f;
+    }
+
+    .result-box {
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 6px;
+      background: var(--background-dim);
+      color: inherit;
+    }
+
+    .result-ok {
+      color: var(--success-color);
+    }
+
+    .result-fail {
+      color: var(--error-color);
+    }
+
+    .param-title {
+      font-weight: bold;
+      margin-top: 0.5em;
+    }
+
+    .dark code {
+      color: #ddd;
+    }
+    #evaluationFlex {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 1rem;
+}
+
+    .result-box {
+      flex: 1 1 300px;
+      max-width: 350px;
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+      border-radius: 6px;
+      background: var(--background-dim);
+      color: inherit;
+    }
+
+  </style>
+</head>
+<body>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
+
+  <h2>🌡️ Klima-Evaluierung</h2>
+
+<div id="evaluationFlex"><div id="evaluationContainer">⏳ Lade Klima-Auswertung...</div></div>
+
+
+  <!-- Navigationsleiste -->
+  <div class="button-bar">
+    <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
+    <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
+    <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
+    <button type="button" onclick="location.href='/system-status'">🩺 System-Status</button>
+    <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
+    <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
+    <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
+    <button type="button" onclick="location.href='/klima-control'">🌱 Klima-Automatisierung</button>
+    <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
+    <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
+    <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
+    <button type="button" onclick="location.href='/ui'">Zurück zur Übersicht</button>
+  </div>
+
+  <script>
+    let sensorNames = {};
+    async function loadSensorNames() {
+  try {
+    const res = await fetch('/api/sensor-names');
+    sensorNames = await res.json();
+  } catch (err) {
+    console.warn('[WARN] Konnte sensorNames.json nicht laden:', err);
+  }
+}
+
+async function init() {
+  await loadSensorNames();
+  fetchEvaluation();
+}
+
+init();
+
+
+    async function fetchEvaluation() {
+      try {
+        const res = await fetch('/api/climate-evaluation');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        renderEvaluation(data);
+      } catch (err) {
+        console.error('[ERROR] Fehler beim Laden der API:', err);
+        document.getElementById('evaluationContainer').innerHTML = '❌ Fehler beim Laden der Klima-Auswertung';
+      }
+    }
+
+    function renderEvaluation(data) {
+      const container = document.getElementById('evaluationFlex');
+
+      container.innerHTML = '';
+
+      if (!data || !data.evaluation) {
+        container.textContent = '❌ Keine gültige Auswertung erhalten.';
+        return;
+      }
+
+      for (const [sensor, params] of Object.entries(data.evaluation)) {
+        const box = document.createElement('div');
+        box.className = 'result-box';
+          const sensorId = sensor.match(/sensor_(\d+)\.json/)?.[1];
+          const sensorName = sensorNames?.[sensorId] || sensor;
+          const title = `<h3>📟 Sensor: <code>${sensorName}</code></h3>`;
+          const rows = Object.entries(params).map(([param, result]) => {
+          const colorClass = result.result.includes('✅') ? 'result-ok' : 'result-fail';
+          const target = `🎯 Ziel: ${result.target.min ?? '–'} – ${result.target.max ?? '–'}`;
+          const actual = `📊 Gemessen: ${result.actualAvg ?? '–'}`;
+          const suggestion = result.suggestion
+            ? `💡 Vorschlag: ${
+                result.suggestion.newMin !== undefined ? `min → ${result.suggestion.newMin} ` : ''
+              }${result.suggestion.newMax !== undefined ? `max → ${result.suggestion.newMax}` : ''}
+              ${result.suggestion._correctionRatio
+  ? `<small>(${(parseFloat(result.suggestion._correctionRatio) * 100).toFixed(0)} % Korrektur)</small>`
+  : ''}
+`
+            : '';
+
+          return `<div class="param-title">${param}:</div>
+                  <div class="${colorClass}">${result.result}</div>
+                  <div>${target}</div>
+                  <div>${actual}</div>
+                  ${suggestion ? `<div>${suggestion}</div>` : ''}<br>`;
+        }).join('');
+
+        box.innerHTML = title + rows;
+        container.appendChild(box);
+      }
+    }
+
+    fetchEvaluation();
+  </script>
+</body>
+</html>

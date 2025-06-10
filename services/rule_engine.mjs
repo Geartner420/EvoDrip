@@ -123,22 +123,22 @@ function isWithinTimeWindow(startTime, endTime) {
   return inWindow;
 }
 
-function evaluateCondition(sensorData, { param, op, value, hysteresis }, currentState) {
+function evaluateCondition(sensorData, { param, op, value, hysteresis }) {
   const actual = sensorData?.[param];
   const expected = parseFloat(value);
+  const h = parseFloat(hysteresis) || 0;
   if (actual == null || isNaN(expected)) return false;
 
-  const h = parseFloat(hysteresis) || 0;
-
   switch (op) {
-    case '>':  return currentState === 'off' ? actual > expected : actual > (expected - h);
-    case '<':  return currentState === 'off' ? actual < expected : actual < (expected + h);
-    case '>=': return currentState === 'off' ? actual >= expected : actual > (expected - h);
-    case '<=': return currentState === 'off' ? actual <= expected : actual < (expected + h);
-    case '==': return actual === expected;
+    case '>':  return actual > expected + h;
+    case '<':  return actual < expected - h;
+    case '>=': return actual >= expected + h;
+    case '<=': return actual <= expected - h;
+    case '==': return Math.abs(actual - expected) <= h;
     default:   return false;
   }
 }
+
 
 function formatConditionGroup(groups) {
   return groups
@@ -190,6 +190,7 @@ async function runRuleEngine() {
   const relays = loadJsonCached(relaysFile);
   const sensors = loadJsonCached(sensorFile);
 
+  // Zuordnung: Relaisname → IP, Sensor-ID → Sensordaten
   const relayMap = Object.fromEntries(relays.map(r => [r.name, r.ip]));
   const sensorMap = Object.fromEntries(
     sensors.filter(s => s.sensor && typeof s === 'object').map(s => [s.sensor, s])
@@ -197,80 +198,84 @@ async function runRuleEngine() {
 
   let checked = 0;
   let switched = 0;
-  const pendingStates = {};
+  const pendingStates = {}; // Zu schaltende Relais
 
-for (const rule of rules) {
-  const ruleName = rule.name || '🛠 Unbenannte Regel';
+  for (const rule of rules) {
+    const ruleName = rule.name || '🛠 Unbenannte Regel';
 
-  if (rule.enabled === false) {
-    logger.debug(`[skip] ❎ ${ruleName} → deaktiviert`);
-    continue;
-  }
+    if (rule.enabled === false) {
+      logger.debug(`[skip] ❎ ${ruleName} → deaktiviert`);
+      continue;
+    }
 
-  const relayNames = Array.isArray(rule.relays) ? rule.relays : [rule.relay];
-  const inTimeWindow = isWithinTimeWindow(rule.activeFrom, rule.activeTo);
+    const relayNames = Array.isArray(rule.relays) ? rule.relays : [rule.relay];
+    const fallbackLogic = (rule.logic || 'AND').toUpperCase();
 
-  if (!inTimeWindow) {
-    logger.debug(`[skip] 🕛 ${ruleName} → außerhalb Zeitfenster ${rule.activeFrom}-${rule.activeTo}`);
-    continue;
-  }
+    // Zeitfenster prüfen
+    const inTimeWindow = isWithinTimeWindow(rule.activeFrom, rule.activeTo);
+    if (!inTimeWindow) {
+      logger.debug(`[skip] 🕛 ${ruleName} → außerhalb Zeitfenster ${rule.activeFrom}-${rule.activeTo}`);
+      continue;
+    }
 
-  const fallbackLogic = (rule.logic || 'AND').toUpperCase();
-  const groupedConditions = groupConditions(rule.conditions, fallbackLogic);
-  logger.debug(`📐 Bedingungslogik für "${ruleName}": ${formatConditionGroup(groupedConditions)}`);
+    // Bedingungen gruppieren (z. B. für OR-Logik)
+    const groupedConditions = groupConditions(rule.conditions, fallbackLogic);
+    logger.debug(`📐 Bedingungslogik für "${ruleName}": ${formatConditionGroup(groupedConditions)}`);
 
+    // Bedingungen prüfen (ohne Relaiszustand – Hysterese direkt in evaluateCondition eingebaut)
+    const groupResults = groupedConditions.map((group, i) => {
+      const result = group.every(cond => evaluateCondition(sensorMap[cond.sensor], cond));
+      logger.debug(`🔍 Gruppe ${i + 1} von ${ruleName} → ${result ? '✅ erfüllt' : '❌ nicht erfüllt'}`);
+      return result;
+    });
 
-  const groupResults = groupedConditions.map((group, i) => {
-    const result = group.every(cond => evaluateCondition(sensorMap[cond.sensor], cond, 'off'));
-    logger.debug(`🔍 Gruppe ${i + 1} von ${ruleName} → ${result ? '✅ erfüllt' : '❌ nicht erfüllt'}`);
-    return result;
-  });
+    const shouldActivate = groupResults.some(Boolean);
+    checked++;
 
-  const shouldActivate = inTimeWindow && groupResults.some(result => result);
-  checked++;
+    if (!shouldActivate) {
+      logger.debug(`[skip] 🚫 ${ruleName} → Keine Gruppe erfüllt (${groupResults.length} Gruppen)`);
+      continue;
+    }
 
-  if (!shouldActivate) {
-    logger.debug(`[skip] 🚫 ${ruleName} → Keine Gruppe erfüllt (${groupResults.length} Gruppen)`);
-    continue;
-  }
+    logger.debug(` [Schaltung]🔥 ${ruleName} → Zeit ok, Gruppe erfüllt → Schalte: ${rule.action.toUpperCase()}`);
 
-  logger.debug(` [Schaltung]🔥 ${ruleName} → Zeit ok, Gruppe erfüllt → Schalte: ${rule.action.toUpperCase()}`);
+    // Beschreibung für Logging erzeugen
+    const passedConditionsFlat = groupedConditions
+      .flat()
+      .filter(cond => evaluateCondition(sensorMap[cond.sensor], cond));
 
-  const passedConditionsFlat = groupedConditions
-    .flat()
-    .filter(cond => evaluateCondition(sensorMap[cond.sensor], cond, 'off'));
+    const descList = passedConditionsFlat.map(cond => {
+      const sensorData = sensorMap[cond.sensor];
+      const actual = sensorData?.[cond.param];
+      const hStr = cond.hysteresis ? ` ±${cond.hysteresis}` : '';
+      const label = cond.param === 'temperature' ? '🌡' :
+                    cond.param === 'humidity' ? '💧' :
+                    cond.param === 'vpd' ? '📈' : '📊';
+      const opText = operatorMap[cond.op] || cond.op;
+      return `${label} ${cond.param} ${opText} ${cond.value}${hStr} @${cond.sensor} → aktuell: ${actual}`;
+    });
 
-  const descList = passedConditionsFlat.map(cond => {
-    const sensorData = sensorMap[cond.sensor];
-    const actual = sensorData?.[cond.param];
-    const hStr = cond.hysteresis ? ` ±${cond.hysteresis}` : '';
-    const label = cond.param === 'temperature' ? '🌡' :
-                  cond.param === 'humidity' ? '💧' :
-                  cond.param === 'vpd' ? '📈' : '📊';
-    const opText = operatorMap[cond.op] || cond.op;
-    return `${label} ${cond.param} ${opText} ${cond.value}${hStr} @${cond.sensor} → aktuell: ${actual}`;
-  });
-
-  for (const relayName of relayNames) {
-    const already = pendingStates[relayName];
-    if (already?.action === 'on') continue;
-    if (rule.action === 'on' || !already) {
-      pendingStates[relayName] = {
-        rule,
-        action: rule.action,
-        desc: descList.join(' UND/ODER ')
-      };
+    // Schaltbefehl für jedes Zielrelais vorbereiten
+    for (const relayName of relayNames) {
+      const already = pendingStates[relayName];
+      if (already?.action === 'on') continue; // ON-Befehle haben Priorität
+      if (rule.action === 'on' || !already) {
+        pendingStates[relayName] = {
+          rule,
+          action: rule.action,
+          desc: descList.join(' UND/ODER ')
+        };
+      }
     }
   }
-}
 
-
+  // Relais nun tatsächlich schalten
   for (const [relayName, { rule, action, desc }] of Object.entries(pendingStates)) {
     const ip = relayMap[relayName];
     if (!ip) continue;
 
     const actualState = await getRelayState(ip);
-    if (actualState === action) continue;
+    if (actualState === action) continue; // Keine Änderung nötig
 
     const url = getShellyUrl(ip, action);
     try {
@@ -295,6 +300,8 @@ for (const rule of rules) {
   const usedMB = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
   logger.debug(`[rule_engine] ✅ ${checked} Regeln geprüft, ${switched} geschaltet | RAM: ${usedMB} MB`);
 }
+
+
 
 let intervalRef = null;
 let tick = 0;

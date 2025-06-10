@@ -7,37 +7,49 @@ import logger from '../helper/logger.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = express.Router();
 
+const logPath = path.resolve(__dirname, '../newdrip.log');
+
+// Hilfsfunktion: Letzte X Zeilen holen
+function getLastLines(data, limit = 300) {
+  return data
+    .split('\n')
+    .filter(Boolean)
+    .reverse()
+    .slice(0, limit)
+    .reverse()
+    .join('\n');
+}
+
+// 🧾 /log → gerendertes HTML mit begrenztem Log
 router.get('/log', (req, res) => {
-  const logPath = path.resolve(__dirname, '../newdrip.log');
   fs.readFile(logPath, 'utf8', (err, data) => {
     if (err) {
       logger.error(`❌ Fehler beim Laden der Logdatei: ${err.message}`);
       return res.status(500).send('Fehler beim Laden der Logdatei.');
     }
 
-    router.get('/log/raw', (req, res) => {
-      const limit = Number(req.query.limit) || 200;
-      fs.readFile(logPath, 'utf8', (err, data) => {
-        if (err) return res.status(500).json({ error: err.message });
-        const lines = data
-          .split('\\n')
-          .filter(Boolean)
-          .reverse()        // neueste zuerst
-          .slice(0, limit);   // begrenzen
-        res.json(lines);      // Array zurück
-      });
-    });
-    
+    const limitedLog = getLastLines(data, 300)
+      .replace(/</g, '&lt;') // Sicherheit: Kein HTML einschleusen
+      .replace(/>/g, '&gt;');
 
-    const reversedLog = data
-    .split('\n')
-    .filter(line => line)
-    .reverse() // 🧠 Neueste zuerst!
-    .join('\n')
-    .replace(/</g, '&lt;');
-  
+    res.render('log', { logContent: limitedLog });
+  });
+});
 
-    res.render('log', { logContent: reversedLog });
+// 🔄 /log/raw?limit=200 → JSON-Array für API oder Live-Viewer
+router.get('/log/raw', (req, res) => {
+  const limit = Number(req.query.limit) || 200;
+  fs.readFile(logPath, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    const lines = data
+      .split('\n')
+      .filter(Boolean)
+      .reverse()
+      .slice(0, limit);
+
+    res.json(lines);
   });
 });
 

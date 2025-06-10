@@ -42,6 +42,9 @@ import { checkAllPhases } from './services/checkCropSteering.mjs'; // Crop-Steer
 
 
 // Importiere alle Route-Module für die API und UI
+import climateEvalApi from './routes/api/climateEvaluation.mjs';
+import climateEvaluationRouter from './routes/api/climateEvaluation.mjs';
+import climateEvaluationUi from './routes/ui/climateEvaluationUi.mjs';
 import sensorDataRoutes from './routes/sensorDataRoutes.mjs';
 import historyRoute from './routes/historyRoute.mjs';
 import historyViewRoute from './routes/historyView.mjs';
@@ -54,6 +57,7 @@ import chartSwitches from './routes/api/chartSwitches.mjs';
 import regelLogRouter from './routes/regelLogRoutes.mjs';
 import envUpdateRoute from './routes/updateRoute.mjs';
 import uiRoutes from './routes/uiRoutes.mjs';
+import sensorNames from './routes/api/sensorNames.mjs';
 
 // Entpacke wichtige Config-Parameter
 const {
@@ -89,11 +93,14 @@ async function startServer() {
   app.use('/api/sensors', sensorsRoutes);
   app.use('/api/sensor-status', sensorStatusRoute);
   app.use('/api/relaysRules', relayRulesRoutes);
+  app.use('/api/climate-evaluation', climateEvalApi);
   app.use('/rulelog', regelLogRouter);
   app.use('/updateEnv', envUpdateRoute);
   app.use(historyRoute);
   app.use(historyViewRoute);
   app.use('/ui', uiRoutes);
+  app.use('/climate-evaluation', climateEvaluationUi);
+  app.use('/api/sensor-names', sensorNames);
 
   // UI-Einzelseiten
   app.get('/klima-control', (req, res) => res.render('klimaControl'));

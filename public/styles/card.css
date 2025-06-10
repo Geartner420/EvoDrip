@@ -101,13 +101,31 @@ input, select {
 
 /* ========== Buttons ========== */
 .button-bar {
+  bottom: 0;
+  background: var(--bg-color);
+  padding: 10px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  max-width: 1100px;
   gap: 12px;
-  margin: auto;
-  padding: 10px;
+  width: 100%;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: auto; /* macht, dass sie unten im Layout klebt */
+}
+
+
+.button-bar button,
+.button-bar .button {
+  background: var(--button-bg);
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+  transition: background-color 0.3s;
 }
 
 button {
@@ -387,5 +405,20 @@ html.dark .card {
   .button-bar {
     padding: 8px;
   }
+ }
 
-}
+ @media (min-width: 1024px) {
+ 
+    .button-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  body {
+    padding-bottom: 125px; /* Platz für fixe Leiste */
+  }
+  }

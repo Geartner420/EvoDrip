@@ -95,7 +95,7 @@
     let historyData = {};
     let selectedSensor = '';
     let selectedMetric = 'vpd';
-    let aggregationInterval = 10;
+    let aggregationInterval = 30;
 
     const metricDefinitions = {
       vpd: '🌬️ VPD',
@@ -304,7 +304,7 @@ function filterWithQuarantine(data, metric, windowSize = 50, tolerance = 0.5, qu
 
 
 
-function aggregateByInterval(data, metric, intervalMinutes = 10) {
+function aggregateByInterval(data, metric, intervalMinutes) {
   const filterSpikes = document.getElementById('filterSpikesCheckbox')?.checked;
 
   // Werte vorbereiten (timestamp + metric-Wert)
@@ -399,6 +399,7 @@ if (filterSpikes) {
     <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
     <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
     <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
+    <button type="button" onclick="location.href='/climate-evaluation'">Klima-Evaluation</button>
     <button type="button" onclick="location.href='/ui'">Zur Übersicht</button>
   </div>
 </body>
