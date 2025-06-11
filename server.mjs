@@ -25,7 +25,7 @@ if (!fs.existsSync(sensorDataDir)) {
 }
 
 // Lade alle relevanten Services und Hilfsmodule
-import { loadState, saveState } from './services/stateService.mjs';
+import { loadState, loadStateLegacy, saveState } from './services/stateService.mjs';
 import { loadMoistureData, saveMoistureData } from './services/moistureService.mjs';
 import { fetchMoisture } from './services/fytaservice.mjs';
 import { triggerShelly } from './services/shellyService.mjs';
@@ -39,6 +39,8 @@ import { startRuleEngine } from './services/rule_engine.mjs';
 import { controlRelays } from './services/umluftContol.mjs';
 import config from './helper/config.mjs';
 import { checkAllPhases } from './services/checkCropSteering.mjs'; // Crop-Steering!
+import { sendPhaseSummary } from './services/phaseSummaryReporter.mjs';
+
 
 
 // Importiere alle Route-Module für die API und UI
@@ -58,6 +60,7 @@ import regelLogRouter from './routes/regelLogRoutes.mjs';
 import envUpdateRoute from './routes/updateRoute.mjs';
 import uiRoutes from './routes/uiRoutes.mjs';
 import sensorNames from './routes/api/sensorNames.mjs';
+import umluftConfigRouter from './routes/api/umluftConfig.mjs';
 
 // Entpacke wichtige Config-Parameter
 const {
@@ -101,6 +104,7 @@ async function startServer() {
   app.use('/ui', uiRoutes);
   app.use('/climate-evaluation', climateEvaluationUi);
   app.use('/api/sensor-names', sensorNames);
+  app.use('/api/umluft-config', umluftConfigRouter);
 
   // UI-Einzelseiten
   app.get('/klima-control', (req, res) => res.render('klimaControl'));
@@ -133,7 +137,7 @@ async function startServer() {
   });
 
   // Interne Initialisierung: Lese letzten Trigger, lade Daten, Routen etc.
-  let lastTriggerTime = loadState();
+  let lastTriggerTime = loadStateLegacy();
   loadMoistureData();
   await loadRoutes(app, path.join(__dirname, 'routes'));
 
@@ -221,6 +225,16 @@ async function main() {
     process.exit(1);
   }
 }
+    loadState();
+
+    // Beispiel: um 13:00 jeden Tag
+    setInterval(() => {
+      const now = new Date();
+      if (now.getHours() === 13 && now.getMinutes() === 0) {
+        sendPhaseSummary('P1');
+        saveState(); // nach dem Reset speichern
+      }
+    }, 60_000);
 
 main();
 setInterval(() => {saveMoistureData()}, 600000); // Speichere Feuchtigkeitsdaten alle 10 Minuten

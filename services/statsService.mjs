@@ -71,3 +71,8 @@ export function resetTodayStats() {
   stats.lastReset = new Date().toISOString();
   saveStats(stats);
 }
+
+export function getTodayWaterCount() {
+  const stats = loadStats();
+  return stats.dayWaterCount ?? 0;
+}

@@ -14,11 +14,14 @@ function getLastLines(data, limit = 300) {
   return data
     .split('\n')
     .filter(Boolean)
-    .reverse()
+    .reverse()  // ⬅️ neueste oben
     .slice(0, limit)
-    .reverse()
+    .map(line =>
+      line.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    )
     .join('\n');
 }
+
 
 // 🧾 /log → gerendertes HTML mit begrenztem Log
 router.get('/log', (req, res) => {

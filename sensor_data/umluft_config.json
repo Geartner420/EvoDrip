@@ -1,9 +1,9 @@
 {
   "global": {
-    "initialOffset": 120000,
-    "minOn": 120000,
+    "initialOffset": 60000,
+    "minOn": 60000,
     "maxOn": 480000,
-    "minOff": 120000,
+    "minOff": 60000,
     "maxOff": 300000,
     "simultaneousCycleInterval": 5
   },

@@ -6,58 +6,183 @@
   <title>Umluft-Automatik</title>
   <link rel="stylesheet" href="/styles/main.css" />
   <script src="/scripts/darkmode.js" defer></script>
+  <style>
+
+    .field-group input {
+      padding: 6px;
+      margin-top: 5px;
+    }
+    #relay-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .relay-item {
+      background: var(--card-bg, #222);
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      min-width: 200px;
+      gap: 10px;
+    }
+    .relay-item input {
+      padding: 6px;
+    }
+.relay-item button {
+  background: #b00020;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+.relay-item button:hover {
+  background: #d32f2f;
+}
+form button {
+  background: var(--button-bg);
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+form button:hover {
+  background: var(--button-hover);
+}
+
+ 
+  </style>
 </head>
 <body>
   <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
-  <h2>Umluft-Automatik</h2>
+  <h2 style="text-align: center;">Umluft-Automatik</h2>
 
-  <form method="POST" action="/start-relay-cycle">
-    <div class="form-container">
+  <form onsubmit="saveConfig(event)">
+    <div class="form-container-uL">
       <div class="field-group">
         <label for="initialOffset">Initialer Versatz (Minuten):</label>
-        <input type="number" id="initialOffset" name="initialOffset" value="2" step="1" />
+        <input type="number" id="initialOffset" step="1" />
       </div>
-
       <div class="field-group">
         <label for="minOnDuration">Min. Einschaltzeit (Minuten):</label>
-        <input type="number" id="minOnDuration" name="minOnDuration" value="4" step="0.1" />
+        <input type="number" id="minOnDuration" step="0.1" />
       </div>
-
       <div class="field-group">
         <label for="maxOnDuration">Max. Einschaltzeit (Minuten):</label>
-        <input type="number" id="maxOnDuration" name="maxOnDuration" value="8" step="0.1" />
+        <input type="number" id="maxOnDuration" step="0.1" />
       </div>
-
       <div class="field-group">
         <label for="minOffDuration">Min. Ausschaltzeit (Minuten):</label>
-        <input type="number" id="minOffDuration" name="minOffDuration" value="2" step="0.1" />
+        <input type="number" id="minOffDuration" step="0.1" />
       </div>
-
       <div class="field-group">
         <label for="maxOffDuration">Max. Ausschaltzeit (Minuten):</label>
-        <input type="number" id="maxOffDuration" name="maxOffDuration" value="5" step="0.1" />
+        <input type="number" id="maxOffDuration" step="0.1" />
       </div>
-
       <div class="field-group">
         <label for="simultaneousCycleInterval">Zyklen bis simultanes Einschalten:</label>
-        <input type="number" id="simultaneousCycleInterval" name="simultaneousCycleInterval" value="5" step="1" min="5" max="20" />
+        <input type="number" id="simultaneousCycleInterval" min="1" step="1" />
       </div>
     </div>
 
-    <div class="button-bar">
-      <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
-      <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
-      <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
-      <button type="button" onclick="location.href='/system-status'">🩺 System-Status</button>
-      <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
-      <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
-      <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
-      <button type="button" onclick="location.href='/klima-control'">🌱 Klima-Automatisierung</button>
-      <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
-      <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
-      <button type="button" onclick="location.href='/climate-evaluation'">Klima-Evaluation</button>
-      <button type="button" onclick="location.href='/ui'">Zur Übersicht</button>
+    <h3 style="text-align: center;">Relais-Konfiguration</h3>
+    <div id="relay-list"></div>
+    <div style="text-align: center; margin: 10px 0;">
+      <button type="button" onclick="addRelay()">➕ Relais hinzufügen</button>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <button type="submit">💾 Konfiguration speichern</button>
     </div>
   </form>
+
+  <div class="button-bar">
+    <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
+    <button type="button" onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
+    <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
+    <button type="button" onclick="location.href='/system-status'">🩺 System-Status</button>
+    <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
+    <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
+    <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
+    <button type="button" onclick="location.href='/klima-control'">🌱 Klima-Automatisierung</button>
+    <button type="button" onclick="location.href='/rulelog'">📋 Regel-Log</button>
+    <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
+    <button type="button" onclick="location.href='/climate-evaluation'">Klima-Evaluation</button>
+    <button type="button" onclick="location.href='/ui'">Zur Übersicht</button>
+  </div>
+
+  <script>
+    async function loadConfig() {
+      try {
+        const res = await fetch('/api/umluft-config');
+        const data = await res.json();
+
+        document.getElementById('initialOffset').value = data.global.initialOffset / 60000;
+        document.getElementById('minOnDuration').value = data.global.minOn / 60000;
+        document.getElementById('maxOnDuration').value = data.global.maxOn / 60000;
+        document.getElementById('minOffDuration').value = data.global.minOff / 60000;
+        document.getElementById('maxOffDuration').value = data.global.maxOff / 60000;
+        document.getElementById('simultaneousCycleInterval').value = data.global.simultaneousCycleInterval;
+
+        const relayList = document.getElementById('relay-list');
+        relayList.innerHTML = '';
+        data.relays.forEach(relay => addRelay(relay.name, relay.ip));
+      } catch (err) {
+        console.error('❌ Fehler beim Laden der Konfiguration:', err);
+      }
+    }
+
+    function addRelay(name = '', ip = '') {
+      const div = document.createElement('div');
+      div.className = 'relay-item';
+      div.innerHTML = `
+        <input type="text" placeholder="Name" value="${name}" />
+        <input type="text" placeholder="IP-Adresse" value="${ip}" />
+        <button type="button" onclick="this.parentElement.remove()">❌</button>
+      `;
+      document.getElementById('relay-list').appendChild(div);
+    }
+
+    async function saveConfig(event) {
+      event.preventDefault();
+
+      const relays = Array.from(document.querySelectorAll('.relay-item')).map(item => ({
+        name: item.querySelector('input[placeholder="Name"]').value,
+        ip: item.querySelector('input[placeholder="IP-Adresse"]').value
+      }));
+
+      const global = {
+        initialOffset: +document.getElementById('initialOffset').value * 60000,
+        minOn: +document.getElementById('minOnDuration').value * 60000,
+        maxOn: +document.getElementById('maxOnDuration').value * 60000,
+        minOff: +document.getElementById('minOffDuration').value * 60000,
+        maxOff: +document.getElementById('maxOffDuration').value * 60000,
+        simultaneousCycleInterval: +document.getElementById('simultaneousCycleInterval').value
+      };
+
+      try {
+        await fetch('/api/umluft-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ global, relays })
+        });
+        alert('✅ Konfiguration gespeichert');
+      } catch (err) {
+        alert('❌ Fehler beim Speichern');
+        console.error(err);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadConfig);
+  </script>
 </body>
 </html>
