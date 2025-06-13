@@ -5,28 +5,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bodenfeuchtigkeitsdaten</title>
   <link rel="stylesheet" href="/styles/main.css" />
+  <style>
+    .sparkline {
+      width: 100%;
+      height: 30px;
+      margin-top: 4px;
+    }
+  </style>
 </head>
 <body>
   <button class="dark-toggle" onclick="toggleDarkMode()">🌗</button>
   <h1>🌱 Bodenfeuchtigkeitsdaten</h1>
+
   <div class="card-container-data">
-    <% function card(title, value, tooltip) { 
-         const bg = getBackgroundForValue(value);
-         const fg = getColorForValue(value); %>
-      <div class="card-data" style="background-color: <%= bg %>;" title="<%= tooltip || '' %>">
-        <div class="card-title"><%= title %></div>
-        <div class="card-value" style="color: <%= fg %>;">
-          <%= value != null ? value + '%' : 'Keine Daten' %>
-        </div>
-      </div>
+
+    <% if (avgTrendValues && avgTrendValues.length > 1) {
+         const trendData = avgTrendValues.filter(v => v != null);
+         const max = Math.max(...trendData);
+         const min = Math.min(...trendData);
+         const range = max - min || 1;
+         const step = 100 / (trendData.length - 1);
+    %>
+    <div class="card-data" style="background-color: rgba(150,200,255,0.1);" title="Geglätteter Verlauf auf Basis mehrerer Mittelwerte">
+      <div class="card-title">Trend (geglättet)</div>
+      <svg class="sparkline" viewBox="0 0 100 30" preserveAspectRatio="none">
+        <path d="
+          <% for (let i = 0; i < trendData.length; i++) {
+               const x = (step * i).toFixed(2);
+               const y = (30 - ((trendData[i] - min) / range * 30)).toFixed(2);
+               if (i === 0) { %>M <%= x %> <%= y %>
+               <% } else { %>L <%= x %> <%= y %><% }
+             } %>"
+          fill="none" stroke="steelblue" stroke-width="1.5" />
+      </svg>
+    </div>
     <% } %>
 
-    <% card('Letzter Wert', lastEntry?.value, 'Letzte Messung vom Sensor'); %>
-    <% card('Durchschnitt letzte 10', averages.last10, 'Berechnet aus den letzten 10 Werten'); %>
-    <% card('Durchschnitt letzte 50', averages.last50, 'Berechnet aus den letzten 50 Werten'); %>
-    <% card('Durchschnitt letzte 100', averages.last100, 'Berechnet aus den letzten 100 Werten'); %>
-    <% card('Minimum', min, 'Tiefster aufgezeichneter Wert'); %>
-    <% card('Maximum', max, 'Höchster aufgezeichneter Wert'); %>
+    <% const cards = [
+      { title: 'Durchschnitt letzte 10', value: averages.last10, tooltip: 'Letzte 10 Werte', data: valuesLast10 },
+      { title: 'Durchschnitt letzte 50', value: averages.last50, tooltip: 'Letzte 50 Werte', data: valuesLast50 },
+      { title: 'Durchschnitt letzte 100', value: averages.last100, tooltip: 'Letzte 100 Werte', data: valuesLast100 },
+      { title: 'Letzter Wert', value: lastEntry?.value, tooltip: 'Letzte Messung vom Sensor', data: null },
+      { title: 'Minimum', value: min, tooltip: 'Tiefster Wert', data: null },
+      { title: 'Maximum', value: max, tooltip: 'Höchster Wert', data: null }
+    ]; %>
+
+    <% cards.forEach(c => { 
+         const bg = getBackgroundForValue(c.value);
+         const fg = getColorForValue(c.value);
+    %>
+      <div class="card-data" style="background-color: <%= bg %>;" title="<%= c.tooltip %>">
+        <div class="card-title"><%= c.title %></div>
+        <div class="card-value" style="color: <%= fg %>;"><%= c.value != null ? c.value + '%' : 'Keine Daten' %></div>
+        <% if (c.data && c.data.length > 1) {
+             const max = Math.max(...c.data);
+             const min = Math.min(...c.data);
+             const range = max - min || 1;
+             const step = 100 / (c.data.length - 1);
+        %>
+        <svg class="sparkline" viewBox="0 0 100 30" preserveAspectRatio="none">
+          <path d="
+            <% for (let i = 0; i < c.data.length; i++) {
+                 const x = (step * i).toFixed(2);
+                 const y = (30 - ((c.data[i] - min) / range * 30)).toFixed(2);
+                 if (i === 0) { %>M <%= x %> <%= y %>
+                 <% } else { %>L <%= x %> <%= y %><% }
+               } %>"
+            fill="none" stroke="<%= fg %>" stroke-width="1.5" />
+        </svg>
+        <% } %>
+      </div>
+    <% }); %>
 
     <div class="card-data" style="background-color: rgba(200,200,200,0.3);" title="Erste gespeicherte Messung">
       <div class="card-title">Messung seit</div>
@@ -36,35 +85,34 @@
     </div>
   </div>
 
-
   <script>
     function toggleDarkMode() {
       document.documentElement.classList.toggle('dark');
       localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
     }
-
     (function () {
       if (localStorage.getItem('theme') === 'dark') {
         document.documentElement.classList.add('dark');
       }
     })();
   </script>
-    <div class="button-bar">
-        <a class="button" type ="button" href="/moisture-data/export-latest500">⬇️ Letzte 500 speichern</a>
-        <a class="button" type="button" href="/moisture-data/export-all">⬇️ Alle speichern</a>
-      <button type="button" onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
-      <button type="button" onclick="location.href='/log'">📜 Logbuch</button>
-      <button type="button" onclick="location.href='/system-status'">🩺 System-Status</button>
-      <button type="button" onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
-      <button type="button" onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
-      <button type="button" onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
-      <button type="button" onclick="location.href='/klima-control'">🌱 Klima-Automatisierung</button>
-      <button type="button" onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
-      <button type="button" onclick="location.href='/rulelog'">Regel-Log</button>
-      <button type="button" onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
-      <button type="button" onclick="location.href='/climate-evaluation'">Klima-Evaluation</button>
-      <button type="button" onclick="location.href='/ui'">Zur Übersicht</button>
-    </div>
-  </body>
+
+  <div class="button-bar">
+    <a class="button" href="/moisture-data/export-latest500">⬇️ Letzte 500 speichern</a>
+    <a class="button" href="/moisture-data/export-all">⬇️ Alle speichern</a>
+    <button onclick="location.href='/chart'">📈 Bodenfeuchte-Diagramm</button>
+    <button onclick="location.href='/moisture-data'">💧 Bodenfeuchte-Datenbank</button>
+    <button onclick="location.href='/log'">📜 Logbuch</button>
+    <button onclick="location.href='/rulelog'">Regel-Log</button>
+    <button onclick="location.href='/system-status'">🩺 System-Status</button>
+    <button onclick="location.href='/stats'">🔢 Bewässerungs-Zähler</button>
+    <button onclick="location.href='/sensordata'">🌡️💧 Temperatur-Feuchtigkeits-Diagramme</button>
+    <button onclick="location.href='/dashboard/history'">🌡️💧 Klima-Diagramme</button>
+    <button onclick="location.href='/klima-control'">🌱 Klima-Automatisierung</button>
+    <button onclick="location.href='/relay-cycle'">🌬️ Umluft-Automatik</button>
+    <button onclick="location.href='/combined-dashboard'">Combi-Dashboard</button>
+    <button onclick="location.href='/climate-evaluation'">Klima-Evaluation</button>
+    <button onclick="location.href='/ui'">📁 Zur Übersicht</button>
+  </div>
 </body>
 </html>

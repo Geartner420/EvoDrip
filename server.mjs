@@ -1,3 +1,6 @@
+//server.mjs
+// Haupt-Server für das Klima-Management-System
+
 import logger from './helper/logger.mjs';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -27,8 +30,6 @@ if (!fs.existsSync(sensorDataDir)) {
 // Lade alle relevanten Services und Hilfsmodule
 import { loadState, loadStateLegacy, saveState } from './services/stateService.mjs';
 import { loadMoistureData, saveMoistureData } from './services/moistureService.mjs';
-import { fetchMoisture } from './services/fytaservice.mjs';
-import { triggerShelly } from './services/shellyService.mjs';
 import { checkAndWater } from './services/wateringService.mjs';
 import { buildWateringOptions } from './helper/wateringOptions.mjs';
 import { buildMineralWateringOptions } from './helper/mineralWateringOptions.mjs';
@@ -45,7 +46,6 @@ import { sendPhaseSummary } from './services/phaseSummaryReporter.mjs';
 
 // Importiere alle Route-Module für die API und UI
 import climateEvalApi from './routes/api/climateEvaluation.mjs';
-import climateEvaluationRouter from './routes/api/climateEvaluation.mjs';
 import climateEvaluationUi from './routes/ui/climateEvaluationUi.mjs';
 import sensorDataRoutes from './routes/sensorDataRoutes.mjs';
 import historyRoute from './routes/historyRoute.mjs';
@@ -61,6 +61,7 @@ import envUpdateRoute from './routes/updateRoute.mjs';
 import uiRoutes from './routes/uiRoutes.mjs';
 import sensorNames from './routes/api/sensorNames.mjs';
 import umluftConfigRouter from './routes/api/umluftConfig.mjs';
+import statsRoute from './routes/statsRoute.mjs';
 
 // Entpacke wichtige Config-Parameter
 const {
@@ -105,6 +106,7 @@ async function startServer() {
   app.use('/climate-evaluation', climateEvaluationUi);
   app.use('/api/sensor-names', sensorNames);
   app.use('/api/umluft-config', umluftConfigRouter);
+  app.use('/stats', statsRoute);
 
   // UI-Einzelseiten
   app.get('/klima-control', (req, res) => res.render('klimaControl'));
@@ -179,7 +181,7 @@ async function startServer() {
     setInterval(() => checkAndWater(wateringOptions), config.CHECK_INTERVAL_MINUTES * 60_000);
   } else if (config.WATERING_MODE === 'mineralisch') {
     logger.info('🔵 Mineralischer Gießmodus (Crop Steering) aktiv');
-    checkAllPhases(); // ruft automatisch P1, P2, P3
+    await checkAllPhases(); // ruft automatisch P1, P2, P3
     setInterval(() => checkAllPhases(), config.CHECK_INTERVAL_MINUTES * 60_000);
   }
 

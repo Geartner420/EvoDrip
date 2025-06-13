@@ -1,10 +1,10 @@
 import express from 'express';
-import { loadStats } from '../services/statsService.mjs';
+import { getStats, resetTodayStats } from '../services/statsService.mjs';
 
 const router = express.Router();
 
-router.get('/stats', (req, res) => {
-  const stats = loadStats();
+router.get('/', (req, res) => {
+  const stats = getStats();
   res.render('stats', {
     nightWaterCount: stats.nightWaterCount,
     dayWaterCount: stats.dayWaterCount,
@@ -12,6 +12,11 @@ router.get('/stats', (req, res) => {
     dayWatering: stats.dayWatering,
     lastReset: stats.lastReset || null
   });
+});
+
+router.post('/reset', (req, res) => {
+  resetTodayStats();
+  res.redirect('/stats');
 });
 
 export default router;

@@ -1,5 +1,7 @@
 {
-  "nightWaterCount": 0,
   "dayWaterCount": 0,
-  "dayWatering": 6228
+  "nightWaterCount": 0,
+  "dayWatering": 2376,
+  "nightWatering": 0,
+  "lastReset": "2025-06-13"
 }

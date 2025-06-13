@@ -12,6 +12,10 @@ function calculateAverage(data, count) {
   return (sum / sliced.length).toFixed(1);
 }
 
+function extractLastValues(data, count) {
+  return data.slice(-count).map(entry => entry.value);
+}
+
 function findMinMax(data) {
   if (data.length === 0) return { min: null, max: null };
   let min = data[0].value;
@@ -57,8 +61,8 @@ function getBackgroundForValue(value) {
 // Hauptroute
 router.get('/moisture-data', (req, res) => {
   const history = getMoistureHistory();
-  const lastEntry = history.length > 0 ? history[history.length - 1] : null;
-  const firstEntry = history.length > 0 ? history[0] : null;
+  const lastEntry = history.at(-1) || null;
+  const firstEntry = history[0] || null;
 
   const averages = {
     last10: calculateAverage(history, 10),
@@ -66,7 +70,16 @@ router.get('/moisture-data', (req, res) => {
     last100: calculateAverage(history, 100),
   };
 
+  const valuesLast10 = extractLastValues(history, 10);
+  const valuesLast50 = extractLastValues(history, 50);
+  const valuesLast100 = extractLastValues(history, 100);
+
   const { min, max } = findMinMax(history);
+
+  const trendSteps = [10, 30, 50, 100, 200, 300];
+  const avgTrendValues = trendSteps
+    .map(n => calculateAverage(history, n))
+    .map(v => v !== null ? parseFloat(v) : null);
 
   res.render('moistureData', {
     lastEntry,
@@ -74,12 +87,16 @@ router.get('/moisture-data', (req, res) => {
     min,
     max,
     firstEntry,
+    valuesLast10,
+    valuesLast50,
+    valuesLast100,
+    avgTrendValues,
     getColorForValue,
     getBackgroundForValue
   });
 });
 
-// CSV Export-Routen (unverändert)
+// CSV Export-Routen
 router.get('/moisture-data/export-latest500', (req, res) => {
   const history = getMoistureHistory();
   const latest500 = history.slice(-500);

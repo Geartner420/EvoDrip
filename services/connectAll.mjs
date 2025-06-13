@@ -13,7 +13,7 @@ const DATA_DIR = path.join(__dirname, '../sensor_data');
 const OFFLINE_TIMEOUT_MS = 4 * 60 * 60 * 1000; // 4 Stunden
 const OFFLINE_CHECK_INTERVAL_MS = 10 * 60 * 1000; // 10 Minuten
 const WRITE_THROTTLE_MS = 20_000;
-const MAX_SENSOR_CACHE = 500;  // max Anzahl Sensorspeicher
+const MAX_SENSOR_CACHE = 500;
 
 let noble;
 const offlineNotified = new Set();
@@ -22,7 +22,7 @@ const lastUpdateTime = new Map();
 const latestValues = new Map();
 let sensorCounter = 1;
 
-// ================== Sensor-ID Zuordnung ===================
+// ========== Sensor-ID-Zuordnung ==========
 function loadSensorIdMapping() {
   if (fs.existsSync(ID_FILE)) {
     try {
@@ -51,54 +51,60 @@ function saveSensorIdMapping() {
   logger.debug('💾 sensor_ids.json gespeichert');
 }
 
-// ================== Sensordaten speichern ===================
+// ========== Sensordaten speichern ==========
 function writeSensorData(sensorId, data) {
   const now = Date.now();
   const lastWrite = lastUpdateTime.get(sensorId) || 0;
   if (now - lastWrite < WRITE_THROTTLE_MS) return;
-
   lastUpdateTime.set(sensorId, now);
 
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
   const file = path.join(DATA_DIR, `sensor_${sensorId}.json`);
+  const tmpFile = file + '.tmp';
   let existingData = [];
 
   try {
     if (fs.existsSync(file)) {
-      const raw = fs.readFileSync(file);
+      const raw = fs.readFileSync(file, 'utf-8');
       existingData = JSON.parse(raw);
       if (!Array.isArray(existingData)) existingData = [];
     }
   } catch (err) {
-    logger.error(`❌ Fehler beim Lesen ${file}:`, err.message);
+    logger.error(`❌ Fehler beim Lesen von ${file}: ${err.message}`);
+    existingData = [];
   }
 
   existingData.push(data);
-  if (existingData.length > 200000) existingData = existingData.slice(-200000);
+  if (existingData.length > 200_000) {
+    existingData = existingData.slice(-200_000);
+  }
 
-  const tmpFile = file + '.tmp';
   try {
     fs.writeFileSync(tmpFile, JSON.stringify(existingData, null, 2), 'utf-8');
-  } catch (err) {
-    logger.error(`❌ Fehler beim Schreiben von ${tmpFile}: ${err.message}`);
-    return;
-  }
 
-  try {
-    if (fs.existsSync(tmpFile)) {
-      fs.renameSync(tmpFile, file);
-      logger.debug(`💾 Gespeichert in ${file}`);
-    } else {
-      logger.warn(`⚠️ Temporäre Datei ${tmpFile} nicht gefunden – kein Rename.`);
+    const start = Date.now();
+    while (Date.now() - start < 10); // 10ms Delay für Windows-Sync
+
+    if (!fs.existsSync(tmpFile)) {
+      logger.warn(`⚠️ Temporäre Datei ${tmpFile} wurde nicht gefunden, obwohl gerade geschrieben – Rename abgebrochen.`);
+      return;
     }
-  } catch (err) {
-    logger.error(`❌ Fehler beim Umbenennen ${tmpFile} → ${file}: ${err.message}`);
-  }
 
-  
+    fs.renameSync(tmpFile, file);
+    logger.debug(`💾 Sensor ${sensorId} erfolgreich in ${file} gespeichert.`);
+
+  } catch (err) {
+    logger.error(`❌ Fehler beim Schreiben oder Umbenennen von ${tmpFile} → ${file}: ${err.message}`);
+    try {
+      if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile);
+    } catch (e2) {
+      logger.warn(`⚠️ Konnte temporäre Datei ${tmpFile} nicht entfernen: ${e2.message}`);
+    }
+  }
 }
 
+// ========== BLE-Daten entschlüsseln ==========
 function decodeAdvertisement(manufacturerData) {
   if (!manufacturerData || manufacturerData.length < 7) return null;
   const tempRaw = manufacturerData.readUInt16LE(1);
@@ -111,6 +117,7 @@ function decodeAdvertisement(manufacturerData) {
   };
 }
 
+// ========== Offline-Erkennung ==========
 function checkForOfflineSensors() {
   const now = Date.now();
 
@@ -137,10 +144,24 @@ function checkForOfflineSensors() {
 
 setInterval(checkForOfflineSensors, OFFLINE_CHECK_INTERVAL_MS);
 
-// ================== Main BLE Init ===================
+// ========== Hauptfunktion BLE ==========
 export async function cta() {
   loadSensorIdMapping();
-    if (global.bleStarted) {
+  // Vor dem Start: alte .tmp-Dateien aufräumen
+try {
+  const files = fs.readdirSync(DATA_DIR);
+  for (const file of files) {
+    if (file.endsWith('.tmp')) {
+      const fullPath = path.join(DATA_DIR, file);
+      fs.unlinkSync(fullPath);
+      logger.warn(`🧹 Entfernte veraltete temporäre Datei: ${file}`);
+    }
+  }
+} catch (err) {
+  logger.error(`❌ Fehler beim Aufräumen von .tmp-Dateien: ${err.message}`);
+}
+
+  if (global.bleStarted) {
     logger.info('[BLE] Schon aktiv – kein erneuter Start');
     return;
   }
@@ -183,7 +204,6 @@ export async function cta() {
     const decoded = decodeAdvertisement(manufacturerData);
     if (!decoded) return;
 
-        // Speicherbegrenzung
     if (latestValues.size >= MAX_SENSOR_CACHE) {
       const oldest = latestValues.keys().next().value;
       latestValues.delete(oldest);
@@ -198,7 +218,7 @@ export async function cta() {
   });
 }
 
-// ================== Zugriff für andere Module ===================
+// ========== Externe Datenzugriffe ==========
 export function getLatestSensorValues() {
   const result = {};
   const files = fs.readdirSync(DATA_DIR);
@@ -215,15 +235,16 @@ export function getLatestSensorValues() {
         result[sensorId] = data[data.length - 1];
       }
     } catch (err) {
-      logger.error(`❌ Fehler beim Parsen von ${file}:`, err.message);
+      logger.error(`❌ Fehler beim Parsen von ${file}: ${err.message}`);
     }
   }
 
   return result;
 }
+
 export { loadSensorIdMapping, saveSensorIdMapping };
 
-// ================== Speicherdiagnose alle 10 Min ===================
+// ========== Diagnose-Memorylog ==========
 setInterval(() => {
   const mb = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
   logger.info(`[MEM] Heap-Nutzung: ${mb} MB`);

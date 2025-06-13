@@ -1,78 +1,103 @@
-// services/statsService.mjs
 import fs from 'fs';
 import path from 'path';
 import logger from '../helper/logger.mjs';
 
 const STATS_FILE = path.resolve('./sensor_data', 'wateringStats.json');
 
-export function loadStats() {
+let stats = {
+  dayWaterCount: 0,
+  nightWaterCount: 0,
+  dayWatering: 0,
+  nightWatering: 0,
+  lastReset: null
+};
+
+function getTodayDate() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function ensureStatsLoaded() {
   try {
     if (fs.existsSync(STATS_FILE)) {
       const raw = fs.readFileSync(STATS_FILE, 'utf-8');
-      return JSON.parse(raw);
+      stats = { ...stats, ...JSON.parse(raw) };
     }
   } catch (err) {
     logger.error('❌ Fehler beim Laden der Stats:', err.message);
   }
-  return {
-    dayWaterCount: 0,
-    nightWaterCount: 0,
-    dayWatering: 0,
-    nightWatering: 0,
-    lastReset: null
-  };
 }
 
-export function saveStats(stats) {
-  try {
-    fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2));
-  } catch (err) {
-    logger.error('❌ Fehler beim Speichern der Stats:', err.message);
+function ensureDailyReset() {
+  const today = getTodayDate();
+  if (stats.lastReset !== today) {
+    logger.info(`📆 Stats-Reset für neuen Tag (${today})`);
+    stats.dayWaterCount = 0;
+    stats.dayWatering = 0;
+    stats.lastReset = today;
+    saveStats();
   }
 }
 
-// === Deine bestehenden Exports ===
+function saveStats() {
+  try {
+    fs.writeFile(STATS_FILE, JSON.stringify(stats, null, 2), err => {
+      if (err) {
+        logger.error(`❌ Fehler beim Speichern der Stats: ${err.message}`);
+      }
+    });
+  } catch (err) {
+    logger.error(`❌ Fehler beim Schreiben der Stats: ${err.message}`);
+  }
+}
+
+// ========== Öffentliche API ==========
 
 export function incrementDayWater() {
-  const stats = loadStats();
+  ensureDailyReset();
   stats.dayWaterCount += 1;
-  saveStats(stats);
+  saveStats();
 }
 
 export function incrementNightWater() {
-  const stats = loadStats();
   stats.nightWaterCount += 1;
-  saveStats(stats);
+  saveStats();
 }
 
-// === Ergänzt: Menge hinzufügen ===
-
 export function incrementDayWatering(amount) {
-  const stats = loadStats();
+  ensureDailyReset();
   stats.dayWatering += amount;
-  saveStats(stats);
+  saveStats();
 }
 
 export function incrementNightWatering(amount) {
-  const stats = loadStats();
   stats.nightWatering += amount;
-  saveStats(stats);
+  saveStats();
 }
 
 export function getTodayTotalWater() {
-  const stats = loadStats();
+  ensureDailyReset();
   return stats.dayWatering;
 }
 
-export function resetTodayStats() {
-  const stats = loadStats();
-  stats.dayWaterCount = 0;
-  stats.dayWatering = 0;
-  stats.lastReset = new Date().toISOString();
-  saveStats(stats);
+export function getTodayWaterCount() {
+  ensureDailyReset();
+  return stats.dayWaterCount;
 }
 
-export function getTodayWaterCount() {
-  const stats = loadStats();
-  return stats.dayWaterCount ?? 0;
+export function resetTodayStats() {
+  const today = getTodayDate();
+  stats.dayWaterCount = 0;
+  stats.dayWatering = 0;
+  stats.lastReset = today;
+  saveStats();
+  logger.info('♻️ Tages-Wasserstatistik manuell zurückgesetzt.');
 }
+
+export function getStats() {
+  ensureDailyReset();
+  return { ...stats };
+}
+
+// Initial laden bei Modulstart
+ensureStatsLoaded();
+ensureDailyReset();
